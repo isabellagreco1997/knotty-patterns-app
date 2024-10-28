@@ -7,23 +7,23 @@ import BlogPreview from '../components/BlogPreview';
 
 const carouselImages = [
   {
-    url: "https://images.unsplash.com/photo-1615646589661-0e7bc0b2b6c3?auto=format&fit=crop&q=80&w=2000",
+    url: "https://images.pexels.com/photos/7585853/pexels-photo-7585853.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     alt: "Colorful crochet blanket"
   },
   {
-    url: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&q=80&w=2000",
+    url: "https://images.pexels.com/photos/10585181/pexels-photo-10585181.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     alt: "Crochet amigurumi toys"
   },
   {
-    url: "https://images.unsplash.com/photo-1612870466688-277d0f8f5082?auto=format&fit=crop&q=80&w=2000",
+    url: "https://images.pexels.com/photos/10585328/pexels-photo-10585328.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     alt: "Crochet supplies and yarn"
   },
   {
-    url: "https://images.unsplash.com/photo-1604940500627-d3f44d1d21c7?auto=format&fit=crop&q=80&w=2000",
+    url: "https://images.pexels.com/photos/10585047/pexels-photo-10585047.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     alt: "Handmade crochet items"
   },
   {
-    url: "https://images.unsplash.com/photo-1582838038154-a88f9a755f89?auto=format&fit=crop&q=80&w=2000",
+    url: "https://images.pexels.com/photos/10585168/pexels-photo-10585168.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     alt: "Crochet work in progress"
   }
 ];
@@ -146,7 +146,7 @@ export default function Home() {
       </section>
 
       {/* Blog Preview Section */}
-      <BlogPreview />
+      {/* <BlogPreview /> */}
 
       {/* Testimonials */}
       <section className="py-20 bg-primary-900 text-white">

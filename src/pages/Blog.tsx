@@ -16,7 +16,7 @@ const blogPosts = [
     id: 2,
     title: "Understanding Crochet Pattern Terminology",
     excerpt: "A comprehensive guide to reading and understanding crochet patterns, from basic abbreviations to complex instructions.",
-    image: "https://images.unsplash.com/photo-1615646589661-0e7bc0b2b6c3?auto=format&fit=crop&q=80&w=600",
+    image: "https://images.pexels.com/photos/7585853/pexels-photo-7585853.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     author: "Sarah Parker",
     date: "2024-02-18",
     category: "Education"

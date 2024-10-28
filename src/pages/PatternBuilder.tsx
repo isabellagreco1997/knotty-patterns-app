@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
+import { usePatternStore } from '../stores/usePatternStore';
 import PatternStarter from '../components/pattern-builder/PatternStarter';
 import StitchPanel from '../components/pattern-builder/StitchPanel';
 import CurrentRound from '../components/pattern-builder/CurrentRound';
@@ -10,12 +11,16 @@ import PatternSettings from '../components/pattern-builder/PatternSettings';
 import StitchGuide from '../components/pattern-builder/StitchGuide';
 import CrochetPreview from '../components/pattern-builder/CrochetPreview';
 import AddSectionModal from '../components/pattern-builder/AddSectionModal';
-import { PiPlus, PiCaretDown, PiTrash } from 'react-icons/pi';
+import { PiPlus, PiCaretDown, PiTrash, PiSpinner } from 'react-icons/pi';
 import type { Round, Pattern, PatternSection } from '../types/pattern';
 
 export default function PatternBuilder() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { addPattern, updatePattern } = usePatternStore();
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [customText, setCustomText] = useState('');
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
   const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
@@ -44,6 +49,52 @@ export default function PatternBuilder() {
   const currentSection = pattern.sections.find(s => s.id === currentSectionId);
   const hasActualRounds = currentSection?.rounds.some(round => !round.isText);
 
+  useEffect(() => {
+    if (user) {
+      setPattern(prev => ({
+        ...prev,
+        userId: user.id
+      }));
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user) {
+      navigate('/login?redirect=/pattern-builder');
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      const patternToSave = {
+        ...pattern,
+        userId: user.id,
+        updatedAt: new Date()
+      };
+
+      if (id) {
+        await updatePattern(patternToSave);
+      } else {
+        await addPattern(patternToSave);
+      }
+
+      // Show success message
+      const successMessage = document.createElement('div');
+      successMessage.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
+      successMessage.textContent = 'Pattern saved successfully!';
+      document.body.appendChild(successMessage);
+      setTimeout(() => successMessage.remove(), 3000);
+    } catch (error) {
+      console.error('Failed to save pattern:', error);
+      setSaveError(error instanceof Error ? error.message : 'Failed to save pattern');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // ... rest of your existing functions ...
   const handleAddSection = (name: string) => {
     const newSection: PatternSection = {
       id: Math.random().toString(36).substr(2, 9),
@@ -292,11 +343,6 @@ export default function PatternBuilder() {
     }));
   };
 
-  const savePattern = async () => {
-    // TODO: Implement pattern saving to backend
-    console.log('Saving pattern:', pattern);
-  };
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -414,11 +460,25 @@ export default function PatternBuilder() {
               </>
             )}
 
+            {saveError && (
+              <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
+                {saveError}
+              </div>
+            )}
+
             <button
-              onClick={savePattern}
-              className="mt-6 w-full inline-flex justify-center items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="mt-6 w-full inline-flex justify-center items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Save Pattern
+              {isSaving ? (
+                <>
+                  <PiSpinner className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save Pattern'
+              )}
             </button>
           </div>
         </div>

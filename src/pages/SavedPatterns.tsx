@@ -1,49 +1,61 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
-import { PiPencil, PiTrash, PiCopy } from 'react-icons/pi';
+import { usePatternStore } from '../stores/usePatternStore';
+import { PiPencil, PiTrash, PiCopy, PiSpinner } from 'react-icons/pi';
 
 function SavedPatterns() {
   const { user } = useAuthStore();
-  const [patterns, setPatterns] = React.useState([
-    {
-      id: '1',
-      name: 'Cozy Winter Hat',
-      description: 'A warm and stylish winter hat with a simple pattern.',
-      difficulty: 'beginner',
-      rounds: 15,
-      createdAt: '2024-02-10',
-      previewImage: 'https://images.unsplash.com/photo-1612870466688-277d0f8f5082?auto=format&fit=crop&q=80&w=300'
-    },
-    {
-      id: '2',
-      name: 'Granny Square Blanket',
-      description: 'Traditional granny square pattern for a cozy blanket.',
-      difficulty: 'intermediate',
-      rounds: 24,
-      createdAt: '2024-02-15',
-      previewImage: 'https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&q=80&w=300'
-    }
-  ]);
+  const { patterns, loading, error, fetchPatterns, deletePattern, duplicatePattern } = usePatternStore();
 
-  const deletePattern = (id: string) => {
+  useEffect(() => {
+    if (user) {
+      fetchPatterns(user.id);
+    }
+  }, [user, fetchPatterns]);
+
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this pattern?')) {
-      setPatterns(patterns.filter(p => p.id !== id));
+      try {
+        await deletePattern(id);
+      } catch (error) {
+        console.error('Error deleting pattern:', error);
+        alert('Failed to delete pattern. Please try again.');
+      }
     }
   };
 
-  const duplicatePattern = (id: string) => {
-    const pattern = patterns.find(p => p.id === id);
-    if (pattern) {
-      const newPattern = {
-        ...pattern,
-        id: Date.now().toString(),
-        name: `${pattern.name} (Copy)`,
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-      setPatterns([...patterns, newPattern]);
+  const handleDuplicate = async (pattern: any) => {
+    if (!user) return;
+    
+    try {
+      await duplicatePattern(pattern, user.id);
+    } catch (error) {
+      console.error('Error duplicating pattern:', error);
+      alert('Failed to duplicate pattern. Please try again.');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center space-x-2 text-primary-600">
+          <PiSpinner className="w-6 h-6 animate-spin" />
+          <span>Loading patterns...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="bg-red-50 text-red-600 p-4 rounded-lg">
+          Error loading patterns: {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -52,7 +64,7 @@ function SavedPatterns() {
           <h1 className="text-2xl font-bold">My Patterns</h1>
           <Link
             to="/pattern-builder"
-            className="inline-flex items-center px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700"
+            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
           >
             Create New Pattern
           </Link>
@@ -66,53 +78,60 @@ function SavedPatterns() {
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {patterns.map((pattern) => (
-            <div key={pattern.id} className="border rounded-lg overflow-hidden">
-              <img
-                src={pattern.previewImage}
-                alt={pattern.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2">{pattern.name}</h3>
-                <p className="text-gray-600 text-sm mb-2">{pattern.description}</p>
-                <div className="flex justify-between items-center text-sm text-gray-500">
-                  <span>Difficulty: {pattern.difficulty}</span>
-                  <span>Rounds: {pattern.rounds}</span>
-                </div>
-                <div className="mt-4 flex justify-between items-center">
-                  <span className="text-sm text-gray-500">
-                    Created: {pattern.createdAt}
-                  </span>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => duplicatePattern(pattern.id)}
-                      className="p-2 hover:bg-gray-100 rounded-full"
-                      title="Duplicate Pattern"
-                    >
-                      <PiCopy className="w-5 h-5" />
-                    </button>
-                    <Link
-                      to={`/pattern-builder/${pattern.id}`}
-                      className="p-2 hover:bg-gray-100 rounded-full"
-                      title="Edit Pattern"
-                    >
-                      <PiPencil className="w-5 h-5" />
-                    </Link>
-                    <button
-                      onClick={() => deletePattern(pattern.id)}
-                      className="p-2 hover:bg-gray-100 rounded-full text-red-600"
-                      title="Delete Pattern"
-                    >
-                      <PiTrash className="w-5 h-5" />
-                    </button>
+        {patterns.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <p className="text-gray-600 mb-4">You haven't created any patterns yet.</p>
+            <Link
+              to="/pattern-builder"
+              className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+            >
+              Create Your First Pattern
+            </Link>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {patterns.map((pattern) => (
+              <div key={pattern.id} className="border rounded-lg overflow-hidden">
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">{pattern.name}</h3>
+                  <p className="text-gray-600 text-sm mb-2">{pattern.description}</p>
+                  <div className="flex justify-between items-center text-sm text-gray-500">
+                    <span>Difficulty: {pattern.difficulty}</span>
+                    <span>Sections: {pattern.sections.length}</span>
+                  </div>
+                  <div className="mt-4 flex justify-between items-center">
+                    <span className="text-sm text-gray-500">
+                      Created: {new Date(pattern.createdAt).toLocaleDateString()}
+                    </span>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleDuplicate(pattern)}
+                        className="p-2 hover:bg-gray-100 rounded-full"
+                        title="Duplicate Pattern"
+                      >
+                        <PiCopy className="w-5 h-5" />
+                      </button>
+                      <Link
+                        to={`/pattern-builder/${pattern.id}`}
+                        className="p-2 hover:bg-gray-100 rounded-full"
+                        title="Edit Pattern"
+                      >
+                        <PiPencil className="w-5 h-5" />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(pattern.id)}
+                        className="p-2 hover:bg-gray-100 rounded-full text-red-600"
+                        title="Delete Pattern"
+                      >
+                        <PiTrash className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
