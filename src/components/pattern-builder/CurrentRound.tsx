@@ -10,7 +10,7 @@ interface CurrentRoundProps {
   onUpdateCount: (stitchId: string, count: number) => void;
   onUpdateNotes: (notes: string) => void;
   onDeleteStitch: (stitchId: string) => void;
-  onUpdateStitchNote: (stitchId: string, note: string) => void;
+  onUpdateStitchNote: (stitchId: string, note: any) => void;
   onUpdateHeaderNote: (note: string) => void;
   onUpdateFooterNote: (note: string) => void;
 }
@@ -31,18 +31,26 @@ export default function CurrentRound({
   const [isRepeating, setIsRepeating] = useState(false);
   const [repeatCount, setRepeatCount] = useState(6);
 
-  const calculateTotalStitches = (stitches: Stitch[], repeats: number = 1): number => {
+  function calculateTotalStitches(stitches: Stitch[], repeats: number = 1): number {
     const singleRepeatTotal = stitches.reduce((sum, stitch) => {
+      if (stitch.type === 'skip') return sum;
       if (stitch.type === 'inc') return sum + (stitch.count * 2);
-      if (stitch.type === 'dec') return sum + Math.ceil(stitch.count / 2);
+      if (stitch.type === 'dec') return sum - stitch.count; // Each dec reduces stitch count by 1
       return sum + stitch.count;
     }, 0);
     return singleRepeatTotal * repeats;
-  };
+  }
 
-  const formatStitchPattern = (stitches: Stitch[]): string => {
-    return stitches.map(s => `${s.count} ${s.type}`).join(', ');
-  };
+  function formatStitchPattern(stitches: Stitch[]): string {
+    return stitches.map(s => {
+      const beforeNote = s.beforeNote ? `${s.beforeNote} ` : '';
+      const afterNote = s.afterNote ? ` ${s.afterNote}` : '';
+      if (s.type === 'dec') {
+        return `${beforeNote}dec ${s.count} (${s.count * 2} sts worked)${afterNote}`;
+      }
+      return `${beforeNote}${s.count} ${s.type}${afterNote}`;
+    }).join(', ');
+  }
 
   const handleComplete = () => {
     if (round.stitches.length === 0) return;
@@ -54,16 +62,16 @@ export default function CurrentRound({
       
       updatedRound = {
         ...round,
+        isRepeating: true,
+        repeatCount,
         notes: `(${stitchPattern}) * ${repeatCount}x (${totalStitches} sts)`,
-        stitches: round.stitches.map(stitch => ({
-          ...stitch,
-          note: `Repeat ${repeatCount}x`
-        }))
+        stitches: round.stitches
       };
     } else {
       const totalStitches = calculateTotalStitches(round.stitches);
       updatedRound = {
         ...round,
+        isRepeating: false,
         notes: `${totalStitches} sts`
       };
     }
@@ -109,6 +117,11 @@ export default function CurrentRound({
                 onChange={(count) => onUpdateCount(stitch.id, count)}
               />
               <span>{stitch.type}</span>
+              {stitch.type === 'dec' && (
+                <span className="text-xs text-primary-500">
+                  ({stitch.count * 2} sts)
+                </span>
+              )}
               <button
                 onClick={() => onDeleteStitch(stitch.id)}
                 className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-primary-200 rounded-full"
@@ -124,14 +137,33 @@ export default function CurrentRound({
             </div>
             
             {editingStitchId === stitch.id && (
-              <div className="absolute z-10 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg p-2">
-                <input
-                  type="text"
-                  value={stitch.note || ''}
-                  onChange={(e) => onUpdateStitchNote(stitch.id, e.target.value)}
-                  placeholder="Add note for this stitch..."
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                />
+              <div className="absolute z-10 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg p-2 space-y-2">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Note Before Stitch</label>
+                  <input
+                    type="text"
+                    value={stitch.note?.beforeNote || ''}
+                    onChange={(e) => onUpdateStitchNote(stitch.id, { 
+                      ...stitch.note,
+                      beforeNote: e.target.value 
+                    })}
+                    placeholder="Add note before this stitch..."
+                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">Note After Stitch</label>
+                  <input
+                    type="text"
+                    value={stitch.note?.afterNote || ''}
+                    onChange={(e) => onUpdateStitchNote(stitch.id, {
+                      ...stitch.note,
+                      afterNote: e.target.value
+                    })}
+                    placeholder="Add note after this stitch..."
+                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
+                  />
+                </div>
               </div>
             )}
           </div>

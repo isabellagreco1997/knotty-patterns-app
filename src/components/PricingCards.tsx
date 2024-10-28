@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { PiCheck, PiX, PiCrown, PiStar, PiSparkle } from 'react-icons/pi';
+import { useAuthStore } from '../stores/useAuthStore';
+import { createCheckoutSession } from '../lib/stripe';
 
 interface PricingFeature {
   name: string;
@@ -24,7 +26,49 @@ const features: PricingFeature[] = [
   { name: 'Early access to new features', free: false, basic: false, premium: true },
 ];
 
+const STRIPE_PRICE_IDS = {
+  basic: import.meta.env.VITE_STRIPE_BASIC_PRICE_ID,
+  premium: import.meta.env.VITE_STRIPE_PREMIUM_PRICE_ID
+};
+
 const PricingCards: React.FC = () => {
+  const { user } = useAuthStore();
+  const [isLoading, setIsLoading] = React.useState<string | null>(null);
+
+  const handleSubscribe = async (priceId: string) => {
+    if (!user) {
+      window.location.href = '/login?redirect=pricing';
+      return;
+    }
+
+    try {
+      setIsLoading(priceId);
+      await createCheckoutSession(priceId);
+    } catch (error) {
+      console.error('Subscription error:', error);
+      alert('Failed to start subscription process. Please try again.');
+    } finally {
+      setIsLoading(null);
+    }
+  };
+
+  const renderFeatureList = (planType: 'free' | 'basic' | 'premium') => (
+    <ul className="space-y-4">
+      {features.map((feature, index) => (
+        <li key={index} className="flex items-center text-sm">
+          {feature[planType] ? (
+            <PiCheck className="h-4 w-4 text-primary-500 mr-3" />
+          ) : (
+            <PiX className="h-4 w-4 text-neutral-300 mr-3" />
+          )}
+          <span className={feature[planType] ? 'text-neutral-700' : 'text-neutral-400'}>
+            {feature.name}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
     <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
       {/* Free Plan */}
@@ -42,28 +86,24 @@ const PricingCards: React.FC = () => {
             <span className="text-4xl font-bold text-neutral-800">$0</span>
             <span className="text-sm text-neutral-500">/month</span>
           </p>
-          <Link
-            to="/login"
-            className="mt-8 block w-full rounded-lg bg-secondary-50 px-4 py-2 text-center text-sm font-semibold text-secondary-600 hover:bg-secondary-100 transition-colors"
-          >
-            Get Started
-          </Link>
+          {!user ? (
+            <Link
+              to="/login"
+              className="mt-8 block w-full rounded-lg bg-secondary-50 px-4 py-2 text-center text-sm font-semibold text-secondary-600 hover:bg-secondary-100 transition-colors"
+            >
+              Get Started
+            </Link>
+          ) : (
+            <button
+              disabled
+              className="mt-8 block w-full rounded-lg bg-secondary-50 px-4 py-2 text-center text-sm font-semibold text-secondary-600 cursor-default"
+            >
+              Current Plan
+            </button>
+          )}
         </div>
         <div className="px-8 pb-8">
-          <ul className="space-y-4">
-            {features.map((feature, index) => (
-              <li key={index} className="flex items-center text-sm">
-                {feature.free ? (
-                  <PiCheck className="h-4 w-4 text-secondary-500 mr-3" />
-                ) : (
-                  <PiX className="h-4 w-4 text-neutral-300 mr-3" />
-                )}
-                <span className={feature.free ? 'text-neutral-700' : 'text-neutral-400'}>
-                  {feature.name}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {renderFeatureList('free')}
         </div>
       </div>
 
@@ -82,28 +122,16 @@ const PricingCards: React.FC = () => {
             <span className="text-4xl font-bold text-neutral-800">$5</span>
             <span className="text-sm text-neutral-500">/month</span>
           </p>
-          <Link
-            to="/login"
-            className="mt-8 block w-full rounded-lg bg-accent-500 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-accent-600 transition-colors"
+          <button
+            onClick={() => handleSubscribe(STRIPE_PRICE_IDS.basic)}
+            disabled={isLoading !== null}
+            className="mt-8 block w-full rounded-lg bg-accent-500 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-accent-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Subscribe Now
-          </Link>
+            {isLoading === STRIPE_PRICE_IDS.basic ? 'Processing...' : 'Subscribe Now'}
+          </button>
         </div>
         <div className="px-8 pb-8">
-          <ul className="space-y-4">
-            {features.map((feature, index) => (
-              <li key={index} className="flex items-center text-sm">
-                {feature.basic ? (
-                  <PiCheck className="h-4 w-4 text-accent-500 mr-3" />
-                ) : (
-                  <PiX className="h-4 w-4 text-neutral-300 mr-3" />
-                )}
-                <span className={feature.basic ? 'text-neutral-700' : 'text-neutral-400'}>
-                  {feature.name}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {renderFeatureList('basic')}
         </div>
       </div>
 
@@ -122,28 +150,16 @@ const PricingCards: React.FC = () => {
             <span className="text-4xl font-bold text-neutral-800">$10</span>
             <span className="text-sm text-neutral-500">/month</span>
           </p>
-          <Link
-            to="/login"
-            className="mt-8 block w-full rounded-lg bg-primary-500 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-600 transition-colors"
+          <button
+            onClick={() => handleSubscribe(STRIPE_PRICE_IDS.premium)}
+            disabled={isLoading !== null}
+            className="mt-8 block w-full rounded-lg bg-primary-500 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Go Premium
-          </Link>
+            {isLoading === STRIPE_PRICE_IDS.premium ? 'Processing...' : 'Go Premium'}
+          </button>
         </div>
         <div className="px-8 pb-8">
-          <ul className="space-y-4">
-            {features.map((feature, index) => (
-              <li key={index} className="flex items-center text-sm">
-                {feature.premium ? (
-                  <PiCheck className="h-4 w-4 text-primary-500 mr-3" />
-                ) : (
-                  <PiX className="h-4 w-4 text-neutral-300 mr-3" />
-                )}
-                <span className={feature.premium ? 'text-neutral-700' : 'text-neutral-400'}>
-                  {feature.name}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {renderFeatureList('premium')}
         </div>
       </div>
     </div>

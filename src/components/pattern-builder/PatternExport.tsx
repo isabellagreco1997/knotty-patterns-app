@@ -1,202 +1,252 @@
-import React from 'react';
-import { PiDownload, PiPrinter, PiCopy } from 'react-icons/pi';
-import type { Round, Stitch } from '../../types/pattern';
+import React, { useState } from 'react';
+import { PiDownload, PiPrinter, PiCopy, PiFilePdf } from 'react-icons/pi';
+import type { Round, Pattern, Stitch } from '../../types/pattern';
+import jsPDF from 'jspdf';
 
 interface PatternExportProps {
+  pattern: Pattern;
   rounds: Round[];
 }
 
-function formatStitchPattern(stitches: Stitch[]): string {
-  const groups: { type: string; count: number }[] = [];
-  let currentGroup = { type: '', count: 0 };
+const translations = {
+  round: 'Round',
+  stitches: 'sts',
+  inc: 'inc',
+  dec: 'dec',
+};
 
-  stitches.forEach((stitch) => {
-    if (stitch.type === currentGroup.type) {
-      currentGroup.count += stitch.count;
-    } else {
-      if (currentGroup.type) {
-        groups.push({ type: currentGroup.type, count: currentGroup.count });
-      }
-      currentGroup = { type: stitch.type, count: stitch.count };
-    }
-  });
-  if (currentGroup.type) {
-    groups.push({ type: currentGroup.type, count: currentGroup.count });
+function formatPatternHeader(pattern: Pattern): string {
+  let header = `${pattern.name}\n\n`;
+  
+  if (pattern.description) {
+    header += `${pattern.description}\n\n`;
+  }
+  
+  header += 'Materials:\n';
+  header += `• Hook Size: ${pattern.hookSize}\n`;
+  header += `• Yarn Weight: ${pattern.yarnWeight}\n`;
+  
+  if (pattern.gauge) {
+    header += `• Gauge: ${pattern.gauge}\n`;
+  }
+  
+  if (pattern.materials?.length) {
+    pattern.materials.forEach(material => {
+      header += `• ${material}\n`;
+    });
+  }
+  
+  header += `\nDifficulty: ${pattern.difficulty}\n\n`;
+  
+  return header;
+}
+
+function formatRoundInstructions(round: Round): string {
+  if (round.isText) {
+    return round.notes || '';
   }
 
-  const totalStitches = stitches.reduce((sum, stitch) => {
-    if (stitch.type === 'inc') return sum + (stitch.count * 2);
-    if (stitch.type === 'dec') return sum + Math.ceil(stitch.count / 2);
-    return sum + stitch.count;
+  const stitchPattern = round.stitches.map(s => {
+    const note = s.note || {};
+    const parts = [];
+
+    if (note.beforeNote) parts.push(note.beforeNote);
+    if (note.before) parts.push(note.before);
+
+    if (s.type === 'skip') {
+      const skipType = note.skipType || 'sc';
+      parts.push(`skip ${s.count} ${skipType}`);
+    } else {
+      parts.push(`${s.count} ${s.type}`);
+    }
+
+    if (note.after) parts.push(note.after);
+    if (note.afterNote) parts.push(note.afterNote);
+
+    return parts.join(' ');
+  }).join(', ');
+
+  const totalStitches = calculateTotalStitches(round);
+  return `${stitchPattern} (${totalStitches} ${translations.stitches})`;
+}
+
+function calculateTotalStitches(round: Round): number {
+  if (round.isText) return 0;
+
+  return round.stitches.reduce((total, stitch) => {
+    if (stitch.type === 'skip') return total;
+    if (stitch.type === 'inc') return total + (stitch.count * 2);
+    if (stitch.type === 'dec') return total + Math.ceil(stitch.count / 2);
+    return total + stitch.count;
   }, 0);
-
-  const repeatingPattern = detectRepeatingPattern(groups);
-  if (repeatingPattern) {
-    return `${repeatingPattern} (${totalStitches} sts)`;
-  }
-
-  const pattern = groups.map(g => `${g.count} ${g.type.toUpperCase()}`).join(', ');
-  return `${pattern} (${totalStitches} sts)`;
 }
 
-function detectRepeatingPattern(groups: { type: string; count: number }[]): string | null {
-  const commonPatterns = [
-    { pattern: ['sc', 'inc'], minRepeat: 3 },
-    { pattern: ['sc', 'sc', 'inc'], minRepeat: 2 },
-    { pattern: ['sc', 'sc', 'sc', 'inc'], minRepeat: 2 },
-  ];
-
-  for (const { pattern, minRepeat } of commonPatterns) {
-    const patternLength = pattern.length;
-    if (groups.length % patternLength === 0) {
-      const repetitions = groups.length / patternLength;
-      if (repetitions >= minRepeat) {
-        let matches = true;
-        for (let i = 0; i < groups.length; i++) {
-          if (groups[i].type !== pattern[i % patternLength]) {
-            matches = false;
-            break;
-          }
-        }
-        if (matches) {
-          const patternText = pattern.map((type, i) => 
-            `${groups[i].count} ${type.toUpperCase()}`
-          ).join(', ');
-          return `(${patternText}) * repeat around`;
-        }
-      }
-    }
-  }
-  return null;
+function getRoundNumber(rounds: Round[], currentIndex: number): number {
+  return rounds.slice(0, currentIndex + 1).filter(r => !r.isText).length;
 }
 
-function formatRoundText(round: Round, index: number): string {
-  const roundNum = `R${index + 1}`;
-  const pattern = formatStitchPattern(round.stitches);
-  const notes = round.notes ? ` // ${round.notes}` : '';
-  return `${roundNum}: ${pattern}${notes}`;
-}
+function generateFormattedPattern(pattern: Pattern): string {
+  let formattedContent = formatPatternHeader(pattern);
 
-function detectRepeatedRounds(rounds: Round[]): { text: string; rounds: number[] }[] {
-  const repeatedSections: { text: string; rounds: number[] }[] = [];
-  let currentRepeat: number[] = [];
-  let lastPattern = '';
+  pattern.sections.forEach((section) => {
+    formattedContent += `${section.name}\n\n`;
 
-  rounds.forEach((round, index) => {
-    const currentPattern = formatStitchPattern(round.stitches);
-    
-    if (currentPattern === lastPattern) {
-      if (currentRepeat.length === 0) {
-        currentRepeat.push(index - 1);
+    section.rounds.forEach((round, index) => {
+      if (round.headerNote) {
+        formattedContent += `${round.headerNote}\n`;
       }
-      currentRepeat.push(index);
-    } else {
-      if (currentRepeat.length > 1) {
-        repeatedSections.push({
-          text: `R${currentRepeat[0] + 1} - R${currentRepeat[currentRepeat.length - 1] + 1}: ${lastPattern}`,
-          rounds: currentRepeat
-        });
+
+      if (round.isText) {
+        formattedContent += `${round.notes}\n`;
+      } else {
+        const roundNum = getRoundNumber(section.rounds, index);
+        formattedContent += `${translations.round} ${roundNum}: ${formatRoundInstructions(round)}`;
       }
-      currentRepeat = [];
-    }
-    lastPattern = currentPattern;
+
+      if (round.footerNote) {
+        formattedContent += `\n${round.footerNote}`;
+      }
+
+      formattedContent += '\n\n';
+    });
+
+    formattedContent += '\n';
   });
 
-  if (currentRepeat.length > 1) {
-    repeatedSections.push({
-      text: `R${currentRepeat[0] + 1} - R${currentRepeat[currentRepeat.length - 1] + 1}: ${lastPattern}`,
-      rounds: currentRepeat
-    });
-  }
-
-  return repeatedSections;
+  return formattedContent.trim();
 }
 
-function PatternExport({ rounds }: PatternExportProps) {
-  const generatePatternText = () => {
-    const repeatedSections = detectRepeatedRounds(rounds);
-    const usedRounds = new Set(repeatedSections.flatMap(s => s.rounds));
-    
-    const formattedRounds: string[] = [];
-    
-    rounds.forEach((round, index) => {
-      if (!usedRounds.has(index)) {
-        formattedRounds.push(formatRoundText(round, index));
-      }
-    });
+function generatePDF(pattern: Pattern): jsPDF {
+  const pdf = new jsPDF({
+    unit: 'in',
+    format: 'letter'
+  });
 
-    repeatedSections.forEach(section => {
-      formattedRounds.splice(section.rounds[0], section.rounds.length, section.text);
-    });
-
-    return formattedRounds.join('\n');
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(generatePatternText());
-  };
-
-  const handleDownload = () => {
-    const blob = new Blob([generatePatternText()], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'crochet-pattern.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Crochet Pattern</title>
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-              .round { margin-bottom: 10px; }
-              .notes { color: #666; font-style: italic; margin-left: 20px; }
-            </style>
-          </head>
-          <body>
-            <h1>Crochet Pattern</h1>
-            <pre>${generatePatternText()}</pre>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
+  pdf.setFont('helvetica', 'normal');
+  
+  // Title
+  pdf.setFontSize(24);
+  pdf.text(pattern.name, 1, 1);
+  
+  // Content
+  pdf.setFontSize(12);
+  const content = generateFormattedPattern(pattern);
+  const lines = content.split('\n');
+  let y = 1.5;
+  
+  lines.forEach(line => {
+    if (y > 10) {
+      pdf.addPage();
+      y = 1;
     }
-  };
+    
+    const textLines = pdf.splitTextToSize(line, 6.5);
+    textLines.forEach(textLine => {
+      pdf.text(textLine, 1, y);
+      y += 0.2;
+    });
+    y += 0.1;
+  });
+
+  return pdf;
+}
+
+function PDFPreviewModal({ isOpen, onClose, pattern }: { isOpen: boolean; onClose: () => void; pattern: Pattern }) {
+  if (!isOpen) return null;
+
+  const content = generateFormattedPattern(pattern);
 
   return (
-    <div className="mt-6 flex space-x-2">
-      <button
-        onClick={handleCopy}
-        className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-      >
-        <PiCopy className="w-4 h-4 mr-2" />
-        Copy
-      </button>
-      <button
-        onClick={handleDownload}
-        className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-      >
-        <PiDownload className="w-4 h-4 mr-2" />
-        Download
-      </button>
-      <button
-        onClick={handlePrint}
-        className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-      >
-        <PiPrinter className="w-4 h-4 mr-2" />
-        Print
-      </button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h3 className="text-lg font-semibold">PDF Preview</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            ×
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto p-8 bg-white shadow-inner">
+          <div className="max-w-[8.5in] mx-auto bg-white whitespace-pre-wrap font-serif">
+            {content.split('\n').map((line, i) => (
+              <p key={i} className="leading-relaxed">
+                {line || <br />}
+              </p>
+            ))}
+          </div>
+        </div>
+        <div className="p-4 border-t flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+          >
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
-export default PatternExport;
+export default function PatternExport({ pattern }: PatternExportProps) {
+  const [showPDFPreview, setShowPDFPreview] = useState(false);
+
+  const handleCopy = () => {
+    const content = generateFormattedPattern(pattern);
+    navigator.clipboard.writeText(content);
+  };
+
+  const handleDownload = () => {
+    const pdf = generatePDF(pattern);
+    pdf.save('crochet-pattern.pdf');
+  };
+
+  const handlePrint = () => {
+    const pdf = generatePDF(pattern);
+    pdf.autoPrint();
+    window.open(pdf.output('bloburl'), '_blank');
+  };
+
+  return (
+    <>
+      <div className="mt-6 flex space-x-2">
+        <button
+          onClick={handleCopy}
+          className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+        >
+          <PiCopy className="w-4 h-4 mr-2" />
+          Copy
+        </button>
+        <button
+          onClick={handleDownload}
+          className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+        >
+          <PiDownload className="w-4 h-4 mr-2" />
+          Download PDF
+        </button>
+        <button
+          onClick={handlePrint}
+          className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+        >
+          <PiPrinter className="w-4 h-4 mr-2" />
+          Print
+        </button>
+        <button
+          onClick={() => setShowPDFPreview(true)}
+          className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+        >
+          <PiFilePdf className="w-4 h-4 mr-2" />
+          PDF Preview
+        </button>
+      </div>
+
+      <PDFPreviewModal
+        isOpen={showPDFPreview}
+        onClose={() => setShowPDFPreview(false)}
+        pattern={pattern}
+      />
+    </>
+  );
+}

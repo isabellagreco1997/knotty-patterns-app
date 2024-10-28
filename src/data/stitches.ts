@@ -7,8 +7,16 @@ export const stitchTypes = [
   { id: 'ch', name: 'Chain', abbr: 'ch' },
   { id: 'inc', name: 'Increase', abbr: 'inc' },
   { id: 'dec', name: 'Decrease', abbr: 'dec' },
+  { id: 'skip', name: 'Skip Stitch', abbr: 'skip' },
   { id: 'fpdc', name: 'Front Post Double Crochet', abbr: 'fpdc' },
   { id: 'bpdc', name: 'Back Post Double Crochet', abbr: 'bpdc' },
   { id: 'shell', name: 'Shell Stitch', abbr: 'shell' },
   { id: 'picot', name: 'Picot', abbr: 'picot' },
 ];
+
+// Keep track of custom stitches added during the session
+export const customStitches = new Set<string>();
+
+export function addCustomStitch(stitch: string) {
+  customStitches.add(stitch.toLowerCase());
+}

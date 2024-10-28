@@ -2,7 +2,7 @@ import React, { useRef, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
-import type { Round, Stitch } from '../../types/pattern';
+import type { Round } from '../../types/pattern';
 
 interface CrochetPreviewProps {
   rounds: Round[];
@@ -25,7 +25,7 @@ function AmigurumiMesh({ rounds }: { rounds: Round[] }) {
   const meshRef = useRef<THREE.Mesh>(null);
   
   const geometry = useMemo(() => {
-    if (rounds.length === 0) return new THREE.BufferGeometry();
+    if (!rounds || rounds.length === 0) return new THREE.BufferGeometry();
 
     const vertices: number[] = [];
     const indices: number[] = [];
@@ -41,6 +41,8 @@ function AmigurumiMesh({ rounds }: { rounds: Round[] }) {
 
     // Create vertices for each round
     rounds.forEach((round, roundIndex) => {
+      if (round.isText) return; // Skip text-only rounds
+
       const nextRingVertices: number[] = [];
       
       // Calculate radius based on increases/decreases
@@ -70,7 +72,7 @@ function AmigurumiMesh({ rounds }: { rounds: Round[] }) {
       }
 
       // Create faces between current and last ring
-      if (roundIndex > 0) {
+      if (roundIndex > 0 && lastRingVertices.length > 0) {
         for (let i = 0; i < segmentsPerRound; i++) {
           const v0 = lastRingVertices[i];
           const v1 = lastRingVertices[i + 1];
@@ -110,7 +112,7 @@ function AmigurumiMesh({ rounds }: { rounds: Round[] }) {
 }
 
 export default function CrochetPreview({ rounds, currentRound }: CrochetPreviewProps) {
-  const isMagicRing = rounds.length > 0 && rounds[0].notes?.toLowerCase().includes('magic ring');
+  const isMagicRing = rounds && rounds.length > 0 && rounds[0].notes?.toLowerCase().includes('magic ring');
 
   if (!isMagicRing) {
     return (

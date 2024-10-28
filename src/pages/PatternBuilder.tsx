@@ -9,30 +9,70 @@ import PatternExport from '../components/pattern-builder/PatternExport';
 import PatternSettings from '../components/pattern-builder/PatternSettings';
 import StitchGuide from '../components/pattern-builder/StitchGuide';
 import CrochetPreview from '../components/pattern-builder/CrochetPreview';
-import type { Round, Pattern, Stitch } from '../types/pattern';
+import AddSectionModal from '../components/pattern-builder/AddSectionModal';
+import { PiPlus, PiCaretDown, PiTrash } from 'react-icons/pi';
+import type { Round, Pattern, PatternSection } from '../types/pattern';
 
-function PatternBuilder() {
+export default function PatternBuilder() {
   const { id } = useParams();
   const { user } = useAuthStore();
+  const [customText, setCustomText] = useState('');
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+  const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
+  
   const [pattern, setPattern] = useState<Pattern>({
     name: 'Untitled Pattern',
     description: '',
     difficulty: 'beginner',
     hookSize: '4.0mm',
     yarnWeight: 'worsted',
-    rounds: [],
+    sections: [],
+    notes: [],
     createdAt: new Date(),
     updatedAt: new Date(),
     userId: user?.id || '',
   });
+
   const [currentRound, setCurrentRound] = useState<Round>({
     id: '1',
     stitches: [],
     notes: '',
   });
+
   const [editingRoundId, setEditingRoundId] = useState<string | null>(null);
 
+  const currentSection = pattern.sections.find(s => s.id === currentSectionId);
+  const hasActualRounds = currentSection?.rounds.some(round => !round.isText);
+
+  const handleAddSection = (name: string) => {
+    const newSection: PatternSection = {
+      id: Math.random().toString(36).substr(2, 9),
+      name,
+      rounds: []
+    };
+
+    setPattern(prev => ({
+      ...prev,
+      sections: [...prev.sections, newSection]
+    }));
+    setCurrentSectionId(newSection.id);
+  };
+
+  const handleDeleteSection = (sectionId: string) => {
+    if (confirm('Are you sure you want to delete this section and all its rounds?')) {
+      setPattern(prev => ({
+        ...prev,
+        sections: prev.sections.filter(s => s.id !== sectionId)
+      }));
+      if (currentSectionId === sectionId) {
+        setCurrentSectionId(pattern.sections[0]?.id || null);
+      }
+    }
+  };
+
   const handlePatternStart = (type: 'magic-ring' | 'chain' | 'custom' | 'stitch', config: { count: number; text: string; stitchType: string }) => {
+    if (!currentSectionId) return;
+
     let firstRound: Round;
 
     switch (type) {
@@ -74,16 +114,22 @@ function PatternBuilder() {
           id: '1',
           stitches: [],
           notes: config.text,
+          isText: true,
         };
         break;
       default:
         return;
     }
 
-    setPattern({
-      ...pattern,
-      rounds: [firstRound]
-    });
+    setPattern(prev => ({
+      ...prev,
+      sections: prev.sections.map(section => 
+        section.id === currentSectionId
+          ? { ...section, rounds: [...section.rounds, firstRound] }
+          : section
+      )
+    }));
+    
     setCurrentRound({
       id: '2',
       stitches: [],
@@ -91,8 +137,30 @@ function PatternBuilder() {
     });
   };
 
+  const addCustomText = (text: string) => {
+    if (!text.trim() || !currentSectionId) return;
+
+    const newRound: Round = {
+      id: Math.random().toString(36).substr(2, 9),
+      stitches: [],
+      notes: text,
+      isText: true,
+    };
+
+    setPattern(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === currentSectionId
+          ? { ...section, rounds: [...section.rounds, newRound] }
+          : section
+      ),
+      updatedAt: new Date(),
+    }));
+    setCustomText('');
+  };
+
   const addStitch = (type: string) => {
-    const newStitch: Stitch = {
+    const newStitch = {
       id: Math.random().toString(36).substr(2, 9),
       type,
       count: 1,
@@ -119,7 +187,7 @@ function PatternBuilder() {
     });
   };
 
-  const updateStitchNote = (stitchId: string, note: string) => {
+  const updateStitchNote = (stitchId: string, note: any) => {
     setCurrentRound({
       ...currentRound,
       stitches: currentRound.stitches.map((s) =>
@@ -147,68 +215,81 @@ function PatternBuilder() {
   };
 
   const completeRound = (updatedRound: Round) => {
-    if (updatedRound.stitches.length === 0) return;
+    if (!currentSectionId || updatedRound.stitches.length === 0) return;
     
-    setPattern({
-      ...pattern,
-      rounds: [...pattern.rounds, updatedRound],
+    setPattern(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === currentSectionId
+          ? { ...section, rounds: [...section.rounds, updatedRound] }
+          : section
+      ),
       updatedAt: new Date(),
-    });
+    }));
+
     setCurrentRound({
-      id: (pattern.rounds.length + 2).toString(),
+      id: Math.random().toString(36).substr(2, 9),
       stitches: [],
       notes: '',
     });
   };
 
   const editRound = (roundId: string) => {
-    const round = pattern.rounds.find(r => r.id === roundId);
+    if (!currentSectionId) return;
+
+    const section = pattern.sections.find(s => s.id === currentSectionId);
+    const round = section?.rounds.find(r => r.id === roundId);
+    
     if (round) {
       setEditingRoundId(roundId);
       setCurrentRound(round);
-      setPattern({
-        ...pattern,
-        rounds: pattern.rounds.filter((r) => r.id !== roundId),
-      });
+      setPattern(prev => ({
+        ...prev,
+        sections: prev.sections.map(section =>
+          section.id === currentSectionId
+            ? { ...section, rounds: section.rounds.filter((r) => r.id !== roundId) }
+            : section
+        )
+      }));
     }
   };
 
   const deleteRound = (roundId: string) => {
-    setPattern({
-      ...pattern,
-      rounds: pattern.rounds.filter((r) => r.id !== roundId),
+    if (!currentSectionId) return;
+
+    setPattern(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === currentSectionId
+          ? { ...section, rounds: section.rounds.filter((r) => r.id !== roundId) }
+          : section
+      ),
       updatedAt: new Date(),
-    });
+    }));
   };
 
   const handleReorderRounds = (startIndex: number, endIndex: number) => {
-    const newRounds = Array.from(pattern.rounds);
-    const [removed] = newRounds.splice(startIndex, 1);
-    newRounds.splice(endIndex, 0, removed);
-    setPattern({ ...pattern, rounds: newRounds });
-  };
+    if (!currentSectionId) return;
 
-  const handleDuplicateRound = (roundId: string) => {
-    const roundToDuplicate = pattern.rounds.find(r => r.id === roundId);
-    if (roundToDuplicate) {
-      const newRound = {
-        ...roundToDuplicate,
-        id: `${pattern.rounds.length + 1}`,
-        stitches: roundToDuplicate.stitches.map(s => ({ ...s, id: Math.random().toString(36).substr(2, 9) }))
-      };
-      setPattern({
-        ...pattern,
-        rounds: [...pattern.rounds, newRound]
-      });
-    }
+    setPattern(prev => ({
+      ...prev,
+      sections: prev.sections.map(section => {
+        if (section.id !== currentSectionId) return section;
+        
+        const newRounds = Array.from(section.rounds);
+        const [removed] = newRounds.splice(startIndex, 1);
+        newRounds.splice(endIndex, 0, removed);
+        return { ...section, rounds: newRounds };
+      })
+    }));
   };
 
   const updatePatternSettings = (settings: Partial<Pattern>) => {
-    setPattern({
-      ...pattern,
+    setPattern(prev => ({
+      ...prev,
       ...settings,
       updatedAt: new Date(),
-    });
+    }));
   };
 
   const savePattern = async () => {
@@ -226,32 +307,112 @@ function PatternBuilder() {
               onUpdate={updatePatternSettings}
             />
 
-            {/* Pattern Starter - Always visible */}
-            <PatternStarter onStart={handlePatternStart} />
+            {/* Section Management */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Pattern Sections</h2>
+                <button
+                  onClick={() => setShowAddSectionModal(true)}
+                  className="inline-flex items-center px-3 py-2 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700"
+                >
+                  <PiPlus className="w-4 h-4 mr-1" />
+                  Add Section
+                </button>
+              </div>
 
-            <StitchPanel onStitchSelect={addStitch} />
-            
-            <CurrentRound
-              round={currentRound}
-              onComplete={completeRound}
-              onUpdateCount={updateStitchCount}
-              onUpdateNotes={updateNotes}
-              onDeleteStitch={deleteStitch}
-              onUpdateStitchNote={updateStitchNote}
-              onUpdateHeaderNote={updateHeaderNote}
-              onUpdateFooterNote={updateFooterNote}
-            />
+              {pattern.sections.length === 0 ? (
+                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                  <p className="text-gray-600">Add a section to start building your pattern</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {pattern.sections.map((section) => (
+                    <div
+                      key={section.id}
+                      className={`flex items-center justify-between p-3 rounded-lg border ${
+                        section.id === currentSectionId
+                          ? 'border-primary-500 bg-primary-50'
+                          : 'border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      <button
+                        onClick={() => setCurrentSectionId(section.id)}
+                        className="flex items-center flex-1"
+                      >
+                        <PiCaretDown className={`w-4 h-4 mr-2 transition-transform ${
+                          section.id === currentSectionId ? 'transform rotate-180' : ''
+                        }`} />
+                        <span className="font-medium">{section.name}</span>
+                        <span className="ml-2 text-sm text-gray-500">
+                          ({section.rounds.length} rounds)
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteSection(section.id)}
+                        className="p-1 text-red-600 hover:bg-red-50 rounded-full"
+                      >
+                        <PiTrash className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-            <PatternDisplay
-              rounds={pattern.rounds}
-              onEdit={editRound}
-              onDelete={deleteRound}
-              onDuplicate={handleDuplicateRound}
-              onReorder={handleReorderRounds}
-              language="en"
-            />
+            {currentSectionId && (
+              <>
+                {!hasActualRounds && (
+                  <PatternStarter onStart={handlePatternStart} />
+                )}
 
-            <PatternExport rounds={pattern.rounds} />
+                <div className="mb-6">
+                  <div className="flex items-end gap-2">
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Add Custom Text
+                      </label>
+                      <input
+                        type="text"
+                        value={customText}
+                        onChange={(e) => setCustomText(e.target.value)}
+                        placeholder="Enter notes, comments, or instructions..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <button
+                      onClick={() => addCustomText(customText)}
+                      className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+                    >
+                      Add Text
+                    </button>
+                  </div>
+                </div>
+
+                <StitchPanel onStitchSelect={addStitch} />
+                
+                <CurrentRound
+                  round={currentRound}
+                  onComplete={completeRound}
+                  onUpdateCount={updateStitchCount}
+                  onUpdateNotes={updateNotes}
+                  onDeleteStitch={deleteStitch}
+                  onUpdateStitchNote={updateStitchNote}
+                  onUpdateHeaderNote={updateHeaderNote}
+                  onUpdateFooterNote={updateFooterNote}
+                />
+
+                <PatternDisplay
+                  pattern={pattern}
+                  rounds={currentSection?.rounds || []}
+                  onEdit={editRound}
+                  onDelete={deleteRound}
+                  onReorder={handleReorderRounds}
+                  language="en"
+                />
+
+                <PatternExport pattern={pattern} rounds={currentSection?.rounds || []} />
+              </>
+            )}
 
             <button
               onClick={savePattern}
@@ -264,13 +425,20 @@ function PatternBuilder() {
 
         <div className="md:col-span-1">
           <div className="space-y-6">
-            <CrochetPreview rounds={pattern.rounds} currentRound={currentRound} />
+            <CrochetPreview
+              rounds={currentSection?.rounds || []}
+              currentRound={currentRound}
+            />
             <StitchGuide />
           </div>
         </div>
       </div>
+
+      <AddSectionModal
+        isOpen={showAddSectionModal}
+        onClose={() => setShowAddSectionModal(false)}
+        onAdd={handleAddSection}
+      />
     </div>
   );
 }
-
-export default PatternBuilder;

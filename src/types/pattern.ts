@@ -4,7 +4,7 @@ export interface Stitch {
   id: string;
   type: string;
   count: number;
-  note?: string;
+  note?: any;
 }
 
 export interface Round {
@@ -13,6 +13,15 @@ export interface Round {
   footerNote?: string;
   stitches: Stitch[];
   notes?: string;
+  isText?: boolean;
+  isRepeating?: boolean;
+  repeatCount?: number;
+}
+
+export interface PatternSection {
+  id: string;
+  name: string;
+  rounds: Round[];
 }
 
 export interface Pattern {
@@ -24,7 +33,8 @@ export interface Pattern {
   yarnWeight: string;
   gauge?: string;
   materials?: string[];
-  rounds: Round[];
+  sections: PatternSection[];
+  notes: string[];
   createdAt: Date;
   updatedAt: Date;
   userId: string;
