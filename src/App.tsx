@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { checkSupabaseConnection } from './lib/supabase';
+import { supabase } from './lib/supabase';
 import { useAuthStore } from './stores/useAuthStore';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -16,17 +16,55 @@ import CookieConsent from './components/CookieConsent';
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const isDevelopment = import.meta.env.DEV;
-  const checkAuth = useAuthStore(state => state.checkAuth);
+  const { checkAuth, refreshProfile, initialized } = useAuthStore();
 
   useEffect(() => {
+    let authListener: any;
+
     async function initializeApp() {
-      const connected = await checkSupabaseConnection();
-      setIsConnected(connected);
-      await checkAuth();
+      try {
+        // First check the connection
+        const { error: connectionError } = await supabase.from('profiles').select('count');
+        setIsConnected(!connectionError);
+
+        if (connectionError) {
+          console.error('Database connection error:', connectionError);
+          return;
+        }
+
+        // Then check auth state
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          await checkAuth();
+          await refreshProfile();
+        }
+
+        // Set up auth state change listener
+        authListener = supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log('Auth state changed:', event);
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            await checkAuth();
+            await refreshProfile();
+          } else if (event === 'SIGNED_OUT') {
+            useAuthStore.getState().signOut();
+          }
+        });
+      } catch (error) {
+        console.error('Error initializing app:', error);
+        setIsConnected(false);
+      }
     }
 
-    initializeApp();
-  }, [checkAuth]);
+    if (!initialized) {
+      initializeApp();
+    }
+
+    return () => {
+      if (authListener) {
+        authListener.subscription.unsubscribe();
+      }
+    };
+  }, [checkAuth, refreshProfile, initialized]);
 
   if (!isDevelopment && isConnected === false) {
     return (

@@ -1,12 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import { mockSupabase } from './mockSupabase';
-import type { Pattern } from '../types/pattern';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const isDevelopment = import.meta.env.DEV;
 
-// Create Supabase client with persistent storage
+// Create Supabase client with persistent storage and request monitoring
 export const supabase = (!isDevelopment || (supabaseUrl && supabaseAnonKey))
   ? createClient(supabaseUrl || '', supabaseAnonKey || '', {
       auth: {
@@ -16,69 +15,74 @@ export const supabase = (!isDevelopment || (supabaseUrl && supabaseAnonKey))
         storage: localStorage,
         storageKey: 'sb-auth-token',
         flowType: 'pkce'
+      },
+      global: {
+        // Add request monitoring
+        fetch: (url, options) => {
+          const startTime = Date.now();
+          console.log(`🌐 Supabase Request: ${options?.method || 'GET'} ${url}`);
+
+          return fetch(url, options)
+            .then(async (response) => {
+              const endTime = Date.now();
+              const duration = endTime - startTime;
+
+              if (!response.ok) {
+                console.error(`❌ Supabase Request Failed: ${options?.method || 'GET'} ${url}`, {
+                  status: response.status,
+                  statusText: response.statusText,
+                  duration: `${duration}ms`,
+                });
+                // Clone the response before reading it
+                const clone = response.clone();
+                const errorBody = await clone.text();
+                console.error('Error response:', errorBody);
+              } else {
+                console.log(`✅ Supabase Request Complete: ${options?.method || 'GET'} ${url}`, {
+                  status: response.status,
+                  duration: `${duration}ms`,
+                });
+              }
+
+              return response;
+            })
+            .catch((error) => {
+              console.error(`🔥 Supabase Request Failed: ${options?.method || 'GET'} ${url}`, error);
+              throw error;
+            });
+        }
       }
     })
   : mockSupabase;
 
-// Listen for auth changes across tabs
-if (typeof window !== 'undefined') {
-  window.addEventListener('storage', (event) => {
-    if (event.key === 'sb-auth-token') {
-      // Reload the page to sync auth state
-      window.location.reload();
-    }
-  });
-}
-
-// Initialize auth state
-supabase.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session?.user) {
-    // Check if profile exists
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', session.user.id)
-      .single();
-
-    // If no profile exists, create one
-    if (!profile && !error) {
-      const { error: insertError } = await supabase
-        .from('profiles')
-        .insert([{
-          id: session.user.id,
-          email: session.user.email,
-          full_name: session.user.user_metadata.full_name || session.user.email?.split('@')[0],
-          is_premium: false
-        }]);
-
-      if (insertError) {
-        console.error('Error creating profile:', insertError);
-      }
-    }
-  }
-});
-
 export async function checkSupabaseConnection() {
   try {
     const { data, error } = await supabase.from('profiles').select('count');
-    if (error) throw error;
-    console.log('Supabase connection successful');
+    if (error) {
+      console.error('Database connection failed:', error);
+      return false;
+    }
     return true;
   } catch (error) {
-    console.error('Supabase connection failed:', error);
+    console.error('Database connection failed:', error);
     return false;
   }
 }
 
 export async function verifyEmail(token: string) {
-  const { error } = await supabase.auth.verifyOtp({
-    token_hash: token,
-    type: 'email'
-  });
-  return { error };
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash: token,
+      type: 'email'
+    });
+    return { data, error };
+  } catch (error) {
+    console.error('Email verification failed:', error);
+    return { data: null, error };
+  }
 }
 
-export async function savePattern(pattern: Pattern) {
+export async function savePattern(pattern: any) {
   const { data, error } = await supabase
     .from('patterns')
     .insert([pattern])
@@ -89,7 +93,7 @@ export async function savePattern(pattern: Pattern) {
   return data;
 }
 
-export async function updatePattern(pattern: Pattern) {
+export async function updatePattern(pattern: any) {
   const { data, error } = await supabase
     .from('patterns')
     .update(pattern)

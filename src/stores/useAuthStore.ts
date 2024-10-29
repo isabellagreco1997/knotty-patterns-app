@@ -15,72 +15,125 @@ interface AuthState {
   session: any | null;
   loading: boolean;
   error: string | null;
+  initialized: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<{ confirmEmailSent: boolean }>;
   signOut: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       session: null,
       loading: false,
       error: null,
+      initialized: false,
+
+      refreshProfile: async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.user) {
+            set({ user: null, session: null });
+            return;
+          }
+
+          const { data: profileData, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching profile:', error);
+            // If there's an error fetching the profile, clear the auth state
+            set({ user: null, session: null });
+            return;
+          }
+
+          if (profileData) {
+            set({
+              user: {
+                id: session.user.id,
+                email: session.user.email!,
+                isPremium: profileData.is_premium || false,
+                savedPatterns: 0,
+                createdAt: session.user.created_at,
+              },
+              session,
+              initialized: true,
+            });
+          }
+        } catch (error) {
+          console.error('Error in refreshProfile:', error);
+          // On error, clear the auth state
+          set({ user: null, session: null });
+        }
+      },
 
       checkAuth: async () => {
         try {
           const { data: { session } } = await supabase.auth.getSession();
-          if (session?.user) {
-            const { data: profileData } = await supabase
+          
+          if (!session?.user) {
+            set({ user: null, session: null, initialized: true });
+            return;
+          }
+
+          const { data: profileData, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (error) {
+            throw error;
+          }
+
+          if (profileData) {
+            set({
+              user: {
+                id: session.user.id,
+                email: session.user.email!,
+                isPremium: profileData.is_premium || false,
+                savedPatterns: 0,
+                createdAt: session.user.created_at,
+              },
+              session,
+              initialized: true,
+            });
+          } else {
+            // Create profile if it doesn't exist
+            const { data: newProfile, error: createError } = await supabase
               .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
+              .insert([{
+                id: session.user.id,
+                email: session.user.email,
+                full_name: session.user.user_metadata.full_name || session.user.email?.split('@')[0],
+                is_premium: false
+              }])
+              .select()
               .single();
 
-            if (!profileData) {
-              const { data: newProfile, error: createError } = await supabase
-                .from('profiles')
-                .insert([{
-                  id: session.user.id,
-                  email: session.user.email,
-                  full_name: session.user.user_metadata.full_name || session.user.email?.split('@')[0],
-                  is_premium: false
-                }])
-                .select()
-                .single();
+            if (createError) throw createError;
 
-              if (createError) throw createError;
-              
-              set({
-                user: {
-                  id: session.user.id,
-                  email: session.user.email!,
-                  isPremium: false,
-                  savedPatterns: 0,
-                  createdAt: session.user.created_at,
-                },
-                session,
-              });
-            } else {
-              set({
-                user: {
-                  id: session.user.id,
-                  email: session.user.email!,
-                  isPremium: profileData.is_premium || false,
-                  savedPatterns: 0,
-                  createdAt: session.user.created_at,
-                },
-                session,
-              });
-            }
-          } else {
-            set({ user: null, session: null });
+            set({
+              user: {
+                id: session.user.id,
+                email: session.user.email!,
+                isPremium: false,
+                savedPatterns: 0,
+                createdAt: session.user.created_at,
+              },
+              session,
+              initialized: true,
+            });
           }
         } catch (error) {
           console.error('Auth check failed:', error);
-          set({ user: null, session: null });
+          set({ user: null, session: null, initialized: true });
         }
       },
 
@@ -105,19 +158,6 @@ export const useAuthStore = create<AuthState>()(
             .eq('id', data.user.id)
             .single();
 
-          if (!profileData) {
-            const { error: createError } = await supabase
-              .from('profiles')
-              .insert([{
-                id: data.user.id,
-                email: data.user.email,
-                full_name: data.user.user_metadata.full_name || data.user.email?.split('@')[0],
-                is_premium: false
-              }]);
-
-            if (createError) throw createError;
-          }
-
           set({
             user: {
               id: data.user.id,
@@ -129,6 +169,7 @@ export const useAuthStore = create<AuthState>()(
             session: data.session,
             loading: false,
             error: null,
+            initialized: true,
           });
         } catch (error) {
           let message = 'Failed to sign in';
@@ -182,11 +223,13 @@ export const useAuthStore = create<AuthState>()(
         set({ loading: true, error: null });
         try {
           await supabase.auth.signOut();
+          localStorage.removeItem('auth-storage');
           set({
             user: null,
             session: null,
             loading: false,
             error: null,
+            initialized: true,
           });
         } catch (error) {
           set({ 
@@ -201,7 +244,17 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ user: state.user, session: state.session }),
+      partialize: (state) => ({ 
+        user: state.user, 
+        session: state.session,
+        initialized: state.initialized 
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Refresh profile when rehydrating from storage
+        if (state?.user) {
+          state.refreshProfile();
+        }
+      },
     }
   )
 );
