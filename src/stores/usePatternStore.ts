@@ -31,14 +31,20 @@ export const usePatternStore = create<PatternState>()(
 
           if (error) throw error;
 
-          // Convert snake_case to camelCase for frontend use
           const formattedPatterns = (data || []).map(pattern => ({
-            ...pattern,
+            id: pattern.id,
             userId: pattern.user_id,
+            name: pattern.name,
+            description: pattern.description,
+            difficulty: pattern.difficulty,
             hookSize: pattern.hook_size,
             yarnWeight: pattern.yarn_weight,
-            createdAt: pattern.created_at,
-            updatedAt: pattern.updated_at
+            gauge: pattern.gauge,
+            materials: pattern.materials || [],
+            sections: pattern.sections || [],
+            notes: pattern.notes || [],
+            createdAt: new Date(pattern.created_at),
+            updatedAt: new Date(pattern.updated_at)
           }));
 
           set({ patterns: formattedPatterns, loading: false });
@@ -54,9 +60,7 @@ export const usePatternStore = create<PatternState>()(
       addPattern: async (pattern: Pattern) => {
         set({ loading: true, error: null });
         try {
-          // Convert camelCase to snake_case for database
           const patternToSave = {
-            id: crypto.randomUUID(),
             user_id: pattern.userId,
             name: pattern.name,
             description: pattern.description,
@@ -64,9 +68,9 @@ export const usePatternStore = create<PatternState>()(
             hook_size: pattern.hookSize,
             yarn_weight: pattern.yarnWeight,
             gauge: pattern.gauge,
-            materials: pattern.materials,
-            sections: pattern.sections,
-            notes: pattern.notes,
+            materials: pattern.materials || [],
+            sections: pattern.sections || [],
+            notes: pattern.notes || [],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           };
@@ -79,14 +83,20 @@ export const usePatternStore = create<PatternState>()(
 
           if (error) throw error;
 
-          // Convert back to camelCase for frontend
           const savedPattern = {
-            ...data,
+            id: data.id,
             userId: data.user_id,
+            name: data.name,
+            description: data.description,
+            difficulty: data.difficulty,
             hookSize: data.hook_size,
             yarnWeight: data.yarn_weight,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at
+            gauge: data.gauge,
+            materials: data.materials || [],
+            sections: data.sections || [],
+            notes: data.notes || [],
+            createdAt: new Date(data.created_at),
+            updatedAt: new Date(data.updated_at)
           };
 
           set(state => ({
@@ -106,7 +116,6 @@ export const usePatternStore = create<PatternState>()(
         set({ loading: true, error: null });
         try {
           const patternToUpdate = {
-            id: pattern.id,
             user_id: pattern.userId,
             name: pattern.name,
             description: pattern.description,
@@ -114,9 +123,9 @@ export const usePatternStore = create<PatternState>()(
             hook_size: pattern.hookSize,
             yarn_weight: pattern.yarnWeight,
             gauge: pattern.gauge,
-            materials: pattern.materials,
-            sections: pattern.sections,
-            notes: pattern.notes,
+            materials: pattern.materials || [],
+            sections: pattern.sections || [],
+            notes: pattern.notes || [],
             updated_at: new Date().toISOString()
           };
 
@@ -130,12 +139,19 @@ export const usePatternStore = create<PatternState>()(
           if (error) throw error;
 
           const updatedPattern = {
-            ...data,
+            id: data.id,
             userId: data.user_id,
+            name: data.name,
+            description: data.description,
+            difficulty: data.difficulty,
             hookSize: data.hook_size,
             yarnWeight: data.yarn_weight,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at
+            gauge: data.gauge,
+            materials: data.materials || [],
+            sections: data.sections || [],
+            notes: data.notes || [],
+            createdAt: new Date(data.created_at),
+            updatedAt: new Date(data.updated_at)
           };
 
           set(state => ({
@@ -180,7 +196,6 @@ export const usePatternStore = create<PatternState>()(
         set({ loading: true, error: null });
         try {
           const patternToSave = {
-            id: crypto.randomUUID(),
             user_id: userId,
             name: `${pattern.name} (Copy)`,
             description: pattern.description,
@@ -188,9 +203,9 @@ export const usePatternStore = create<PatternState>()(
             hook_size: pattern.hookSize,
             yarn_weight: pattern.yarnWeight,
             gauge: pattern.gauge,
-            materials: pattern.materials,
-            sections: pattern.sections,
-            notes: pattern.notes,
+            materials: pattern.materials || [],
+            sections: pattern.sections || [],
+            notes: pattern.notes || [],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           };
@@ -204,12 +219,19 @@ export const usePatternStore = create<PatternState>()(
           if (error) throw error;
 
           const savedPattern = {
-            ...data,
+            id: data.id,
             userId: data.user_id,
+            name: data.name,
+            description: data.description,
+            difficulty: data.difficulty,
             hookSize: data.hook_size,
             yarnWeight: data.yarn_weight,
-            createdAt: data.created_at,
-            updatedAt: data.updated_at
+            gauge: data.gauge,
+            materials: data.materials || [],
+            sections: data.sections || [],
+            notes: data.notes || [],
+            createdAt: new Date(data.created_at),
+            updatedAt: new Date(data.updated_at)
           };
 
           set(state => ({

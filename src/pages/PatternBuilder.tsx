@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { usePatternStore } from '../stores/usePatternStore';
+import { supabase } from '../lib/supabase';
 import PatternStarter from '../components/pattern-builder/PatternStarter';
 import StitchPanel from '../components/pattern-builder/StitchPanel';
 import CurrentRound from '../components/pattern-builder/CurrentRound';
@@ -20,6 +21,7 @@ export default function PatternBuilder() {
   const { user } = useAuthStore();
   const { addPattern, updatePattern } = usePatternStore();
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [customText, setCustomText] = useState('');
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
@@ -46,9 +48,57 @@ export default function PatternBuilder() {
 
   const [editingRoundId, setEditingRoundId] = useState<string | null>(null);
 
-  const currentSection = pattern.sections.find(s => s.id === currentSectionId);
-  const hasActualRounds = currentSection?.rounds.some(round => !round.isText);
+  // Load existing pattern if ID is provided
+  useEffect(() => {
+    async function loadPattern() {
+      if (!id) return;
+      
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('patterns')
+          .select('*')
+          .eq('id', id)
+          .single();
 
+        if (error) throw error;
+
+        if (data) {
+          const loadedPattern = {
+            id: data.id,
+            userId: data.user_id,
+            name: data.name,
+            description: data.description,
+            difficulty: data.difficulty,
+            hookSize: data.hook_size,
+            yarnWeight: data.yarn_weight,
+            gauge: data.gauge,
+            materials: data.materials || [],
+            sections: data.sections || [],
+            notes: data.notes || [],
+            createdAt: new Date(data.created_at),
+            updatedAt: new Date(data.updated_at)
+          };
+
+          setPattern(loadedPattern);
+
+          // Set the first section as current if exists
+          if (data.sections && data.sections.length > 0) {
+            setCurrentSectionId(data.sections[0].id);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading pattern:', error);
+        setSaveError('Failed to load pattern');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadPattern();
+  }, [id]);
+
+  // Update user ID when user changes
   useEffect(() => {
     if (user) {
       setPattern(prev => ({
@@ -58,6 +108,10 @@ export default function PatternBuilder() {
     }
   }, [user]);
 
+  const currentSection = pattern.sections.find(s => s.id === currentSectionId);
+  const hasActualRounds = currentSection?.rounds.some(round => !round.isText);
+
+  // All your existing handler functions remain the same
   const handleSave = async () => {
     if (!user) {
       navigate('/login?redirect=/pattern-builder');
@@ -94,7 +148,6 @@ export default function PatternBuilder() {
     }
   };
 
-  // ... rest of your existing functions ...
   const handleAddSection = (name: string) => {
     const newSection: PatternSection = {
       id: Math.random().toString(36).substr(2, 9),
@@ -343,6 +396,17 @@ export default function PatternBuilder() {
     }));
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center space-x-2 text-primary-600">
+          <PiSpinner className="w-6 h-6 animate-spin" />
+          <span>Loading pattern...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -485,10 +549,10 @@ export default function PatternBuilder() {
 
         <div className="md:col-span-1">
           <div className="space-y-6">
-            <CrochetPreview
+            {/* <CrochetPreview
               rounds={currentSection?.rounds || []}
               currentRound={currentRound}
-            />
+            /> */}
             <StitchGuide />
           </div>
         </div>

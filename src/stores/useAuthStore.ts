@@ -30,30 +30,65 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
+        // First check if profile exists
         const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
 
-        set({
-          user: {
-            id: session.user.id,
-            email: session.user.email!,
-            isPremium: profileData?.is_premium || false,
-            savedPatterns: 0,
-            createdAt: session.user.created_at,
-          },
-          session,
-        });
+        // If no profile exists, create one
+        if (!profileData) {
+          const { data: newProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert([{
+              id: session.user.id,
+              email: session.user.email,
+              full_name: session.user.user_metadata.full_name || session.user.email?.split('@')[0],
+              is_premium: false
+            }])
+            .select()
+            .single();
+
+          if (createError) throw createError;
+          
+          set({
+            user: {
+              id: session.user.id,
+              email: session.user.email!,
+              isPremium: false,
+              savedPatterns: 0,
+              createdAt: session.user.created_at,
+            },
+            session,
+          });
+        } else {
+          set({
+            user: {
+              id: session.user.id,
+              email: session.user.email!,
+              isPremium: profileData.is_premium || false,
+              savedPatterns: 0,
+              createdAt: session.user.created_at,
+            },
+            session,
+          });
+        }
+      } else {
+        set({ user: null, session: null });
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+      set({ user: null, session: null });
     }
   },
 
   signIn: async (email: string, password: string) => {
     set({ loading: true, error: null });
+    
+    // First, ensure we're starting with a clean state
+    await supabase.auth.signOut();
+    
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -66,15 +101,25 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw new Error('No user data returned');
       }
 
-      const { data: profileData, error: profileError } = await supabase
+      // Ensure profile exists
+      const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', data.user.id)
         .single();
 
-      if (profileError) {
-        console.error('Profile fetch error:', profileError);
-        // Don't throw here, use default values instead
+      if (!profileData) {
+        // Create profile if it doesn't exist
+        const { error: createError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: data.user.id,
+            email: data.user.email,
+            full_name: data.user.user_metadata.full_name || data.user.email?.split('@')[0],
+            is_premium: false
+          }]);
+
+        if (createError) throw createError;
       }
 
       set({
@@ -105,9 +150,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   signUp: async (email: string, password: string) => {
     set({ loading: true, error: null });
-    const isDevelopment = import.meta.env.DEV;
-    const autoConfirm = import.meta.env.VITE_DEV_AUTO_CONFIRM === 'true';
-
+    
+    // First, ensure we're starting with a clean state
+    await supabase.auth.signOut();
+    
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -127,31 +173,18 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw error;
       }
 
-      // In development with auto-confirm enabled, automatically sign in
-      if (isDevelopment && autoConfirm && data.user) {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      if (data.user) {
+        // Create profile immediately
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: data.user.id,
+            email: data.user.email,
+            full_name: data.user.user_metadata.full_name || data.user.email?.split('@')[0],
+            is_premium: false
+          }]);
 
-        if (signInError) throw signInError;
-
-        if (signInData.user) {
-          set({
-            user: {
-              id: signInData.user.id,
-              email: signInData.user.email!,
-              isPremium: false,
-              savedPatterns: 0,
-              createdAt: signInData.user.created_at,
-            },
-            session: signInData.session,
-            loading: false,
-            error: null,
-          });
-        }
-        
-        return { confirmEmailSent: false };
+        if (profileError) throw profileError;
       }
 
       set({ loading: false, error: null });
@@ -169,15 +202,15 @@ export const useAuthStore = create<AuthState>((set) => ({
   signOut: async () => {
     set({ loading: true, error: null });
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
+      await supabase.auth.signOut();
       set({
         user: null,
         session: null,
         loading: false,
         error: null,
       });
+      // Reload the page to ensure a clean state
+      window.location.reload();
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to sign out',

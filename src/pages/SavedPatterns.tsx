@@ -1,8 +1,118 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { usePatternStore } from '../stores/usePatternStore';
-import { PiPencil, PiTrash, PiCopy, PiSpinner } from 'react-icons/pi';
+import { PiPencil, PiTrash, PiCopy, PiSpinner, PiCaretDown, PiCaretUp } from 'react-icons/pi';
+import type { Pattern } from '../types/pattern';
+
+function formatDate(dateString: string | Date): string {
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function PatternCard({ pattern, onDelete, onDuplicate }: { 
+  pattern: Pattern; 
+  onDelete: (id: string) => void;
+  onDuplicate: (pattern: Pattern) => void;
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="border rounded-lg overflow-hidden bg-white">
+      <div className="p-4">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">{pattern.name}</h3>
+            <p className="text-gray-600 text-sm mb-2">{pattern.description}</p>
+          </div>
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-2 hover:bg-gray-100 rounded-full"
+          >
+            {isExpanded ? (
+              <PiCaretUp className="w-5 h-5" />
+            ) : (
+              <PiCaretDown className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+
+        <div className="flex justify-between items-center text-sm text-gray-500">
+          <span>Difficulty: {pattern.difficulty}</span>
+          <span>Sections: {pattern.sections.length}</span>
+        </div>
+
+        {isExpanded && (
+          <div className="mt-4 border-t pt-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="font-medium text-gray-700">Hook Size</p>
+                <p className="text-gray-600">{pattern.hookSize}</p>
+              </div>
+              <div>
+                <p className="font-medium text-gray-700">Yarn Weight</p>
+                <p className="text-gray-600">{pattern.yarnWeight}</p>
+              </div>
+            </div>
+
+            {pattern.sections.map((section, index) => (
+              <div key={section.id} className="mt-4">
+                <h4 className="font-medium text-gray-700">{section.name}</h4>
+                <p className="text-sm text-gray-600">
+                  {section.rounds.length} rounds
+                </p>
+              </div>
+            ))}
+
+            {pattern.notes && pattern.notes.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-medium text-gray-700">Notes</h4>
+                <ul className="list-disc list-inside text-sm text-gray-600">
+                  {pattern.notes.map((note, index) => (
+                    <li key={index}>{note}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-4 flex justify-between items-center">
+          <span className="text-sm text-gray-500">
+            Created: {formatDate(pattern.createdAt)}
+          </span>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => onDuplicate(pattern)}
+              className="p-2 hover:bg-gray-100 rounded-full"
+              title="Duplicate Pattern"
+            >
+              <PiCopy className="w-5 h-5" />
+            </button>
+            <Link
+              to={`/pattern-builder/${pattern.id}`}
+              className="p-2 hover:bg-gray-100 rounded-full"
+              title="Edit Pattern"
+            >
+              <PiPencil className="w-5 h-5" />
+            </Link>
+            <button
+              onClick={() => onDelete(pattern.id)}
+              className="p-2 hover:bg-gray-100 rounded-full text-red-600"
+              title="Delete Pattern"
+            >
+              <PiTrash className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function SavedPatterns() {
   const { user } = useAuthStore();
@@ -25,7 +135,7 @@ function SavedPatterns() {
     }
   };
 
-  const handleDuplicate = async (pattern: any) => {
+  const handleDuplicate = async (pattern: Pattern) => {
     if (!user) return;
     
     try {
@@ -89,46 +199,14 @@ function SavedPatterns() {
             </Link>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid gap-6">
             {patterns.map((pattern) => (
-              <div key={pattern.id} className="border rounded-lg overflow-hidden">
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-2">{pattern.name}</h3>
-                  <p className="text-gray-600 text-sm mb-2">{pattern.description}</p>
-                  <div className="flex justify-between items-center text-sm text-gray-500">
-                    <span>Difficulty: {pattern.difficulty}</span>
-                    <span>Sections: {pattern.sections.length}</span>
-                  </div>
-                  <div className="mt-4 flex justify-between items-center">
-                    <span className="text-sm text-gray-500">
-                      Created: {new Date(pattern.createdAt).toLocaleDateString()}
-                    </span>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleDuplicate(pattern)}
-                        className="p-2 hover:bg-gray-100 rounded-full"
-                        title="Duplicate Pattern"
-                      >
-                        <PiCopy className="w-5 h-5" />
-                      </button>
-                      <Link
-                        to={`/pattern-builder/${pattern.id}`}
-                        className="p-2 hover:bg-gray-100 rounded-full"
-                        title="Edit Pattern"
-                      >
-                        <PiPencil className="w-5 h-5" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(pattern.id)}
-                        className="p-2 hover:bg-gray-100 rounded-full text-red-600"
-                        title="Delete Pattern"
-                      >
-                        <PiTrash className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <PatternCard
+                key={pattern.id}
+                pattern={pattern}
+                onDelete={handleDelete}
+                onDuplicate={handleDuplicate}
+              />
             ))}
           </div>
         )}

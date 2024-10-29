@@ -14,7 +14,6 @@ export default function Login() {
   const { signIn, signUp, user, loading } = useAuthStore();
   const isDevelopment = import.meta.env.DEV;
 
-  // Redirect if already logged in
   useEffect(() => {
     if (user) {
       const redirectTo = new URLSearchParams(location.search).get('redirect') || '/pattern-builder';
@@ -113,8 +112,7 @@ export default function Login() {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-       
-          <div className="bg-white p-8 rounded-b-xl shadow-lg">
+          <div className="bg-white p-8 rounded-xl shadow-lg">
             <h2 className="text-3xl font-bold text-gray-900">
               {isSignUp ? 'Create an account' : 'Sign in to your account'}
             </h2>
@@ -146,17 +144,6 @@ export default function Login() {
               {error && (
                 <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
                   {error}
-                  {error.includes('not authorized') && (
-                    <p className="mt-2 text-sm">
-                      Please make sure you have:
-                      <ul className="list-disc ml-4 mt-1">
-                        <li>Set up your Supabase project correctly</li>
-                        <li>Enabled Email Auth in Authentication → Providers</li>
-                        <li>Added your domain to the allowed list</li>
-                        <li>Configured SMTP settings for email confirmation</li>
-                      </ul>
-                    </p>
-                  )}
                 </div>
               )}
 
@@ -207,7 +194,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center">
