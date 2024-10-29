@@ -151,9 +151,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   signUp: async (email: string, password: string) => {
     set({ loading: true, error: null });
     
-    // First, ensure we're starting with a clean state
-    await supabase.auth.signOut();
-    
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -173,20 +170,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw error;
       }
 
-      if (data.user) {
-        // Create profile immediately
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([{
-            id: data.user.id,
-            email: data.user.email,
-            full_name: data.user.user_metadata.full_name || data.user.email?.split('@')[0],
-            is_premium: false
-          }]);
-
-        if (profileError) throw profileError;
-      }
-
+      // Don't create profile here - wait for email confirmation
       set({ loading: false, error: null });
       return { confirmEmailSent: true };
     } catch (error) {
