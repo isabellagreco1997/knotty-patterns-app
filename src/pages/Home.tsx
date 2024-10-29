@@ -4,6 +4,7 @@ import { PiSparkle, PiHeart, PiTrophy, PiStar, PiPencilSimple, PiQuotes } from '
 import ImageCarousel from '../components/ImageCarousel';
 import PricingCards from '../components/PricingCards';
 import BlogPreview from '../components/BlogPreview';
+import ScrollFadeIn from '../components/ScrollFadeIn';
 
 const carouselImages = [
   {
@@ -78,7 +79,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center text-center">
         <ImageCarousel images={carouselImages} />
-        <div className="relative z-10 max-w-4xl mx-auto px-4">
+        <ScrollFadeIn direction="up" className="relative z-10 max-w-4xl mx-auto px-4">
           <h1 className="text-5xl font-bold text-white mb-6">
             Create Beautiful Crochet Patterns
           </h1>
@@ -100,22 +101,26 @@ export default function Home() {
               View Pricing
             </Link>
           </div>
-        </div>
+        </ScrollFadeIn>
       </section>
 
       {/* Features Section */}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose Our Pattern Builder?</h2>
+          <ScrollFadeIn>
+            <h2 className="text-3xl font-bold text-center mb-12">Why Choose Our Pattern Builder?</h2>
+          </ScrollFadeIn>
           <div className="grid md:grid-cols-4 gap-8">
-            {features.map((feature) => (
-              <div key={feature.label} className="text-center group hover:-translate-y-1 transition-transform">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary-100 mb-3 group-hover:bg-primary-200 transition-colors">
-                  {feature.icon}
+            {features.map((feature, index) => (
+              <ScrollFadeIn key={feature.label} delay={index * 100}>
+                <div className="text-center group hover:-translate-y-1 transition-transform">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary-100 mb-3 group-hover:bg-primary-200 transition-colors">
+                    {feature.icon}
+                  </div>
+                  <div className="text-lg font-semibold text-neutral-900 mb-1">{feature.label}</div>
+                  <div className="text-sm text-neutral-600">{feature.description}</div>
                 </div>
-                <div className="text-lg font-semibold text-neutral-900 mb-1">{feature.label}</div>
-                <div className="text-sm text-neutral-600">{feature.description}</div>
-              </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
@@ -124,53 +129,58 @@ export default function Home() {
       {/* How It Works */}
       <section className="py-20 bg-gradient-to-b from-primary-50 to-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+          <ScrollFadeIn>
+            <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+          </ScrollFadeIn>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="text-2xl font-bold text-primary-500 mb-4">1</div>
-              <h3 className="text-xl font-semibold mb-2">Choose Your Start</h3>
-              <p className="text-neutral-600">Begin with a magic ring, chain, or custom start for your pattern.</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="text-2xl font-bold text-primary-500 mb-4">2</div>
-              <h3 className="text-xl font-semibold mb-2">Build Your Pattern</h3>
-              <p className="text-neutral-600">Add stitches, rounds, and notes using our intuitive builder.</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="text-2xl font-bold text-primary-500 mb-4">3</div>
-              <h3 className="text-xl font-semibold mb-2">Share & Export</h3>
-              <p className="text-neutral-600">Save your pattern, share with others, or export for offline use.</p>
-            </div>
+            {[1, 2, 3].map((step, index) => (
+              <ScrollFadeIn key={step} direction="up" delay={index * 200}>
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <div className="text-2xl font-bold text-primary-500 mb-4">{step}</div>
+                  <h3 className="text-xl font-semibold mb-2">
+                    {step === 1 && "Choose Your Start"}
+                    {step === 2 && "Build Your Pattern"}
+                    {step === 3 && "Share & Export"}
+                  </h3>
+                  <p className="text-neutral-600">
+                    {step === 1 && "Begin with a magic ring, chain, or custom start for your pattern."}
+                    {step === 2 && "Add stitches, rounds, and notes using our intuitive builder."}
+                    {step === 3 && "Save your pattern, share with others, or export for offline use."}
+                  </p>
+                </div>
+              </ScrollFadeIn>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Blog Preview Section */}
-      {/* <BlogPreview /> */}
-
       {/* Testimonials */}
       <section className="py-20 bg-primary-900 text-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">What Our Users Say</h2>
+          <ScrollFadeIn>
+            <h2 className="text-3xl font-bold text-center mb-12">What Our Users Say</h2>
+          </ScrollFadeIn>
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-primary-800/50 p-6 rounded-lg">
-                <div className="flex items-start mb-4">
-                  <PiQuotes className="w-8 h-8 text-primary-300 mr-2 flex-shrink-0" />
-                  <p className="text-primary-100 italic">{testimonial.quote}</p>
-                </div>
-                <div className="flex items-center mt-4">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.author}
-                    className="w-10 h-10 rounded-full object-cover mr-3"
-                  />
-                  <div>
-                    <div className="font-semibold text-primary-100">{testimonial.author}</div>
-                    <div className="text-sm text-primary-300">{testimonial.role}</div>
+              <ScrollFadeIn key={index} direction="up" delay={index * 200}>
+                <div className="bg-primary-800/50 p-6 rounded-lg">
+                  <div className="flex items-start mb-4">
+                    <PiQuotes className="w-8 h-8 text-primary-300 mr-2 flex-shrink-0" />
+                    <p className="text-primary-100 italic">{testimonial.quote}</p>
+                  </div>
+                  <div className="flex items-center mt-4">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.author}
+                      className="w-10 h-10 rounded-full object-cover mr-3"
+                    />
+                    <div>
+                      <div className="font-semibold text-primary-100">{testimonial.author}</div>
+                      <div className="text-sm text-primary-300">{testimonial.role}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </ScrollFadeIn>
             ))}
           </div>
         </div>
@@ -179,17 +189,21 @@ export default function Home() {
       {/* Pricing Section */}
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-4">Simple, Transparent Pricing</h2>
-          <p className="text-center text-neutral-600 mb-12 max-w-2xl mx-auto">
-            Choose the perfect plan for your crochet journey. All plans include access to our pattern builder and basic features.
-          </p>
-          <PricingCards />
+          <ScrollFadeIn>
+            <h2 className="text-3xl font-bold text-center mb-4">Simple, Transparent Pricing</h2>
+            <p className="text-center text-neutral-600 mb-12 max-w-2xl mx-auto">
+              Choose the perfect plan for your crochet journey. All plans include access to our pattern builder and basic features.
+            </p>
+          </ScrollFadeIn>
+          <ScrollFadeIn direction="up" delay={200}>
+            <PricingCards />
+          </ScrollFadeIn>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="py-20 bg-primary-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <ScrollFadeIn className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Creating?</h2>
           <p className="text-xl mb-8">Join our community of crochet enthusiasts and start creating beautiful patterns today.</p>
           <Link
@@ -198,7 +212,7 @@ export default function Home() {
           >
             Try Pattern Builder Free
           </Link>
-        </div>
+        </ScrollFadeIn>
       </section>
     </div>
   );
