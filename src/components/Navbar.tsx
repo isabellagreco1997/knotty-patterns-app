@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PiScissors, PiUser, PiSignOut } from 'react-icons/pi';
+import { PiScissors, PiUser, PiSignOut, PiList, PiX } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 
 const Navbar: React.FC = () => {
   const { user, signOut } = useAuthStore();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -12,6 +13,10 @@ const Navbar: React.FC = () => {
     } catch (error) {
       console.error('Error signing out:', error);
     }
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
   };
 
   return (
@@ -23,7 +28,20 @@ const Navbar: React.FC = () => {
             <span className="text-xl font-bold text-primary-500">KnottyPatterns</span>
           </Link>
 
-          <div className="flex items-center space-x-4">
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-2 rounded-md text-primary-500 hover:bg-primary-50"
+          >
+            {isMenuOpen ? (
+              <PiX className="w-6 h-6" />
+            ) : (
+              <PiList className="w-6 h-6" />
+            )}
+          </button>
+
+          {/* Desktop menu */}
+          <div className="hidden md:flex items-center space-x-4">
             <Link
               to="/pattern-builder"
               className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
@@ -73,6 +91,77 @@ const Navbar: React.FC = () => {
                 className="inline-flex items-center px-4 py-2 border border-primary-300 text-sm font-medium rounded-md text-primary-500 hover:bg-primary-50 transition-colors"
               >
                 <PiUser className="w-4 h-4 mr-2" />
+                Sign In
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        <div
+          className={`md:hidden ${
+            isMenuOpen ? 'block' : 'hidden'
+          } border-t border-gray-200 py-2`}
+        >
+          <div className="flex flex-col space-y-1 px-2 pb-3 pt-2">
+            <Link
+              to="/pattern-builder"
+              onClick={closeMenu}
+              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+            >
+              Pattern Builder
+            </Link>
+            <Link
+              to="/pricing"
+              onClick={closeMenu}
+              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+            >
+              Pricing
+            </Link>
+            <Link
+              to="/blog"
+              onClick={closeMenu}
+              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+            >
+              Blog
+            </Link>
+            {user && (
+              <Link
+                to="/saved-patterns"
+                onClick={closeMenu}
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+              >
+                My Patterns
+              </Link>
+            )}
+            {user ? (
+              <>
+                <Link
+                  to="/account"
+                  onClick={closeMenu}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+                >
+                  <PiUser className="w-4 h-4 inline mr-2" />
+                  {user.email}
+                </Link>
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    closeMenu();
+                  }}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium text-left w-full"
+                >
+                  <PiSignOut className="w-4 h-4 inline mr-2" />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                onClick={closeMenu}
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+              >
+                <PiUser className="w-4 h-4 inline mr-2" />
                 Sign In
               </Link>
             )}
