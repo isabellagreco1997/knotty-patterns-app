@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { PiSparkle, PiHeart, PiTrophy, PiStar, PiPencilSimple, PiQuotes } from 'react-icons/pi';
 import ImageCarousel from '../components/ImageCarousel';
 import PricingCards from '../components/PricingCards';
-import BlogPreview from '../components/BlogPreview';
 import ScrollFadeIn from '../components/ScrollFadeIn';
 
 const carouselImages = [
@@ -73,6 +72,21 @@ const testimonials = [
   }
 ];
 
+const team = [
+  {
+    name: "Isabella Greco",
+    role: "Founder & CEO",
+    image: "https://media.licdn.com/dms/image/v2/D4E03AQGGO7Gx_CBFEQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1689498610769?e=1735776000&v=beta&t=h5-I_25ANNdUx4F8KHNtOEVxG87F0ZgkzjBW2W2-f0M",
+    description: "A passionate crocheter with a background in software development, Isabella founded KnottyPatterns to bridge the gap between traditional crafting and modern technology."
+  },
+  {
+    name: "Omrit Sarangi",
+    role: "Co-Founder & CTO",
+    image: "https://media.licdn.com/dms/image/v2/D4D03AQENCl1tKK9Z9g/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1707227181115?e=1735776000&v=beta&t=Xxie8-tU-TH9yY6qjjL0GJ8iqm350kvyuCaeAWkD0ak",
+    description: "With expertise in both UI/UX design and crochet pattern creation, Omrit brings a unique perspective to making pattern design more accessible and enjoyable for everyone."
+  }
+];
+
 export default function Home() {
   return (
     <div className="w-full">
@@ -126,8 +140,10 @@ export default function Home() {
         </div>
       </section>
 
+      
+
       {/* How It Works */}
-      <section className="py-20 bg-gradient-to-b from-primary-50 to-white">
+      <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <ScrollFadeIn>
             <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
@@ -147,6 +163,37 @@ export default function Home() {
                     {step === 2 && "Add stitches, rounds, and notes using our intuitive builder."}
                     {step === 3 && "Save your pattern, share with others, or export for offline use."}
                   </p>
+                </div>
+              </ScrollFadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section className="py-20 bg-gradient-to-b from-primary-50 to-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <ScrollFadeIn>
+            <h2 className="text-3xl font-bold text-center mb-4">About Us</h2>
+            <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
+              KnottyPatterns was born from a shared passion for crochet and technology. We recognized the need for a modern, 
+              intuitive tool that could help both beginners and experienced crocheters create, manage, and share their patterns. 
+              Our mission is to make pattern creation accessible to everyone while fostering a supportive community of makers.
+            </p>
+          </ScrollFadeIn>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            {team.map((member, index) => (
+              <ScrollFadeIn key={member.name} direction="up" delay={index * 200}>
+                <div className="flex flex-col items-center text-center">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-48 h-48 rounded-full object-cover mb-6 shadow-lg"
+                  />
+                  <h3 className="text-xl font-semibold text-gray-900">{member.name}</h3>
+                  <p className="text-primary-600 font-medium mb-4">{member.role}</p>
+                  <p className="text-gray-600 max-w-md">{member.description}</p>
                 </div>
               </ScrollFadeIn>
             ))}
