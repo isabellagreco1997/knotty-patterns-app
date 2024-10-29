@@ -12,12 +12,36 @@ export const supabase = (!isDevelopment || (supabaseUrl && supabaseAnonKey))
       auth: {
         autoRefreshToken: true,
         persistSession: true,
-        detectSessionInUrl: true
+        detectSessionInUrl: true,
+        storageKey: 'knottypatterns_auth',
+        storage: {
+          getItem: (key) => {
+            // Check for cookie consent
+            const hasConsent = localStorage.getItem('cookieConsent') === 'true';
+            if (hasConsent) {
+              return localStorage.getItem(key);
+            }
+            // If no consent, only allow session storage
+            return sessionStorage.getItem(key);
+          },
+          setItem: (key, value) => {
+            const hasConsent = localStorage.getItem('cookieConsent') === 'true';
+            if (hasConsent) {
+              localStorage.setItem(key, value);
+            } else {
+              sessionStorage.setItem(key, value);
+            }
+          },
+          removeItem: (key) => {
+            localStorage.removeItem(key);
+            sessionStorage.removeItem(key);
+          },
+        },
       }
     })
   : mockSupabase;
 
-// Initialize auth state from local storage
+// Initialize auth state from storage
 supabase.auth.onAuthStateChange(async (event, session) => {
   if (event === 'SIGNED_IN' && session?.user) {
     // Check if profile exists
@@ -60,7 +84,7 @@ export async function checkSupabaseConnection() {
   }
 }
 
-// Helper function to verify email confirmation token
+// Rest of the code remains the same...
 export async function verifyEmail(token: string) {
   const { error } = await supabase.auth.verifyOtp({
     token_hash: token,
@@ -69,7 +93,6 @@ export async function verifyEmail(token: string) {
   return { error };
 }
 
-// Pattern management functions
 export async function savePattern(pattern: Pattern) {
   const { data, error } = await supabase
     .from('patterns')

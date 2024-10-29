@@ -11,6 +11,7 @@ import EmailConfirmation from './pages/EmailConfirmation';
 import Pricing from './pages/Pricing';
 import Blog from './pages/Blog';
 import Footer from './components/Footer';
+import CookieConsent from './components/CookieConsent';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -63,6 +64,7 @@ export default function App() {
           </Routes>
         </main>
         <Footer />
+        <CookieConsent />
       </div>
     </BrowserRouter>
   );
