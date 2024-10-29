@@ -118,7 +118,7 @@ export const useAuthStore = create<AuthState>()(
               .single();
 
             if (createError) throw createError;
-
+            
             set({
               user: {
                 id: session.user.id,
@@ -231,6 +231,8 @@ export const useAuthStore = create<AuthState>()(
             error: null,
             initialized: true,
           });
+          // Redirect to login page
+          window.location.href = '/login';
         } catch (error) {
           set({ 
             error: error instanceof Error ? error.message : 'Failed to sign out',

@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { PiScissors, PiUser, PiSignOut, PiList, PiX } from 'react-icons/pi';
+import { Link, useNavigate } from 'react-router-dom';
+import { PiScissors, PiUser, PiSignOut, PiList, PiX, PiGear } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 
 const Navbar: React.FC = () => {
   const { user, signOut } = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      navigate('/login');
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -74,7 +76,7 @@ const Navbar: React.FC = () => {
                   to="/account"
                   className="inline-flex items-center px-3 py-2 border border-primary-300 text-sm font-medium rounded-md text-primary-500 hover:bg-primary-50 transition-colors"
                 >
-                  <PiUser className="w-4 h-4 mr-2" />
+                  <PiGear className="w-4 h-4 mr-2" />
                   {user.email}
                 </Link>
                 <button
@@ -141,8 +143,8 @@ const Navbar: React.FC = () => {
                   onClick={closeMenu}
                   className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
                 >
-                  <PiUser className="w-4 h-4 inline mr-2" />
-                  {user.email}
+                  <PiGear className="w-4 h-4 inline mr-2" />
+                  Settings
                 </Link>
                 <button
                   onClick={() => {

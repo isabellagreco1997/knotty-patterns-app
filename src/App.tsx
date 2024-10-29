@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import EmailConfirmation from './pages/EmailConfirmation';
 import Pricing from './pages/Pricing';
 import Blog from './pages/Blog';
+import AccountSettings from './pages/AccountSettings';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
 
@@ -99,6 +100,7 @@ export default function App() {
             <Route path="/auth/confirm" element={<EmailConfirmation />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/account" element={<AccountSettings />} />
           </Routes>
         </main>
         <Footer />
