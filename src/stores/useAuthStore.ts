@@ -86,9 +86,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   signIn: async (email: string, password: string) => {
     set({ loading: true, error: null });
     
-    // First, ensure we're starting with a clean state
-    await supabase.auth.signOut();
-    
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -170,7 +167,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw error;
       }
 
-      // Don't create profile here - wait for email confirmation
       set({ loading: false, error: null });
       return { confirmEmailSent: true };
     } catch (error) {
@@ -193,8 +189,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         loading: false,
         error: null,
       });
-      // Reload the page to ensure a clean state
-      window.location.reload();
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to sign out',
