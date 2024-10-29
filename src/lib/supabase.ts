@@ -6,44 +6,31 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const isDevelopment = import.meta.env.DEV;
 
-// Custom storage implementation
-const customStorage = {
-  getItem: (key: string) => {
-    const hasConsent = localStorage.getItem('cookieConsent') === 'true';
-    // Always try localStorage first for existing sessions
-    const localValue = localStorage.getItem(key);
-    if (localValue) return localValue;
-    
-    // If no consent, use sessionStorage as fallback
-    return hasConsent ? null : sessionStorage.getItem(key);
-  },
-  setItem: (key: string, value: string) => {
-    const hasConsent = localStorage.getItem('cookieConsent') === 'true';
-    if (hasConsent) {
-      localStorage.setItem(key, value);
-    } else {
-      sessionStorage.setItem(key, value);
-    }
-  },
-  removeItem: (key: string) => {
-    localStorage.removeItem(key);
-    sessionStorage.removeItem(key);
-  },
-};
-
-// Use mock client in development if environment variables are not set
+// Create Supabase client with persistent storage
 export const supabase = (!isDevelopment || (supabaseUrl && supabaseAnonKey))
   ? createClient(supabaseUrl || '', supabaseAnonKey || '', {
       auth: {
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,
-        storage: customStorage,
+        storage: localStorage,
+        storageKey: 'sb-auth-token',
+        flowType: 'pkce'
       }
     })
   : mockSupabase;
 
-// Initialize auth state from storage
+// Listen for auth changes across tabs
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'sb-auth-token') {
+      // Reload the page to sync auth state
+      window.location.reload();
+    }
+  });
+}
+
+// Initialize auth state
 supabase.auth.onAuthStateChange(async (event, session) => {
   if (event === 'SIGNED_IN' && session?.user) {
     // Check if profile exists
@@ -57,14 +44,12 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     if (!profile && !error) {
       const { error: insertError } = await supabase
         .from('profiles')
-        .insert([
-          {
-            id: session.user.id,
-            email: session.user.email,
-            full_name: session.user.user_metadata.full_name || session.user.email?.split('@')[0],
-            is_premium: false
-          },
-        ]);
+        .insert([{
+          id: session.user.id,
+          email: session.user.email,
+          full_name: session.user.user_metadata.full_name || session.user.email?.split('@')[0],
+          is_premium: false
+        }]);
 
       if (insertError) {
         console.error('Error creating profile:', insertError);

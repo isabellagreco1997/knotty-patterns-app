@@ -22,8 +22,10 @@ export default function CookieConsent() {
     setTimeout(() => {
       setIsVisible(false);
       localStorage.setItem('cookieConsent', 'true');
-      // Set cookie preferences
-      document.cookie = "cookieConsent=true; max-age=31536000; path=/"; // 1 year
+      // Set secure cookie with SameSite attribute
+      document.cookie = "cookieConsent=true; max-age=31536000; path=/; secure; samesite=strict";
+      // Reload to ensure auth state is properly initialized
+      window.location.reload();
     }, 300);
   };
 
@@ -32,6 +34,8 @@ export default function CookieConsent() {
     setTimeout(() => {
       setIsVisible(false);
       localStorage.setItem('cookieConsent', 'false');
+      // Use session storage for temporary storage
+      sessionStorage.setItem('tempAuth', 'true');
     }, 300);
   };
 
