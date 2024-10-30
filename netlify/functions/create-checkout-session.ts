@@ -2,29 +2,31 @@ import { Handler } from '@netlify/functions';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2024-09-30.acacia',
 });
 
 const PREMIUM_PRICE_ID = process.env.STRIPE_PREMIUM_PRICE_ID;
 
 export const handler: Handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
+
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
+      headers,
       body: ''
     };
   }
 
   if (event.httpMethod !== 'POST') {
-    return { 
-      statusCode: 405, 
-      body: JSON.stringify({ error: 'Method Not Allowed' }),
-      headers: { 'Access-Control-Allow-Origin': '*' }
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Method Not Allowed' })
     };
   }
 
@@ -34,7 +36,7 @@ export const handler: Handler = async (event) => {
     if (!customerEmail || !PREMIUM_PRICE_ID) {
       return {
         statusCode: 400,
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        headers,
         body: JSON.stringify({ 
           error: !customerEmail ? 'Missing customer email' : 'Premium price ID not configured'
         })
@@ -62,14 +64,14 @@ export const handler: Handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers,
       body: JSON.stringify({ sessionId: session.id })
     };
   } catch (error) {
     console.error('Checkout session error:', error);
     return {
       statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers,
       body: JSON.stringify({ 
         error: error instanceof Error ? error.message : 'Failed to create checkout session' 
       })
