@@ -1,19 +1,23 @@
 import { Handler } from '@netlify/functions';
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY environment variable is not set');
-}
 
+
+
+if (!process.env.VITE_STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY environment variable is not set isa');
+}
 if (!process.env.STRIPE_PREMIUM_PRICE_ID) {
+  console.log( 'isabella', process.env.VITE_STRIPE_SECRET_KEY, 'next', process.env.STRIPE_PREMIUM_PRICE_ID)
+
   throw new Error('STRIPE_PREMIUM_PRICE_ID environment variable is not set');
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.VITE_STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
 });
 
-const PREMIUM_PRICE_ID = process.env.STRIPE_PREMIUM_PRICE_ID;
+const PREMIUM_PRICE_ID = process.env.VITE_STRIPE_PREMIUM_PRICE_ID;
 
 export const handler: Handler = async (event) => {
   // Handle CORS
@@ -54,7 +58,7 @@ export const handler: Handler = async (event) => {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: PREMIUM_PRICE_ID,
+          price: process.env.STRIPE_PREMIUM_PRICE_ID, // Use the predefined price ID
           quantity: 1,
         },
       ],

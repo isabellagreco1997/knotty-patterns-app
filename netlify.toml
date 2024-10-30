@@ -11,12 +11,16 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# Ensure all routes are handled by the SPA
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = true
+[dev]
+  command = "npm run dev"
+  port = 8888
+  targetPort = 5173
+  publish = "dist"
+  framework = "#custom"
+  autoLaunch = true
 
-  [functions]
+[functions]
   node_bundler = "esbuild"
+  external_node_modules = ["stripe"]
+
+  

@@ -1,7 +1,9 @@
 import { loadStripe } from '@stripe/stripe-js';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!);
-
+const isDevelopment = import.meta.env.DEV;
+// Always initialize Stripe, but use test key in development
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+console.log('testing', import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY, 'test');
 export async function createCheckoutSession(): Promise<void> {
   try {
     const userEmail = localStorage.getItem('sb-auth-email');
@@ -9,10 +11,13 @@ export async function createCheckoutSession(): Promise<void> {
       throw new Error('User email not found');
     }
 
-    const baseUrl = import.meta.env.PROD 
-      ? window.location.origin
-      : 'http://localhost:8888';
+    if (!stripePromise) {
+      throw new Error('Stripe is not initialized');
+    }
 
+    // In development, use local server URL
+    const baseUrl = isDevelopment ? 'http://localhost:8888' : '';
+    
     const response = await fetch(`${baseUrl}/.netlify/functions/create-checkout-session`, {
       method: 'POST',
       headers: {
@@ -27,13 +32,9 @@ export async function createCheckoutSession(): Promise<void> {
     }
 
     const { sessionId } = await response.json();
-
     const stripe = await stripePromise;
-    if (!stripe) {
-      throw new Error('Stripe failed to initialize');
-    }
     
-    const { error } = await stripe.redirectToCheckout({ sessionId });
+    const { error } = await stripe!.redirectToCheckout({ sessionId });
     if (error) {
       throw error;
     }
@@ -50,10 +51,8 @@ export async function createPortalSession(): Promise<void> {
       throw new Error('User email not found');
     }
 
-    const baseUrl = import.meta.env.PROD 
-      ? window.location.origin
-      : 'http://localhost:8888';
-
+    const baseUrl = isDevelopment ? 'http://localhost:8888' : '';
+    
     const response = await fetch(`${baseUrl}/.netlify/functions/create-portal-session`, {
       method: 'POST',
       headers: {
@@ -85,10 +84,8 @@ export async function getSubscriptionStatus(): Promise<{
       return { isActive: false, plan: 'free' };
     }
 
-    const baseUrl = import.meta.env.PROD 
-      ? window.location.origin
-      : 'http://localhost:8888';
-
+    const baseUrl = isDevelopment ? 'http://localhost:8888' : '';
+    
     const response = await fetch(`${baseUrl}/.netlify/functions/get-subscription-status`, {
       method: 'POST',
       headers: {
@@ -119,10 +116,8 @@ export async function handlePaymentSuccess(): Promise<void> {
       throw new Error('User email not found');
     }
 
-    const baseUrl = import.meta.env.PROD 
-      ? window.location.origin
-      : 'http://localhost:8888';
-
+    const baseUrl = isDevelopment ? 'http://localhost:8888' : '';
+    
     const response = await fetch(`${baseUrl}/.netlify/functions/handle-payment-success`, {
       method: 'POST',
       headers: {
