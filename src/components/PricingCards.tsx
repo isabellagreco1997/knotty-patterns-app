@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { PiCheck, PiX, PiStar, PiSparkle } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
-import { createCheckoutSession } from '../lib/stripe';
 
 interface PricingFeature {
   name: string;
@@ -21,27 +20,28 @@ const features: PricingFeature[] = [
   { name: 'Custom stitch creation', free: false, premium: true },
 ];
 
-const STRIPE_PREMIUM_PRICE_ID = import.meta.env.VITE_STRIPE_PREMIUM_PRICE_ID;
+// Stripe payment link with custom data
+const createPaymentLink = (email: string) => {
+  const baseLink = 'https://buy.stripe.com/3cseV56sVc1S4SI6oo';
+  const prefillData = encodeURIComponent(JSON.stringify({
+    email: email,
+    client_reference_id: email // This helps track the payment in webhooks
+  }));
+  return `${baseLink}?prefilled_email=${email}&client_reference_id=${email}`;
+};
 
 const PricingCards: React.FC = () => {
   const { user } = useAuthStore();
-  const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleSubscribe = async () => {
+  const handleUpgrade = () => {
     if (!user) {
       window.location.href = '/login?redirect=pricing';
       return;
     }
-
-    try {
-      setIsLoading(true);
-      await createCheckoutSession(STRIPE_PREMIUM_PRICE_ID);
-    } catch (error) {
-      console.error('Payment error:', error);
-      alert('Failed to start payment process. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    
+    // Create payment link with user's email
+    const paymentLink = createPaymentLink(user.email);
+    window.location.href = paymentLink;
   };
 
   const renderFeatureList = (planType: 'free' | 'premium') => (
@@ -115,11 +115,10 @@ const PricingCards: React.FC = () => {
             <span className="text-sm text-neutral-500">/one-time</span>
           </p>
           <button
-            onClick={handleSubscribe}
-            disabled={isLoading}
-            className="mt-8 block w-full rounded-lg bg-primary-500 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleUpgrade}
+            className="mt-8 block w-full rounded-lg bg-primary-500 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-600 transition-colors"
           >
-            {isLoading ? 'Processing...' : 'Upgrade to Premium'}
+            Upgrade to Premium
           </button>
         </div>
         <div className="px-8 pb-8">
