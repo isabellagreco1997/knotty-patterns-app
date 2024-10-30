@@ -8,11 +8,13 @@ interface PatternState {
   loading: boolean;
   error: string | null;
   fetchPatterns: (userId: string) => Promise<void>;
-  addPattern: (pattern: Pattern) => Promise<void>;
+  addPattern: (pattern: Pattern, isPremium: boolean) => Promise<void>;
   updatePattern: (pattern: Pattern) => Promise<void>;
   deletePattern: (id: string) => Promise<void>;
-  duplicatePattern: (pattern: Pattern, userId: string) => Promise<void>;
+  duplicatePattern: (pattern: Pattern, userId: string, isPremium: boolean) => Promise<void>;
 }
+
+const MAX_FREE_PATTERNS = 5;
 
 export const usePatternStore = create<PatternState>()(
   persist(
@@ -57,7 +59,13 @@ export const usePatternStore = create<PatternState>()(
         }
       },
 
-      addPattern: async (pattern: Pattern) => {
+      addPattern: async (pattern: Pattern, isPremium: boolean) => {
+        const currentPatterns = get().patterns;
+        
+        if (!isPremium && currentPatterns.length >= MAX_FREE_PATTERNS) {
+          throw new Error(`Free users can only save up to ${MAX_FREE_PATTERNS} patterns. Please upgrade to Premium to save more patterns.`);
+        }
+
         set({ loading: true, error: null });
         try {
           const patternToSave = {
@@ -106,6 +114,67 @@ export const usePatternStore = create<PatternState>()(
         } catch (error) {
           set({ 
             error: error instanceof Error ? error.message : 'Failed to save pattern',
+            loading: false 
+          });
+          throw error;
+        }
+      },
+
+      duplicatePattern: async (pattern: Pattern, userId: string, isPremium: boolean) => {
+        const currentPatterns = get().patterns;
+        
+        if (!isPremium && currentPatterns.length >= MAX_FREE_PATTERNS) {
+          throw new Error(`Free users can only save up to ${MAX_FREE_PATTERNS} patterns. Please upgrade to Premium to save more patterns.`);
+        }
+
+        set({ loading: true, error: null });
+        try {
+          const patternToSave = {
+            user_id: userId,
+            name: `${pattern.name} (Copy)`,
+            description: pattern.description,
+            difficulty: pattern.difficulty,
+            hook_size: pattern.hookSize,
+            yarn_weight: pattern.yarnWeight,
+            gauge: pattern.gauge,
+            materials: pattern.materials || [],
+            sections: pattern.sections || [],
+            notes: pattern.notes || [],
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+
+          const { data, error } = await supabase
+            .from('patterns')
+            .insert([patternToSave])
+            .select()
+            .single();
+
+          if (error) throw error;
+
+          const savedPattern = {
+            id: data.id,
+            userId: data.user_id,
+            name: data.name,
+            description: data.description,
+            difficulty: data.difficulty,
+            hookSize: data.hook_size,
+            yarnWeight: data.yarn_weight,
+            gauge: data.gauge,
+            materials: data.materials || [],
+            sections: data.sections || [],
+            notes: data.notes || [],
+            createdAt: new Date(data.created_at),
+            updatedAt: new Date(data.updated_at)
+          };
+
+          set(state => ({
+            patterns: [...state.patterns, savedPattern],
+            loading: false
+          }));
+        } catch (error) {
+          set({ 
+            error: error instanceof Error ? error.message : 'Failed to duplicate pattern',
             loading: false 
           });
           throw error;

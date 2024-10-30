@@ -112,41 +112,42 @@ export default function PatternBuilder() {
   const hasActualRounds = currentSection?.rounds.some(round => !round.isText);
 
   // All your existing handler functions remain the same
-  const handleSave = async () => {
-    if (!user) {
-      navigate('/login?redirect=/pattern-builder');
-      return;
+ // Update the handleSave function in PatternBuilder.tsx
+const handleSave = async () => {
+  if (!user) {
+    navigate('/login?redirect=/pattern-builder');
+    return;
+  }
+
+  setIsSaving(true);
+  setSaveError(null);
+
+  try {
+    const patternToSave = {
+      ...pattern,
+      userId: user.id,
+      updatedAt: new Date()
+    };
+
+    if (id) {
+      await updatePattern(patternToSave);
+    } else {
+      await addPattern(patternToSave, user.isPremium);
     }
 
-    setIsSaving(true);
-    setSaveError(null);
-
-    try {
-      const patternToSave = {
-        ...pattern,
-        userId: user.id,
-        updatedAt: new Date()
-      };
-
-      if (id) {
-        await updatePattern(patternToSave);
-      } else {
-        await addPattern(patternToSave);
-      }
-
-      // Show success message
-      const successMessage = document.createElement('div');
-      successMessage.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
-      successMessage.textContent = 'Pattern saved successfully!';
-      document.body.appendChild(successMessage);
-      setTimeout(() => successMessage.remove(), 3000);
-    } catch (error) {
-      console.error('Failed to save pattern:', error);
-      setSaveError(error instanceof Error ? error.message : 'Failed to save pattern');
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    // Show success message
+    const successMessage = document.createElement('div');
+    successMessage.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
+    successMessage.textContent = 'Pattern saved successfully!';
+    document.body.appendChild(successMessage);
+    setTimeout(() => successMessage.remove(), 3000);
+  } catch (error) {
+    console.error('Failed to save pattern:', error);
+    setSaveError(error instanceof Error ? error.message : 'Failed to save pattern');
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const handleAddSection = (name: string) => {
     const newSection: PatternSection = {

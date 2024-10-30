@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { PiSparkle, PiHeart, PiTrophy, PiStar, PiPencilSimple, PiQuotes } from 'react-icons/pi';
 import ImageCarousel from '../components/ImageCarousel';
 import PricingCards from '../components/PricingCards';
 import ScrollFadeIn from '../components/ScrollFadeIn';
+import { PiSparkle, PiHeart, PiTrophy, PiStar, PiPencilSimple, PiQuotes, PiCircle, PiCheck, PiShare } from 'react-icons/pi';
 
 const carouselImages = [
   {
@@ -25,6 +25,45 @@ const carouselImages = [
   {
     url: "https://images.pexels.com/photos/10585168/pexels-photo-10585168.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     alt: "Crochet work in progress"
+  }
+];
+
+const howItWorksSections = [
+  {
+    step: 1,
+    title: "Start Your Pattern",
+    description: "Begin with a magic ring or chain for your amigurumi. Our intuitive interface guides you through the initial setup.",
+    icon: <PiCircle className="w-8 h-8 text-primary-500" />,
+    features: [
+      "Magic ring starter",
+      "Chain foundation",
+      "Custom text options",
+      "Basic stitch setup"
+    ]
+  },
+  {
+    step: 2,
+    title: "Build Round by Round",
+    description: "Create your pattern with our comprehensive stitch library. Add increases, decreases, and notes as you go.",
+    icon: <PiPencilSimple className="w-8 h-8 text-primary-500" />,
+    features: [
+      "Visual stitch builder",
+      "Round-by-round creation",
+      "Automatic stitch counting",
+      "Pattern notes & annotations"
+    ]
+  },
+  {
+    step: 3,
+    title: "Export & Share",
+    description: "Save your pattern, export it in multiple formats, or share it with the crochet community.",
+    icon: <PiShare className="w-8 h-8 text-primary-500" />,
+    features: [
+      "PDF export",
+      "Text format",
+      "Pattern versioning",
+      "Easy sharing options"
+    ]
   }
 ];
 
@@ -141,32 +180,56 @@ export default function Home() {
       </section>
 
       
-
-      {/* How It Works */}
-      <section className="py-20 bg-white">
+{/* How It Works */}
+<section className="py-20 bg-gradient-to-b from-white to-primary-50">
         <div className="max-w-6xl mx-auto px-4">
           <ScrollFadeIn>
-            <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+            <h2 className="text-3xl font-bold text-center mb-4">How It Works</h2>
+            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+              Create beautiful crochet patterns in three simple steps with our intuitive pattern builder.
+            </p>
           </ScrollFadeIn>
+
           <div className="grid md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((step, index) => (
-              <ScrollFadeIn key={step} direction="up" delay={index * 200}>
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <div className="text-2xl font-bold text-primary-500 mb-4">{step}</div>
-                  <h3 className="text-xl font-semibold mb-2">
-                    {step === 1 && "Choose Your Start"}
-                    {step === 2 && "Build Your Pattern"}
-                    {step === 3 && "Share & Export"}
-                  </h3>
-                  <p className="text-neutral-600">
-                    {step === 1 && "Begin with a magic ring, chain, or custom start for your pattern."}
-                    {step === 2 && "Add stitches, rounds, and notes using our intuitive builder."}
-                    {step === 3 && "Save your pattern, share with others, or export for offline use."}
-                  </p>
+            {howItWorksSections.map((section, index) => (
+              <ScrollFadeIn key={section.step} direction="up" delay={index * 200}>
+                <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                      {section.icon}
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-primary-600">Step {section.step}</div>
+                      <h3 className="text-xl font-semibold">{section.title}</h3>
+                    </div>
+                  </div>
+                  
+                  <p className="text-gray-600 mb-4">{section.description}</p>
+                  
+                  <ul className="space-y-2">
+                    {section.features.map((feature, i) => (
+                      <li key={i} className="flex items-center text-sm text-gray-600">
+                        <PiCheck className="w-4 h-4 text-primary-500 mr-2" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </ScrollFadeIn>
             ))}
           </div>
+
+          <ScrollFadeIn delay={600}>
+            <div className="text-center mt-12">
+              <Link
+                to="/pattern-builder"
+                className="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                <PiPencilSimple className="w-5 h-5 mr-2" />
+                Start Creating Your Pattern
+              </Link>
+            </div>
+          </ScrollFadeIn>
         </div>
       </section>
 

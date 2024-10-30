@@ -139,10 +139,10 @@ function SavedPatterns() {
     if (!user) return;
     
     try {
-      await duplicatePattern(pattern, user.id);
+      await duplicatePattern(pattern, user.id, user.isPremium);
     } catch (error) {
       console.error('Error duplicating pattern:', error);
-      alert('Failed to duplicate pattern. Please try again.');
+      alert(error instanceof Error ? error.message : 'Failed to duplicate pattern. Please try again.');
     }
   };
 
