@@ -16,8 +16,7 @@ export async function createCheckoutSession(): Promise<void> {
     const response = await fetch(`${baseUrl}/.netlify/functions/create-checkout-session`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ customerEmail: userEmail }),
     });
@@ -58,8 +57,7 @@ export async function createPortalSession(): Promise<void> {
     const response = await fetch(`${baseUrl}/.netlify/functions/create-portal-session`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ customerEmail: userEmail }),
     });
@@ -94,8 +92,7 @@ export async function getSubscriptionStatus(): Promise<{
     const response = await fetch(`${baseUrl}/.netlify/functions/get-subscription-status`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ customerEmail: userEmail }),
     });
@@ -129,8 +126,7 @@ export async function handlePaymentSuccess(): Promise<void> {
     const response = await fetch(`${baseUrl}/.netlify/functions/handle-payment-success`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({ customerEmail: userEmail }),
     });
