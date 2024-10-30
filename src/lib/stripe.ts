@@ -9,7 +9,11 @@ export async function createCheckoutSession(): Promise<void> {
       throw new Error('User email not found');
     }
 
-    const response = await fetch('/.netlify/functions/create-checkout-session', {
+    const baseUrl = import.meta.env.PROD 
+      ? window.location.origin
+      : 'http://localhost:8888';
+
+    const response = await fetch(`${baseUrl}/.netlify/functions/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +50,11 @@ export async function createPortalSession(): Promise<void> {
       throw new Error('User email not found');
     }
 
-    const response = await fetch('/.netlify/functions/create-portal-session', {
+    const baseUrl = import.meta.env.PROD 
+      ? window.location.origin
+      : 'http://localhost:8888';
+
+    const response = await fetch(`${baseUrl}/.netlify/functions/create-portal-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +85,11 @@ export async function getSubscriptionStatus(): Promise<{
       return { isActive: false, plan: 'free' };
     }
 
-    const response = await fetch('/.netlify/functions/get-subscription-status', {
+    const baseUrl = import.meta.env.PROD 
+      ? window.location.origin
+      : 'http://localhost:8888';
+
+    const response = await fetch(`${baseUrl}/.netlify/functions/get-subscription-status`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -107,7 +119,11 @@ export async function handlePaymentSuccess(): Promise<void> {
       throw new Error('User email not found');
     }
 
-    const response = await fetch('/.netlify/functions/handle-payment-success', {
+    const baseUrl = import.meta.env.PROD 
+      ? window.location.origin
+      : 'http://localhost:8888';
+
+    const response = await fetch(`${baseUrl}/.netlify/functions/handle-payment-success`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

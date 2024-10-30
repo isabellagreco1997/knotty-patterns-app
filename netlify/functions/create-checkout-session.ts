@@ -30,7 +30,7 @@ export const handler: Handler = async (event) => {
 
   try {
     const { customerEmail } = JSON.parse(event.body || '{}');
-    
+
     if (!customerEmail || !PREMIUM_PRICE_ID) {
       return {
         statusCode: 400,
@@ -41,10 +41,9 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // Create the checkout session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       customer_email: customerEmail,
+      payment_method_types: ['card'],
       line_items: [
         {
           price: PREMIUM_PRICE_ID,
@@ -52,8 +51,8 @@ export const handler: Handler = async (event) => {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.SITE_URL}/account?success=true`,
-      cancel_url: `${process.env.SITE_URL}/pricing?canceled=true`,
+      success_url: `${process.env.URL}/account?success=true`,
+      cancel_url: `${process.env.URL}/pricing?canceled=true`,
       allow_promotion_codes: true,
       billing_address_collection: 'required',
       metadata: {

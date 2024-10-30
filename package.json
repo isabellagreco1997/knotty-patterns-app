@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && tsc -p netlify/functions/tsconfig.json",
     "postbuild": "cp _redirects dist/",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@netlify/functions": "^2.6.0",
     "@react-three/drei": "^9.99.0",
     "@react-three/fiber": "^8.15.16",
     "@stripe/stripe-js": "^2.4.0",
