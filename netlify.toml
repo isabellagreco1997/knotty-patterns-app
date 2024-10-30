@@ -17,3 +17,6 @@
   to = "/index.html"
   status = 200
   force = true
+
+  [functions]
+  node_bundler = "esbuild"

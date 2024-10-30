@@ -27,8 +27,8 @@ export async function createCheckoutSession(): Promise<void> {
     }
 
     const { sessionId } = await response.json();
-    const stripe = await stripePromise;
     
+    const stripe = await stripePromise;
     if (!stripe) {
       throw new Error('Stripe failed to initialize');
     }
