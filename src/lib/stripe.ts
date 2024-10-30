@@ -17,6 +17,7 @@ export async function createCheckoutSession(): Promise<void> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`
       },
       body: JSON.stringify({ customerEmail: userEmail }),
     });
@@ -27,12 +28,12 @@ export async function createCheckoutSession(): Promise<void> {
     }
 
     const { sessionId } = await response.json();
-    
+
     const stripe = await stripePromise;
     if (!stripe) {
       throw new Error('Stripe failed to initialize');
     }
-
+    
     const { error } = await stripe.redirectToCheckout({ sessionId });
     if (error) {
       throw error;
@@ -58,6 +59,7 @@ export async function createPortalSession(): Promise<void> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`
       },
       body: JSON.stringify({ customerEmail: userEmail }),
     });
@@ -93,10 +95,11 @@ export async function getSubscriptionStatus(): Promise<{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`
       },
       body: JSON.stringify({ customerEmail: userEmail }),
     });
-
+    
     if (!response.ok) {
       throw new Error('Failed to fetch subscription status');
     }
@@ -127,6 +130,7 @@ export async function handlePaymentSuccess(): Promise<void> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`
       },
       body: JSON.stringify({ customerEmail: userEmail }),
     });
