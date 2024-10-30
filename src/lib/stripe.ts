@@ -14,18 +14,26 @@ interface PortalSessionResponse {
 
 export async function createCheckoutSession(priceId: string): Promise<void> {
   try {
-    // Get the current session from Supabase
-    const token = localStorage.getItem('sb-auth-token');
-    if (!token) {
-      throw new Error('No authentication token found');
+    const stripe = await stripePromise;
+    if (!stripe) {
+      throw new Error('Stripe failed to initialize');
     }
 
-    // Create checkout session using Netlify Function
+    // Get user email from auth
+    const userEmail = localStorage.getItem('sb-auth-email');
+    if (!userEmail) {
+      throw new Error('User email not found');
+    }
+
+    // Create basic auth header with email
+    const authHeader = `Basic ${btoa(`${userEmail}:`)}`;
+
+    // Create checkout session
     const response = await fetch('/.netlify/functions/create-checkout-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        'Authorization': authHeader
       },
       body: JSON.stringify({ 
         priceId,
@@ -35,18 +43,14 @@ export async function createCheckoutSession(priceId: string): Promise<void> {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create checkout session');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create checkout session');
     }
 
     const data: CheckoutSessionResponse = await response.json();
 
     if (data.error) {
       throw new Error(data.error);
-    }
-
-    const stripe = await stripePromise;
-    if (!stripe) {
-      throw new Error('Stripe failed to initialize');
     }
 
     const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
@@ -61,21 +65,24 @@ export async function createCheckoutSession(priceId: string): Promise<void> {
 
 export async function createPortalSession(): Promise<void> {
   try {
-    const token = localStorage.getItem('sb-auth-token');
-    if (!token) {
-      throw new Error('No authentication token found');
+    const userEmail = localStorage.getItem('sb-auth-email');
+    if (!userEmail) {
+      throw new Error('User email not found');
     }
+
+    const authHeader = `Basic ${btoa(`${userEmail}:`)}`;
 
     const response = await fetch('/.netlify/functions/create-portal-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        'Authorization': authHeader
       },
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create portal session');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create portal session');
     }
 
     const data: PortalSessionResponse = await response.json();
@@ -96,14 +103,16 @@ export async function getSubscriptionStatus(): Promise<{
   plan: 'free' | 'premium';
 }> {
   try {
-    const token = localStorage.getItem('sb-auth-token');
-    if (!token) {
+    const userEmail = localStorage.getItem('sb-auth-email');
+    if (!userEmail) {
       return { isActive: false, plan: 'free' };
     }
 
+    const authHeader = `Basic ${btoa(`${userEmail}:`)}`;
+
     const response = await fetch('/.netlify/functions/get-subscription-status', {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': authHeader
       },
     });
 

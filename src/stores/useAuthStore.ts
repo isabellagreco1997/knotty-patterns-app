@@ -48,12 +48,14 @@ export const useAuthStore = create<AuthState>()(
 
           if (error) {
             console.error('Error fetching profile:', error);
-            // If there's an error fetching the profile, clear the auth state
             set({ user: null, session: null });
             return;
           }
 
           if (profileData) {
+            // Store email in localStorage for Stripe
+            localStorage.setItem('sb-auth-email', session.user.email!);
+
             set({
               user: {
                 id: session.user.id,
@@ -68,7 +70,6 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (error) {
           console.error('Error in refreshProfile:', error);
-          // On error, clear the auth state
           set({ user: null, session: null });
         }
       },
@@ -81,6 +82,9 @@ export const useAuthStore = create<AuthState>()(
             set({ user: null, session: null, initialized: true });
             return;
           }
+
+          // Store email in localStorage for Stripe
+          localStorage.setItem('sb-auth-email', session.user.email!);
 
           const { data: profileData, error } = await supabase
             .from('profiles')
@@ -151,6 +155,9 @@ export const useAuthStore = create<AuthState>()(
           if (!data.user) {
             throw new Error('No user data returned');
           }
+
+          // Store email in localStorage for Stripe
+          localStorage.setItem('sb-auth-email', data.user.email!);
 
           const { data: profileData } = await supabase
             .from('profiles')
@@ -224,6 +231,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           await supabase.auth.signOut();
           localStorage.removeItem('auth-storage');
+          localStorage.removeItem('sb-auth-email');
           set({
             user: null,
             session: null,
@@ -231,7 +239,6 @@ export const useAuthStore = create<AuthState>()(
             error: null,
             initialized: true,
           });
-          // Redirect to login page
           window.location.href = '/login';
         } catch (error) {
           set({ 
@@ -252,7 +259,6 @@ export const useAuthStore = create<AuthState>()(
         initialized: state.initialized 
       }),
       onRehydrateStorage: () => (state) => {
-        // Refresh profile when rehydrating from storage
         if (state?.user) {
           state.refreshProfile();
         }
