@@ -2,43 +2,23 @@ import { loadStripe } from '@stripe/stripe-js';
 
 export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
-interface CheckoutSessionResponse {
-  sessionId: string;
-  error?: string;
-}
-
-interface PortalSessionResponse {
-  url: string;
-  error?: string;
-}
-
-export async function createCheckoutSession(priceId: string): Promise<void> {
+export async function createCheckoutSession(): Promise<void> {
   try {
-    const stripe = await stripePromise;
-    if (!stripe) {
-      throw new Error('Stripe failed to initialize');
-    }
-
-    // Get user email from auth
+    // Get user email from localStorage
     const userEmail = localStorage.getItem('sb-auth-email');
     if (!userEmail) {
       throw new Error('User email not found');
     }
 
-    // Create basic auth header with email
-    const authHeader = `Basic ${btoa(`${userEmail}:`)}`;
-
-    // Create checkout session
     const response = await fetch('/.netlify/functions/create-checkout-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': authHeader
       },
       body: JSON.stringify({ 
-        priceId,
         successUrl: `${window.location.origin}/account?success=true`,
         cancelUrl: `${window.location.origin}/pricing?canceled=true`,
+        customerEmail: userEmail,
       }),
     });
 
@@ -47,13 +27,15 @@ export async function createCheckoutSession(priceId: string): Promise<void> {
       throw new Error(errorData.error || 'Failed to create checkout session');
     }
 
-    const data: CheckoutSessionResponse = await response.json();
+    const { sessionId } = await response.json();
 
-    if (data.error) {
-      throw new Error(data.error);
+    const stripe = await stripePromise;
+    if (!stripe) {
+      throw new Error('Stripe failed to initialize');
     }
 
-    const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+    // Redirect to Stripe Checkout
+    const { error } = await stripe.redirectToCheckout({ sessionId });
     if (error) {
       throw error;
     }
@@ -70,14 +52,12 @@ export async function createPortalSession(): Promise<void> {
       throw new Error('User email not found');
     }
 
-    const authHeader = `Basic ${btoa(`${userEmail}:`)}`;
-
     const response = await fetch('/.netlify/functions/create-portal-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': authHeader
       },
+      body: JSON.stringify({ customerEmail: userEmail }),
     });
 
     if (!response.ok) {
@@ -85,13 +65,10 @@ export async function createPortalSession(): Promise<void> {
       throw new Error(errorData.error || 'Failed to create portal session');
     }
 
-    const data: PortalSessionResponse = await response.json();
-
-    if (data.error) {
-      throw new Error(data.error);
-    }
-
-    window.location.href = data.url;
+    const { url } = await response.json();
+    
+    // Redirect to the customer portal
+    window.location.href = url;
   } catch (error) {
     console.error('Portal session error:', error);
     throw error;
@@ -108,14 +85,14 @@ export async function getSubscriptionStatus(): Promise<{
       return { isActive: false, plan: 'free' };
     }
 
-    const authHeader = `Basic ${btoa(`${userEmail}:`)}`;
-
     const response = await fetch('/.netlify/functions/get-subscription-status', {
+      method: 'POST',
       headers: {
-        'Authorization': authHeader
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ customerEmail: userEmail }),
     });
-
+    
     if (!response.ok) {
       throw new Error('Failed to fetch subscription status');
     }
@@ -123,10 +100,37 @@ export async function getSubscriptionStatus(): Promise<{
     const data = await response.json();
     return {
       isActive: data.isActive,
-      plan: data.hasPurchased ? 'premium' : 'free'
+      plan: data.isPremium ? 'premium' : 'free'
     };
   } catch (error) {
     console.error('Subscription status error:', error);
     return { isActive: false, plan: 'free' };
+  }
+}
+
+export async function handlePaymentSuccess(): Promise<void> {
+  try {
+    const userEmail = localStorage.getItem('sb-auth-email');
+    if (!userEmail) {
+      throw new Error('User email not found');
+    }
+
+    const response = await fetch('/.netlify/functions/handle-payment-success', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ customerEmail: userEmail }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to handle payment success');
+    }
+
+    console.log('Payment success handled successfully');
+  } catch (error) {
+    console.error('Handle payment success error:', error);
+    throw error;
   }
 }

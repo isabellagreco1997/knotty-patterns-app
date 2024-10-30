@@ -12,7 +12,7 @@ export const handler: Handler = async (event) => {
       statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
       },
       body: ''
@@ -28,19 +28,13 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      throw new Error('STRIPE_SECRET_KEY is not configured');
-    }
-
     const { priceId, successUrl, cancelUrl } = JSON.parse(event.body || '{}');
     
     if (!priceId || !successUrl || !cancelUrl) {
       return {
         statusCode: 400,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ 
-          error: 'Missing required parameters: priceId, successUrl, or cancelUrl' 
-        })
+        body: JSON.stringify({ error: 'Missing required parameters' })
       };
     }
 
@@ -58,10 +52,6 @@ export const handler: Handler = async (event) => {
       cancel_url: cancelUrl,
       allow_promotion_codes: true,
       billing_address_collection: 'required',
-      customer_email: event.headers.authorization ? 
-        Buffer.from(event.headers.authorization.split(' ')[1], 'base64')
-          .toString('ascii')
-          .split(':')[0] : undefined
     });
 
     return {
