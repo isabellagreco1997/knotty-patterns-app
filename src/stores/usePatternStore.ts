@@ -261,60 +261,7 @@ export const usePatternStore = create<PatternState>()(
         }
       },
 
-      duplicatePattern: async (pattern: Pattern, userId: string) => {
-        set({ loading: true, error: null });
-        try {
-          const patternToSave = {
-            user_id: userId,
-            name: `${pattern.name} (Copy)`,
-            description: pattern.description,
-            difficulty: pattern.difficulty,
-            hook_size: pattern.hookSize,
-            yarn_weight: pattern.yarnWeight,
-            gauge: pattern.gauge,
-            materials: pattern.materials || [],
-            sections: pattern.sections || [],
-            notes: pattern.notes || [],
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-
-          const { data, error } = await supabase
-            .from('patterns')
-            .insert([patternToSave])
-            .select()
-            .single();
-
-          if (error) throw error;
-
-          const savedPattern = {
-            id: data.id,
-            userId: data.user_id,
-            name: data.name,
-            description: data.description,
-            difficulty: data.difficulty,
-            hookSize: data.hook_size,
-            yarnWeight: data.yarn_weight,
-            gauge: data.gauge,
-            materials: data.materials || [],
-            sections: data.sections || [],
-            notes: data.notes || [],
-            createdAt: new Date(data.created_at),
-            updatedAt: new Date(data.updated_at)
-          };
-
-          set(state => ({
-            patterns: [...state.patterns, savedPattern],
-            loading: false
-          }));
-        } catch (error) {
-          set({ 
-            error: error instanceof Error ? error.message : 'Failed to duplicate pattern',
-            loading: false 
-          });
-          throw error;
-        }
-      }
+     
     }),
     {
       name: 'pattern-storage',
