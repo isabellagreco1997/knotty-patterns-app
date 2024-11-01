@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import { useAuthStore } from './stores/useAuthStore';
-import { useStripeWebhook } from './hooks/useStripeWebhook';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import PatternBuilder from './pages/PatternBuilder';
@@ -20,8 +19,6 @@ export default function App() {
   const isDevelopment = process.env.NODE_ENV === 'development';
   const { checkAuth, refreshProfile, initialized, user } = useAuthStore();
 
-  // Use the webhook hook
-  useStripeWebhook();
 
   useEffect(() => {
     let authListener: any;
