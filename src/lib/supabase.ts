@@ -3,7 +3,7 @@ import { mockSupabase } from './mockSupabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const isDevelopment = import.meta.env.DEV;
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Create Supabase client with persistent storage and request monitoring
 export const supabase = (!isDevelopment || (supabaseUrl && supabaseAnonKey))

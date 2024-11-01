@@ -1,9 +1,25 @@
 import { loadStripe } from '@stripe/stripe-js';
 
-const isDevelopment = import.meta.env.DEV;
-// Always initialize Stripe, but use test key in development
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
-console.log('testing', import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY, 'test');
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+console.log('test', process.env.NODE_ENV)
+// Get the appropriate keys based on environment
+const stripePublishableKey = isDevelopment
+  ? import.meta.env.VITE_STRIPE_TEST_PUBLISHABLE_KEY
+  : import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+
+// Validate required environment variables
+if (!stripePublishableKey) {
+  throw new Error(
+    isDevelopment
+      ? 'VITE_STRIPE_TEST_PUBLISHABLE_KEY is required in development'
+      : 'VITE_STRIPE_PUBLISHABLE_KEY is required in production'
+  );
+}
+
+// Initialize Stripe with validated key
+const stripePromise = loadStripe(stripePublishableKey);
+
 export async function createCheckoutSession(): Promise<void> {
   try {
     const userEmail = localStorage.getItem('sb-auth-email');
@@ -11,11 +27,11 @@ export async function createCheckoutSession(): Promise<void> {
       throw new Error('User email not found');
     }
 
-    if (!stripePromise) {
-      throw new Error('Stripe is not initialized');
+    const stripe = await stripePromise;
+    if (!stripe) {
+      throw new Error('Failed to initialize Stripe');
     }
 
-    // In development, use local server URL
     const baseUrl = isDevelopment ? 'http://localhost:8888' : '';
     
     const response = await fetch(`${baseUrl}/.netlify/functions/create-checkout-session`, {
@@ -23,7 +39,10 @@ export async function createCheckoutSession(): Promise<void> {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ customerEmail: userEmail }),
+      body: JSON.stringify({ 
+        customerEmail: userEmail,
+        mode: isDevelopment ? 'test' : 'live'
+      }),
     });
 
     if (!response.ok) {
@@ -32,9 +51,8 @@ export async function createCheckoutSession(): Promise<void> {
     }
 
     const { sessionId } = await response.json();
-    const stripe = await stripePromise;
+    const { error } = await stripe.redirectToCheckout({ sessionId });
     
-    const { error } = await stripe!.redirectToCheckout({ sessionId });
     if (error) {
       throw error;
     }
@@ -58,7 +76,10 @@ export async function createPortalSession(): Promise<void> {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ customerEmail: userEmail }),
+      body: JSON.stringify({ 
+        customerEmail: userEmail,
+        mode: isDevelopment ? 'test' : 'live'
+      }),
     });
 
     if (!response.ok) {
@@ -91,7 +112,10 @@ export async function getSubscriptionStatus(): Promise<{
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ customerEmail: userEmail }),
+      body: JSON.stringify({ 
+        customerEmail: userEmail,
+        mode: isDevelopment ? 'test' : 'live'
+      }),
     });
     
     if (!response.ok) {
@@ -123,7 +147,10 @@ export async function handlePaymentSuccess(): Promise<void> {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ customerEmail: userEmail }),
+      body: JSON.stringify({ 
+        customerEmail: userEmail,
+        mode: isDevelopment ? 'test' : 'live'
+      }),
     });
 
     if (!response.ok) {

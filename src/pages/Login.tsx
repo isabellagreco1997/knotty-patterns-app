@@ -12,7 +12,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn, signUp, user, loading } = useAuthStore();
-  const isDevelopment = import.meta.env.DEV;
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   useEffect(() => {
     if (user) {

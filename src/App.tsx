@@ -17,7 +17,7 @@ import CookieConsent from './components/CookieConsent';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const isDevelopment = import.meta.env.DEV;
+  const isDevelopment = process.env.NODE_ENV === 'development';
   const { checkAuth, refreshProfile, initialized, user } = useAuthStore();
 
   // Use the webhook hook

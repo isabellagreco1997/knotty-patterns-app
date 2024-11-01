@@ -1,23 +1,37 @@
 import { Handler } from '@netlify/functions';
 import Stripe from 'stripe';
 
+const isDevelopment = process.env.NODE_ENV === 'development';
 
+console.log('process.env.NODE_ENV', process.env.NODE_ENV)
+// Get the appropriate keys based on environment
+const stripeSecretKey = isDevelopment
+  ? process.env.VITE_TEST_STRIPE_SECRET_KEY
+  : process.env.VITE_STRIPE_SECRET_KEY;
 
+const stripePriceId = isDevelopment
+  ? process.env.STRIPE_TEST_PREMIUM_PRICE_ID
+  : process.env.STRIPE_PREMIUM_PRICE_ID;
 
-if (!process.env.VITE_STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY environment variable is not set isa');
+if (!stripeSecretKey) {
+  throw new Error(
+    isDevelopment
+      ? 'VITE_STRIPE_TEST_SECRET_KEY is required in development'
+      : 'VITE_STRIPE_SECRET_KEY is required in production'
+  );
 }
-if (!process.env.STRIPE_PREMIUM_PRICE_ID) {
-  console.log( 'isabella', process.env.VITE_STRIPE_SECRET_KEY, 'next', process.env.STRIPE_PREMIUM_PRICE_ID)
 
-  throw new Error('STRIPE_PREMIUM_PRICE_ID environment variable is not set');
+if (!stripePriceId) {
+  throw new Error(
+    isDevelopment
+      ? 'STRIPE_TEST_PREMIUM_PRICE_ID is required in development'
+      : 'STRIPE_PREMIUM_PRICE_ID is required in production'
+  );
 }
 
-const stripe = new Stripe(process.env.VITE_STRIPE_SECRET_KEY, {
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
 });
-
-const PREMIUM_PRICE_ID = process.env.VITE_STRIPE_PREMIUM_PRICE_ID;
 
 export const handler: Handler = async (event) => {
   // Handle CORS
@@ -54,15 +68,15 @@ export const handler: Handler = async (event) => {
 
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
       customer_email: customerEmail,
       payment_method_types: ['card'],
       line_items: [
         {
-          price: process.env.STRIPE_PREMIUM_PRICE_ID, // Use the predefined price ID
+          price: stripePriceId,
           quantity: 1,
         },
       ],
-      mode: 'payment',
       success_url: `${process.env.URL}/account?success=true`,
       cancel_url: `${process.env.URL}/pricing?canceled=true`,
       allow_promotion_codes: true,

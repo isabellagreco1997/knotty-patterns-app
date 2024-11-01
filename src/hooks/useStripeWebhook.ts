@@ -3,7 +3,7 @@ import { useAuthStore } from '../stores/useAuthStore';
 
 export function useStripeWebhook() {
   const { user, updatePremiumStatus } = useAuthStore();
-  const isDevelopment = import.meta.env.DEV;
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   useEffect(() => {
     let intervalId: number;
@@ -44,8 +44,8 @@ export function useStripeWebhook() {
         console.log('Webhook check response:', data);
 
         // Update premium status if needed
-        if (data.received && user.isPremium !== data.isPremium) {
-          await updatePremiumStatus(data.isPremium);
+        if (data.received && user.isPremium !== data.hasPurchasedTargetProduct) {
+          await updatePremiumStatus(data.hasPurchasedTargetProduct);
         }
       } catch (error) {
         console.error('Error in webhook check:', error);
