@@ -89,6 +89,13 @@ const PricingCards: React.FC = () => {
             >
               Get Started
             </Link>
+          ) : user.isPremium ? (
+            <button
+              disabled
+              className="mt-8 block w-full rounded-lg bg-secondary-50 px-4 py-2 text-center text-sm font-semibold text-secondary-600 cursor-not-allowed opacity-50"
+            >
+              Previous Plan
+            </button>
           ) : (
             <button
               disabled
@@ -118,24 +125,33 @@ const PricingCards: React.FC = () => {
             <span className="text-4xl font-bold text-neutral-800">$8</span>
             <span className="text-sm text-neutral-500">/one-time</span>
           </p>
-          <button
-            onClick={handleSubscribe}
-            disabled={isLoading}
-            className="mt-8 block w-full rounded-lg bg-primary-500 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <PiSpinner className="w-4 h-4 animate-spin mr-2" />
-                Processing...
-              </span>
-            ) : (
-              'Upgrade to Premium'
-            )}
-          </button>
+          {user?.isPremium ? (
+            <button
+              disabled
+              className="mt-8 block w-full rounded-lg bg-primary-100 px-4 py-2 text-center text-sm font-semibold text-primary-700 cursor-not-allowed"
+            >
+              Current Plan
+            </button>
+          ) : (
+            <button
+              onClick={handleSubscribe}
+              disabled={isLoading}
+              className="mt-8 block w-full rounded-lg bg-primary-500 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <PiSpinner className="w-4 h-4 animate-spin mr-2" />
+                  Processing...
+                </span>
+              ) : (
+                'Upgrade to Premium'
+              )}
+            </button>
+          )}
           {error && (
             <p className="mt-2 text-sm text-red-600">{error}</p>
           )}
-          {isDevelopment && (
+          {isDevelopment && !user?.isPremium && (
             <div className="mt-2 text-xs text-gray-500">
               <p>Test Card: 4242 4242 4242 4242</p>
               <p>Exp: Any future date, CVC: Any 3 digits</p>

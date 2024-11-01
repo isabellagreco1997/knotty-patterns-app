@@ -21,6 +21,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   checkAuth: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updatePremiumStatus: (isPremium: boolean) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -32,9 +33,32 @@ export const useAuthStore = create<AuthState>()(
       error: null,
       initialized: false,
 
+      updatePremiumStatus: async (isPremium: boolean) => {
+        const currentUser = get().user;
+        if (!currentUser) return;
+
+        try {
+          const { error } = await supabase
+            .from('profiles')
+            .update({ is_premium: isPremium })
+            .eq('id', currentUser.id);
+
+          if (error) throw error;
+
+          set(state => ({
+            user: state.user ? { ...state.user, isPremium } : null
+          }));
+        } catch (error) {
+          console.error('Error updating premium status:', error);
+        }
+      },
+
       refreshProfile: async () => {
         try {
           const { data: { session } } = await supabase.auth.getSession();
+
+          console.log('isabella', session)
+
           if (!session?.user) {
             set({ user: null, session: null });
             return;

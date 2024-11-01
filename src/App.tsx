@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import { useAuthStore } from './stores/useAuthStore';
+import { useStripeWebhook } from './hooks/useStripeWebhook';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import PatternBuilder from './pages/PatternBuilder';
@@ -17,7 +18,10 @@ import CookieConsent from './components/CookieConsent';
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const isDevelopment = import.meta.env.DEV;
-  const { checkAuth, refreshProfile, initialized } = useAuthStore();
+  const { checkAuth, refreshProfile, initialized, user } = useAuthStore();
+
+  // Use the webhook hook
+  useStripeWebhook();
 
   useEffect(() => {
     let authListener: any;
