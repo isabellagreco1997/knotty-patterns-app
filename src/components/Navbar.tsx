@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PiScissors, PiUser, PiSignOut, PiList, PiX, PiGear } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
+import { getCustomerDetails } from '../lib/stripe';
 
 const Navbar: React.FC = () => {
   const { user, signOut } = useAuthStore();
@@ -16,6 +17,27 @@ const Navbar: React.FC = () => {
       console.error('Error signing out:', error);
     }
   };
+
+  const [customerData, setCustomerData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getCustomerDetails();
+        setCustomerData(data);
+
+      } catch (err) {
+        setError(err.message || 'Failed to fetch customer details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  console.log(customerData, 'customerData')
 
   const closeMenu = () => {
     setIsMenuOpen(false);

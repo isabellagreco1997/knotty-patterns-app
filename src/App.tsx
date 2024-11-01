@@ -13,6 +13,8 @@ import Blog from './pages/Blog';
 import AccountSettings from './pages/AccountSettings';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
+import { CustomerProvider } from './context/CustomerContext'
+
 
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -92,6 +94,9 @@ export default function App() {
       <div className="min-h-screen flex flex-col bg-[#fdf6f0]">
         <Navbar />
         <main className="flex-grow">
+        <CustomerProvider>
+          
+
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/pattern-builder" element={<PatternBuilder />} />
@@ -103,6 +108,8 @@ export default function App() {
             <Route path="/blog" element={<Blog />} />
             <Route path="/account" element={<AccountSettings />} />
           </Routes>
+          </CustomerProvider>
+
         </main>
         <Footer />
         <CookieConsent />

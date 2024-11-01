@@ -2,7 +2,6 @@ import { loadStripe } from '@stripe/stripe-js';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-console.log('test', process.env.NODE_ENV)
 // Get the appropriate keys based on environment
 const stripePublishableKey = isDevelopment
   ? import.meta.env.VITE_STRIPE_TEST_PUBLISHABLE_KEY
@@ -161,4 +160,32 @@ export async function handlePaymentSuccess(): Promise<void> {
     console.error('Handle payment success error:', error);
     throw error;
   }
+}
+
+export async function getCustomerDetails() {
+  
+    const userEmail = localStorage.getItem('sb-auth-email');
+    try {
+      const response = await fetch('/.netlify/functions/get-customer-details', {
+        method: 'POST', // Ensure the method is POST
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ customerEmail: userEmail }),
+      });
+  
+      if (!response.ok) {
+        // Handle HTTP errors
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch customer details');
+      }
+  
+      const data = await response.json();
+      console.log('Customer Details:', data);
+      return data;
+    } catch (error) {
+      console.error('Error fetching customer details:', error.message);
+      // Handle or re-throw the error as needed
+      throw error;
+    }
 }

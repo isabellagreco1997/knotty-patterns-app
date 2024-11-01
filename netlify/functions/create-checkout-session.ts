@@ -1,5 +1,6 @@
 import { Handler } from '@netlify/functions';
 import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -32,6 +33,11 @@ if (!stripePriceId) {
 const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
 });
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL!,
+  process.env.VITE_SUPABASE_ANON_KEY!
+);
 
 export const handler: Handler = async (event) => {
   // Handle CORS
@@ -66,10 +72,68 @@ export const handler: Handler = async (event) => {
       };
     }
 
+    // Get user profile from Supabase
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', customerEmail)
+      .single();
+
+    if (!profile) {
+      return {
+        statusCode: 404,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ error: 'User profile not found' }),
+      };
+    }
+
+    // Check if customer already exists in Stripe
+    let customer;
+    if (profile.stripe_customer_id) {
+      try {
+        customer = await stripe.customers.retrieve(profile.stripe_customer_id);
+      } catch (error) {
+        // If customer doesn't exist in Stripe, we'll create a new one
+        customer = null;
+      }
+    }
+
+    // Create new customer if doesn't exist
+    if (!customer) {
+      customer = await stripe.customers.create({
+        email: customerEmail,
+        metadata: {
+          supabase_user_id: profile.id
+        }
+      });
+
+      // Update profile with new Stripe customer ID
+      const { data, error: updateError } = await supabase
+        .from('profiles')
+        .update({ stripe_customer_id: customer.id })
+        .eq('id', profile.id);
+console.log('AQUIIIIIIDSADKA', customer.id, 'profile.id', profile.id)
+console.log('Update response:', { data, updateError });
+
+      if (updateError) {
+        throw new Error(`Failed to update profile with Stripe customer ID: ${updateError.message}`);
+      }
+    }
+
+    const { data: profileData, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', profile.id)
+    .single();
+
+console.log('Profile data for verification:', profileData, error);
+
+
+
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
-      customer_email: customerEmail,
+      customer: customer.id,
       payment_method_types: ['card'],
       line_items: [
         {
@@ -83,6 +147,7 @@ export const handler: Handler = async (event) => {
       billing_address_collection: 'required',
       metadata: {
         customerEmail,
+        supabase_user_id: profile.id
       },
     });
 
