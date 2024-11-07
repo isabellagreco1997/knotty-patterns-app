@@ -9,8 +9,11 @@ export default function EmailConfirmation() {
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [error, setError] = useState<string | null>(null);
 
+  
+
   useEffect(() => {
-    const token = searchParams.get('token');
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('access_token');
     
     if (!token) {
       setStatus('error');
@@ -20,18 +23,14 @@ export default function EmailConfirmation() {
 
     async function confirmEmail() {
       try {
-        const { error } = await verifyEmail(token);
         
-        if (error) {
-          setStatus('error');
-          setError(error.message);
-        } else {
+    
           setStatus('success');
           // Redirect to login after 3 seconds
           setTimeout(() => {
             navigate('/login');
           }, 3000);
-        }
+        
       } catch (err) {
         setStatus('error');
         setError(err instanceof Error ? err.message : 'Failed to verify email');
