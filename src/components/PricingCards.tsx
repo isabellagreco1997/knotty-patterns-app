@@ -15,20 +15,21 @@ const features: PricingFeature[] = [
   { name: 'Create basic patterns', free: true, premium: true },
   { name: 'Basic stitch library', free: true, premium: true },
   { name: 'Export as Text', free: true, premium: true },
-  { name: 'Save up to 3 patterns', free: true, premium: true },
+  { name: 'Save up to 5 patterns', free: true, premium: true },
   { name: 'Pattern version history', free: false, premium: true },
   { name: 'Export as PDF', free: false, premium: true },
   { name: 'Unlimited pattern saves', free: false, premium: true },
   { name: 'Custom stitch creation', free: false, premium: true },
+  { name: 'Priority support', free: false, premium: true },
 ];
 
 const PricingCards: React.FC = () => {
   const { user } = useAuthStore();
-  const { status: subscriptionStatus, loading: subscriptionLoading } = useSubscriptionStatus();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const isDevelopment = process.env.NODE_ENV === 'development';
+  const { status: subscriptionStatus, loading: subscriptionLoading } = useSubscriptionStatus();
 
   const handleSubscribe = async () => {
     if (!user) {
@@ -50,6 +51,8 @@ const PricingCards: React.FC = () => {
     }
   };
 
+  const isPremium = subscriptionStatus === 'active';
+
   const renderFeatureList = (planType: 'free' | 'premium') => (
     <ul className="space-y-4">
       {features.map((feature, index) => (
@@ -66,8 +69,6 @@ const PricingCards: React.FC = () => {
       ))}
     </ul>
   );
-
-  const isPremium = subscriptionStatus === 'active';
 
   return (
     <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -121,13 +122,13 @@ const PricingCards: React.FC = () => {
             <h3 className="text-xl font-semibold text-neutral-800">Premium</h3>
             <span className="inline-flex items-center rounded-full bg-primary-50 px-2 py-1">
               <PiSparkle className="w-4 h-4 text-primary-500 mr-1" />
-              <span className="text-sm text-primary-600">Lifetime</span>
+              <span className="text-sm text-primary-600">Most Popular</span>
             </span>
           </div>
-          <p className="mt-4 text-sm text-neutral-600">All features unlocked forever</p>
+          <p className="mt-4 text-sm text-neutral-600">All features unlocked with priority support</p>
           <p className="mt-6">
             <span className="text-4xl font-bold text-neutral-800">$8</span>
-            <span className="text-sm text-neutral-500">/one-time</span>
+            <span className="text-sm text-neutral-500">/month</span>
           </p>
           {subscriptionLoading ? (
             <button
