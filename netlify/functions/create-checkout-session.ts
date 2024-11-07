@@ -166,7 +166,7 @@ export const handler: Handler = async (event) => {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: stripePriceId,
+          price: 'price_1QIUf8GUn4PvA8d7nBH6O0pG',
           quantity: 1,
         },
       ],

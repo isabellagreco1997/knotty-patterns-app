@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
 import { useAuthStore } from './stores/useAuthStore';
 import { useSubscriptionStatus } from './hooks/useSubscriptionStatus';
@@ -36,7 +37,6 @@ export default function App() {
 
     async function initializeApp() {
       try {
-        // First check the connection
         const { error: connectionError } = await supabase.from('profiles').select('count');
         setIsConnected(!connectionError);
 
@@ -45,14 +45,12 @@ export default function App() {
           return;
         }
 
-        // Then check auth state
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           await checkAuth();
           await refreshProfile();
         }
 
-        // Set up auth state change listener
         authListener = supabase.auth.onAuthStateChange(async (event, session) => {
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             await checkAuth();
@@ -98,27 +96,29 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <div className="min-h-screen flex flex-col bg-[#fdf6f0]">
-        <Navbar />
-        <main className="flex-grow">
-          <CustomerProvider>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/pattern-builder" element={<PatternBuilder />} />
-              <Route path="/pattern-builder/:id" element={<PatternBuilder />} />
-              <Route path="/saved-patterns" element={<SavedPatterns />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/auth/confirm" element={<EmailConfirmation />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/account" element={<AccountSettings />} />
-            </Routes>
-          </CustomerProvider>
-        </main>
-        <Footer />
-        <CookieConsent />
-      </div>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <div className="min-h-screen flex flex-col bg-[#fdf6f0]">
+          <Navbar />
+          <main className="flex-grow">
+            <CustomerProvider>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/pattern-builder" element={<PatternBuilder />} />
+                <Route path="/pattern-builder/:id" element={<PatternBuilder />} />
+                <Route path="/saved-patterns" element={<SavedPatterns />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/auth/confirm" element={<EmailConfirmation />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/account" element={<AccountSettings />} />
+              </Routes>
+            </CustomerProvider>
+          </main>
+          <Footer />
+          <CookieConsent />
+        </div>
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }

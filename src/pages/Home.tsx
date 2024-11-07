@@ -4,6 +4,7 @@ import ImageCarousel from '../components/ImageCarousel';
 import PricingCards from '../components/PricingCards';
 import ScrollFadeIn from '../components/ScrollFadeIn';
 import { PiSparkle, PiHeart, PiTrophy, PiStar, PiPencilSimple, PiQuotes, PiCircle, PiCheck, PiShare } from 'react-icons/pi';
+import SEOHead from '../components/SEOHead';
 
 const carouselImages = [
   {
@@ -129,6 +130,11 @@ const team = [
 export default function Home() {
   return (
     <div className="w-full">
+       <SEOHead
+        title="Create Beautiful Crochet Patterns"
+        description="Design, save, and share your crochet patterns with KnottyPatterns - the intuitive pattern builder for crocheters. Start creating professional patterns today!"
+        url="https://knottypatterns.com"
+      />
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center text-center">
         <ImageCarousel images={carouselImages} />
