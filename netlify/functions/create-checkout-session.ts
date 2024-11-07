@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-console.log('process.env.NODE_ENV', process.env.NODE_ENV)
+console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 // Get the appropriate keys based on environment
 const stripeSecretKey = isDevelopment
   ? process.env.VITE_TEST_STRIPE_SECRET_KEY
@@ -92,6 +92,47 @@ export const handler: Handler = async (event) => {
     if (profile.stripe_customer_id) {
       try {
         customer = await stripe.customers.retrieve(profile.stripe_customer_id);
+
+        // Check if the customer has active subscriptions
+        const subscriptions = await stripe.subscriptions.list({
+          customer: customer.id,
+          status: 'all', // You can filter for 'active', 'past_due', etc.
+        });
+
+        const hasActiveSubscription = subscriptions.data.some(subscription => 
+          subscription.status === 'active'
+        );
+
+        // Proceed with the existing customer for checkout if they have an active subscription
+        if (hasActiveSubscription) {
+          const session = await stripe.checkout.sessions.create({
+            mode: 'subscription',
+            customer: customer.id,
+            payment_method_types: ['card'],
+            line_items: [
+              {
+                price: stripePriceId,
+                quantity: 1,
+              },
+            ],
+            success_url: `${process.env.URL}/account?success=true`,
+            cancel_url: `${process.env.URL}/pricing?canceled=true`,
+            allow_promotion_codes: true,
+            billing_address_collection: 'required',
+            metadata: {
+              customerEmail,
+              supabase_user_id: profile.id
+            },
+          });
+
+          return {
+            statusCode: 200,
+            headers: { 'Access-Control-Allow-Origin': '*' },
+            body: JSON.stringify({ sessionId: session.id }),
+          };
+        } else {
+          console.log(`Customer ${customer.id} has no active subscriptions.`);
+        }
       } catch (error) {
         // If customer doesn't exist in Stripe, we'll create a new one
         customer = null;
@@ -112,25 +153,13 @@ export const handler: Handler = async (event) => {
         .from('profiles')
         .update({ stripe_customer_id: customer.id })
         .eq('id', profile.id);
-console.log('AQUIIIIIIDSADKA', customer.id, 'profile.id', profile.id)
-console.log('Update response:', { data, updateError });
 
       if (updateError) {
         throw new Error(`Failed to update profile with Stripe customer ID: ${updateError.message}`);
       }
     }
 
-    const { data: profileData, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', profile.id)
-    .single();
-
-console.log('Profile data for verification:', profileData, error);
-
-
-
-    // Create checkout session
+    // Create checkout session for the new customer
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: customer.id,
