@@ -129,39 +129,53 @@ const team = [
 
 export default function Home() {
   return (
-    <div className="w-full">
-       <SEOHead
-        title="Create Beautiful Crochet Patterns"
-        description="Design, save, and share your crochet patterns with KnottyPatterns - the intuitive pattern builder for crocheters. Start creating professional patterns today!"
-        url="https://knottypatterns.com"
-      />
-      {/* Hero Section */}
-      <section className="relative h-[600px] flex items-center justify-center text-center">
-        <ImageCarousel images={carouselImages} />
-        <ScrollFadeIn direction="up" className="relative z-10 max-w-4xl mx-auto px-4">
-          <h1 className="text-5xl font-bold text-white mb-6">
-            Create Beautiful Crochet Patterns
-          </h1>
-          <p className="text-xl text-white/90 mb-8">
-            Design, save, and share your crochet patterns with our intuitive pattern builder
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/pattern-builder"
-              className="inline-flex items-center px-6 py-3 text-lg font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors"
-            >
-              <PiPencilSimple className="mr-2" />
-              Start Creating
-            </Link>
-            <Link
-              to="/pricing"
-              className="inline-flex items-center px-6 py-3 text-lg font-medium text-primary-700 bg-white rounded-lg hover:bg-primary-50 transition-colors"
-            >
-              View Pricing
-            </Link>
-          </div>
-        </ScrollFadeIn>
-      </section>
+     <div className="w-full">
+        {/* Hero Section */}
+        <section className="relative h-screen min-h-[600px] max-h-[1000px]">
+          <ImageCarousel images={carouselImages}>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="max-w-4xl mx-auto px-4 text-center">
+                <ScrollFadeIn direction="up" delay={200}>
+                  <span className="inline-block px-6 py-2 rounded-full bg-white/10 backdrop-blur-sm text-white/90 text-sm font-medium mb-8 border border-white/20">
+                    Welcome to KnottyPatterns
+                  </span>
+                </ScrollFadeIn>
+                
+                <ScrollFadeIn direction="up" delay={400}>
+                  <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold text-white mb-8 leading-none">
+                    Create Beautiful
+                    <br />
+                    <span className="text-primary-300">Crochet Patterns</span>
+                  </h1>
+                </ScrollFadeIn>
+                
+                <ScrollFadeIn direction="up" delay={600}>
+                  <p className="text-xl sm:text-2xl text-white/90 mb-12 max-w-2xl mx-auto font-light">
+                    Design, save, and share your patterns with our intuitive builder
+                  </p>
+                </ScrollFadeIn>
+                
+                <ScrollFadeIn direction="up" delay={800}>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full">
+                    <Link
+                      to="/pattern-builder"
+                      className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-primary-500 rounded-xl hover:bg-primary-600 transition-all transform hover:scale-105 hover:shadow-lg"
+                    >
+                      <PiPencilSimple className="w-5 h-5 mr-2" />
+                      Start Creating
+                    </Link>
+                    <Link
+                      to="/pricing"
+                      className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-primary-700 bg-white rounded-xl hover:bg-primary-50 transition-all transform hover:scale-105 hover:shadow-lg"
+                    >
+                      View Pricing
+                    </Link>
+                  </div>
+                </ScrollFadeIn>
+              </div>
+            </div>
+          </ImageCarousel>
+        </section>
 
       {/* Features Section */}
       <section className="py-20 bg-white">
