@@ -12,7 +12,7 @@ import PatternSettings from '../components/pattern-builder/PatternSettings';
 import StitchGuide from '../components/pattern-builder/StitchGuide';
 import CrochetPreview from '../components/pattern-builder/CrochetPreview';
 import AddSectionModal from '../components/pattern-builder/AddSectionModal';
-import { PiPlus, PiCaretDown, PiTrash, PiSpinner } from 'react-icons/pi';
+import { PiPlus, PiCaretDown, PiTrash, PiSpinner, PiWarning } from 'react-icons/pi';
 import type { Round, Pattern, PatternSection } from '../types/pattern';
 
 export default function PatternBuilder() {
@@ -399,7 +399,7 @@ const handleSave = async () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex items-center space-x-2 text-primary-600">
           <PiSpinner className="w-6 h-6 animate-spin" />
           <span>Loading pattern...</span>
@@ -409,109 +409,170 @@ const handleSave = async () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 space-y-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <PatternSettings
-              pattern={pattern}
-              onUpdate={updatePatternSettings}
-            />
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-[90rem] mx-auto px-4">
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Pattern Builder</h1>
+          <p className="mt-2 text-gray-600">Create and edit your crochet pattern</p>
+        </div>
 
-            {/* Section Management */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Pattern Sections</h2>
-                <button
-                  onClick={() => setShowAddSectionModal(true)}
-                  className="inline-flex items-center px-3 py-2 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700"
-                >
-                  <PiPlus className="w-4 h-4 mr-1" />
-                  Add Section
-                </button>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Main Content Area */}
+          <div className="space-y-6">
+            {/* Pattern Settings Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6">
+                <PatternSettings
+                  pattern={pattern}
+                  onUpdate={updatePatternSettings}
+                />
               </div>
+            </div>
 
-              {pattern.sections.length === 0 ? (
-                <div className="text-center py-8 bg-gray-50 rounded-lg">
-                  <p className="text-gray-600">Add a section to start building your pattern</p>
+            {/* Sections Management Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Pattern Sections</h2>
+                  <button
+                    onClick={() => setShowAddSectionModal(true)}
+                    className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    <PiPlus className="w-4 h-4 mr-2" />
+                    Add Section
+                  </button>
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  {pattern.sections.map((section) => (
-                    <div
-                      key={section.id}
-                      className={`flex items-center justify-between p-3 rounded-lg border ${
-                        section.id === currentSectionId
-                          ? 'border-primary-500 bg-primary-50'
-                          : 'border-gray-200 hover:bg-gray-50'
-                      }`}
+
+                {pattern.sections.length === 0 ? (
+                  <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                    <PiWarning className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">Add a section to start building your pattern</p>
+                    <button
+                      onClick={() => setShowAddSectionModal(true)}
+                      className="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                     >
-                      <button
-                        onClick={() => setCurrentSectionId(section.id)}
-                        className="flex items-center flex-1"
+                      <PiPlus className="w-4 h-4 mr-2" />
+                      Add Your First Section
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {pattern.sections.map((section) => (
+                      <div
+                        key={section.id}
+                        className={`flex items-center justify-between p-4 rounded-xl border-2 transition-colors ${
+                          section.id === currentSectionId
+                            ? 'border-primary-500 bg-primary-50'
+                            : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
+                        }`}
                       >
-                        <PiCaretDown className={`w-4 h-4 mr-2 transition-transform ${
-                          section.id === currentSectionId ? 'transform rotate-180' : ''
-                        }`} />
-                        <span className="font-medium">{section.name}</span>
-                        <span className="ml-2 text-sm text-gray-500">
-                          ({section.rounds.length} rounds)
-                        </span>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteSection(section.id)}
-                        className="p-1 text-red-600 hover:bg-red-50 rounded-full"
-                      >
-                        <PiTrash className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+                        <button
+                          onClick={() => setCurrentSectionId(section.id)}
+                          className="flex items-center flex-1"
+                        >
+                          <PiCaretDown className={`w-5 h-5 mr-3 transition-transform ${
+                            section.id === currentSectionId ? 'transform rotate-180' : ''
+                          }`} />
+                          <div>
+                            <span className="font-medium text-lg">{section.name}</span>
+                            <span className="ml-3 text-sm text-gray-500">
+                              ({section.rounds.length} rounds)
+                            </span>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteSection(section.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <PiTrash className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {currentSectionId && (
               <>
-                {!hasActualRounds && (
-                  <PatternStarter onStart={handlePatternStart} />
-                )}
+                {/* Pattern Building Area */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6">
+                    {!hasActualRounds && (
+                      <PatternStarter onStart={handlePatternStart} />
+                    )}
 
-                <div className="mb-6">
-                  <div className="flex items-end gap-2">
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Add Custom Text
-                      </label>
-                      <input
-                        type="text"
-                        value={customText}
-                        onChange={(e) => setCustomText(e.target.value)}
-                        placeholder="Enter notes, comments, or instructions..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      />
+                    <div className="mb-8">
+                      <div className="flex items-end gap-2">
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Add Custom Text
+                          </label>
+                          <input
+                            type="text"
+                            value={customText}
+                            onChange={(e) => setCustomText(e.target.value)}
+                            placeholder="Enter notes, comments, or instructions..."
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                          />
+                        </div>
+                        <button
+                          onClick={() => addCustomText(customText)}
+                          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                        >
+                          Add Text
+                        </button>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => addCustomText(customText)}
-                      className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
-                    >
-                      Add Text
-                    </button>
+
+                    <StitchPanel onStitchSelect={addStitch} />
+                    
+                    <CurrentRound
+                      round={currentRound}
+                      onComplete={completeRound}
+                      onUpdateCount={updateStitchCount}
+                      onUpdateNotes={updateNotes}
+                      onDeleteStitch={deleteStitch}
+                      onUpdateStitchNote={updateStitchNote}
+                      onUpdateHeaderNote={updateHeaderNote}
+                      onUpdateFooterNote={updateFooterNote}
+                    />
+
+                    <PatternExport pattern={pattern} rounds={currentSection?.rounds || []} />
                   </div>
                 </div>
+              </>
+            )}
 
-                <StitchPanel onStitchSelect={addStitch} />
-                
-                <CurrentRound
-                  round={currentRound}
-                  onComplete={completeRound}
-                  onUpdateCount={updateStitchCount}
-                  onUpdateNotes={updateNotes}
-                  onDeleteStitch={deleteStitch}
-                  onUpdateStitchNote={updateStitchNote}
-                  onUpdateHeaderNote={updateHeaderNote}
-                  onUpdateFooterNote={updateFooterNote}
-                />
+            {/* Save Button */}
+            {saveError && (
+              <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-200">
+                {saveError}
+              </div>
+            )}
 
+            <button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="w-full inline-flex justify-center items-center px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium"
+            >
+              {isSaving ? (
+                <>
+                  <PiSpinner className="w-5 h-5 mr-2 animate-spin" />
+                  Saving Pattern...
+                </>
+              ) : (
+                'Save Pattern'
+              )}
+            </button>
+          </div>
+
+          {/* Pattern Preview Area */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Pattern Preview</h2>
                 <PatternDisplay
                   pattern={pattern}
                   rounds={currentSection?.rounds || []}
@@ -520,41 +581,13 @@ const handleSave = async () => {
                   onReorder={handleReorderRounds}
                   language="en"
                 />
-
-                <PatternExport pattern={pattern} rounds={currentSection?.rounds || []} />
-              </>
-            )}
-
-            {saveError && (
-              <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-md">
-                {saveError}
               </div>
-            )}
-
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="mt-6 w-full inline-flex justify-center items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSaving ? (
-                <>
-                  <PiSpinner className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                'Save Pattern'
-              )}
-            </button>
-          </div>
-        </div>
-
-        <div className="md:col-span-1">
-          <div className="space-y-6">
-            {/* <CrochetPreview
-              rounds={currentSection?.rounds || []}
-              currentRound={currentRound}
-            /> */}
-            <StitchGuide />
+            </div>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6">
+                <StitchGuide />
+              </div>
+            </div>
           </div>
         </div>
       </div>

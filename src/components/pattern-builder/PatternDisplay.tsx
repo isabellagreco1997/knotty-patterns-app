@@ -119,7 +119,6 @@ export default function PatternDisplay({
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-2">Pattern</h2>
       <div className="text-gray-800">
         <div className="mb-6 whitespace-pre-wrap">
           <div className="text-2xl font-semibold mb-2">{pattern.name}</div>
