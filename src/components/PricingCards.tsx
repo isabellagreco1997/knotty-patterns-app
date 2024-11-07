@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { PiCheck, PiX, PiStar, PiSparkle, PiSpinner } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 import { createCheckoutSession } from '../lib/stripe';
+import { useSubscriptionStatus } from '../hooks/useSubscriptionStatus';
 
 interface PricingFeature {
   name: string;
@@ -23,6 +24,7 @@ const features: PricingFeature[] = [
 
 const PricingCards: React.FC = () => {
   const { user } = useAuthStore();
+  const { status: subscriptionStatus, loading: subscriptionLoading } = useSubscriptionStatus();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -65,6 +67,8 @@ const PricingCards: React.FC = () => {
     </ul>
   );
 
+  const isPremium = subscriptionStatus === 'active';
+
   return (
     <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
       {/* Free Plan */}
@@ -89,7 +93,7 @@ const PricingCards: React.FC = () => {
             >
               Get Started
             </Link>
-          ) : user.isPremium ? (
+          ) : isPremium ? (
             <button
               disabled
               className="mt-8 block w-full rounded-lg bg-secondary-50 px-4 py-2 text-center text-sm font-semibold text-secondary-600 cursor-not-allowed opacity-50"
@@ -125,7 +129,15 @@ const PricingCards: React.FC = () => {
             <span className="text-4xl font-bold text-neutral-800">$8</span>
             <span className="text-sm text-neutral-500">/one-time</span>
           </p>
-          {user?.isPremium ? (
+          {subscriptionLoading ? (
+            <button
+              disabled
+              className="mt-8 block w-full rounded-lg bg-primary-100 px-4 py-2 text-center text-sm font-semibold text-primary-700 cursor-wait"
+            >
+              <PiSpinner className="w-4 h-4 animate-spin inline mr-2" />
+              Loading...
+            </button>
+          ) : isPremium ? (
             <button
               disabled
               className="mt-8 block w-full rounded-lg bg-primary-100 px-4 py-2 text-center text-sm font-semibold text-primary-700 cursor-not-allowed"
@@ -151,7 +163,7 @@ const PricingCards: React.FC = () => {
           {error && (
             <p className="mt-2 text-sm text-red-600">{error}</p>
           )}
-          {isDevelopment && !user?.isPremium && (
+          {isDevelopment && !isPremium && (
             <div className="mt-2 text-xs text-gray-500">
               <p>Test Card: 4242 4242 4242 4242</p>
               <p>Exp: Any future date, CVC: Any 3 digits</p>

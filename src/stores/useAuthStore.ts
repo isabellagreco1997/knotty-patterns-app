@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '../lib/supabase';
+import { clearSubscriptionCache } from '../hooks/useSubscriptionStatus';
 
 interface User {
   id: string;
@@ -48,16 +49,18 @@ export const useAuthStore = create<AuthState>()(
           set(state => ({
             user: state.user ? { ...state.user, isPremium } : null
           }));
+
+          // Clear subscription cache when status is updated
+          clearSubscriptionCache(currentUser.id);
         } catch (error) {
           console.error('Error updating premium status:', error);
+          throw error;
         }
       },
 
       refreshProfile: async () => {
         try {
           const { data: { session } } = await supabase.auth.getSession();
-
-          console.log('isabella', session)
 
           if (!session?.user) {
             set({ user: null, session: null });
@@ -77,7 +80,6 @@ export const useAuthStore = create<AuthState>()(
           }
 
           if (profileData) {
-            // Store email in localStorage for Stripe
             localStorage.setItem('sb-auth-email', session.user.email!);
 
             set({
@@ -107,7 +109,6 @@ export const useAuthStore = create<AuthState>()(
             return;
           }
 
-          // Store email in localStorage for Stripe
           localStorage.setItem('sb-auth-email', session.user.email!);
 
           const { data: profileData, error } = await supabase
@@ -133,7 +134,6 @@ export const useAuthStore = create<AuthState>()(
               initialized: true,
             });
           } else {
-            // Create profile if it doesn't exist
             const { data: newProfile, error: createError } = await supabase
               .from('profiles')
               .insert([{
@@ -180,7 +180,6 @@ export const useAuthStore = create<AuthState>()(
             throw new Error('No user data returned');
           }
 
-          // Store email in localStorage for Stripe
           localStorage.setItem('sb-auth-email', data.user.email!);
 
           const { data: profileData } = await supabase
@@ -256,6 +255,10 @@ export const useAuthStore = create<AuthState>()(
           await supabase.auth.signOut();
           localStorage.removeItem('auth-storage');
           localStorage.removeItem('sb-auth-email');
+          
+          // Clear subscription cache on sign out
+          clearSubscriptionCache();
+          
           set({
             user: null,
             session: null,

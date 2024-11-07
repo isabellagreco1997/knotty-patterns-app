@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useCustomer } from '../hooks/useCustomer';
+import { useSubscriptionStatus } from '../hooks/useSubscriptionStatus';
 import { categorizeSubscriptions } from '../helpers/subscriptionHelpers';
-import { PiSpinner, PiWarning, PiCreditCard, PiReceipt, PiClock, PiCalendar } from 'react-icons/pi';
+import { PiSpinner, PiWarning, PiCreditCard, PiReceipt, PiClock, PiCalendar, PiSparkle } from 'react-icons/pi';
 import { supabase } from '../lib/supabase';
 import { createPortalSession } from '../lib/stripe';
 
@@ -63,22 +64,23 @@ export default function AccountSettings() {
   const navigate = useNavigate();
   const { user, signOut } = useAuthStore();
   const { customer, paymentMethods, invoices, subscriptions, loading } = useCustomer();
+  const { status: subscriptionStatus, loading: subscriptionLoading } = useSubscriptionStatus();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const { current: currentSubscription, canceled: canceledSubscriptions } = 
     categorizeSubscriptions(subscriptions);
 
-    const BILLING_PORTAL_URL = {
-      development: 'https://billing.stripe.com/p/login/test_9AQdUsf6r1zvdsQbII',
-      production: 'https://billing.stripe.com/p/login/aEU5nQ4AU89XfQsbII'
-    };
+  const BILLING_PORTAL_URL = {
+    development: 'https://billing.stripe.com/p/login/test_9AQdUsf6r1zvdsQbII',
+    production: 'https://billing.stripe.com/p/login/aEU5nQ4AU89XfQsbII'
+  };
     
-    const handleManageSubscription = () => {
-      const isDevelopment = process.env.NODE_ENV === 'development';
-      const portalUrl = isDevelopment ? BILLING_PORTAL_URL.development : BILLING_PORTAL_URL.production;
-      window.open(portalUrl, '_blank');
-    };
+  const handleManageSubscription = () => {
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const portalUrl = isDevelopment ? BILLING_PORTAL_URL.development : BILLING_PORTAL_URL.production;
+    window.open(portalUrl, '_blank');
+  };
 
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
@@ -111,7 +113,7 @@ export default function AccountSettings() {
     }
   };
 
-  if (loading) {
+  if (loading || subscriptionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex items-center space-x-2">
@@ -121,6 +123,8 @@ export default function AccountSettings() {
       </div>
     );
   }
+
+  const isPremium = subscriptionStatus === 'active';
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -171,12 +175,28 @@ export default function AccountSettings() {
                     {currentSubscription?.message || 'No active subscription'}
                   </div>
                 </div>
-                <button
-                  onClick={handleManageSubscription}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
-                >
-                  Manage Subscription
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={handleManageSubscription}
+                    disabled={!isPremium}
+                    className={`px-4 py-2 rounded-md ${
+                      isPremium
+                        ? 'bg-primary-600 text-white hover:bg-primary-700'
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    Manage Account
+                  </button>
+                  {!isPremium && (
+                    <button
+                      onClick={() => navigate('/pricing')}
+                      className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 flex items-center"
+                    >
+                      <PiSparkle className="w-4 h-4 mr-2" />
+                      Upgrade to Premium
+                    </button>
+                  )}
+                </div>
               </div>
 
               {currentSubscription && (

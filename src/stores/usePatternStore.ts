@@ -62,6 +62,7 @@ export const usePatternStore = create<PatternState>()(
       addPattern: async (pattern: Pattern, isPremium: boolean) => {
         const currentPatterns = get().patterns;
         
+        // Only check pattern limit for non-premium users
         if (!isPremium && currentPatterns.length >= MAX_FREE_PATTERNS) {
           throw new Error(`Free users can only save up to ${MAX_FREE_PATTERNS} patterns. Please upgrade to Premium to save more patterns.`);
         }
@@ -123,6 +124,7 @@ export const usePatternStore = create<PatternState>()(
       duplicatePattern: async (pattern: Pattern, userId: string, isPremium: boolean) => {
         const currentPatterns = get().patterns;
         
+        // Only check pattern limit for non-premium users
         if (!isPremium && currentPatterns.length >= MAX_FREE_PATTERNS) {
           throw new Error(`Free users can only save up to ${MAX_FREE_PATTERNS} patterns. Please upgrade to Premium to save more patterns.`);
         }
@@ -260,8 +262,6 @@ export const usePatternStore = create<PatternState>()(
           throw error;
         }
       },
-
-     
     }),
     {
       name: 'pattern-storage',
