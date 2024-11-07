@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { PiScissors, PiUser, PiSignOut, PiList, PiX, PiGear } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
-import { getCustomerDetails } from '../lib/stripe';
+import { useCustomer } from '../hooks/useCustomer';
 
 const Navbar: React.FC = () => {
   const { user, signOut } = useAuthStore();
@@ -18,26 +18,10 @@ const Navbar: React.FC = () => {
     }
   };
 
-  const [customerData, setCustomerData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getCustomerDetails();
-        setCustomerData(data);
+ 
+  const { customer, paymentMethods, invoices, subscriptions, loading, error } = useCustomer();
+  console.log(invoices, 'invoices')
 
-      } catch (err) {
-        setError(err.message || 'Failed to fetch customer details');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  console.log(customerData, 'customerData')
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -45,6 +29,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-white shadow-sm">
+
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { usePatternStore } from '../stores/usePatternStore';
+import { useCustomer } from '../hooks/useCustomer';
+import { hasActiveSubscription } from '../helpers/subscriptionHelpers';
 import { PiPencil, PiTrash, PiCopy, PiSpinner, PiCaretDown, PiCaretUp } from 'react-icons/pi';
 import type { Pattern } from '../types/pattern';
 
@@ -117,6 +119,8 @@ function PatternCard({ pattern, onDelete, onDuplicate }: {
 function SavedPatterns() {
   const { user } = useAuthStore();
   const { patterns, loading, error, fetchPatterns, deletePattern, duplicatePattern } = usePatternStore();
+  const { subscriptions } = useCustomer();
+  const isSubscriptionActive = hasActiveSubscription(subscriptions);
 
   useEffect(() => {
     if (user) {
@@ -180,7 +184,7 @@ function SavedPatterns() {
           </Link>
         </div>
 
-        {!user?.isPremium && (
+        {!isSubscriptionActive && (
           <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-md">
             <p className="text-amber-800">
               Free account: You can save up to 5 patterns. Upgrade to Premium for unlimited patterns!

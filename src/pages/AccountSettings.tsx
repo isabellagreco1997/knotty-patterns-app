@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
-import { useSubscription } from '../hooks/useSubscription';
-import { PiSpinner, PiWarning } from 'react-icons/pi';
+import { useCustomer } from '../hooks/useCustomer';
+import { categorizeSubscriptions } from '../helpers/subscriptionHelpers';
+import { PiSpinner, PiWarning, PiCreditCard, PiReceipt, PiClock, PiCalendar } from 'react-icons/pi';
 import { supabase } from '../lib/supabase';
 import { createPortalSession } from '../lib/stripe';
 
@@ -42,26 +43,46 @@ function DeleteAccountModal({ isOpen, onClose, onConfirm }: {
   );
 }
 
+function formatDate(timestamp: number): string {
+  return new Date(timestamp * 1000).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function formatCurrency(amount: number, currency: string): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency || 'USD',
+    minimumFractionDigits: 2
+  }).format(amount / 100);
+}
+
 export default function AccountSettings() {
   const navigate = useNavigate();
   const { user, signOut } = useAuthStore();
-  const { isActive, plan, isLoading } = useSubscription();
+  const { customer, paymentMethods, invoices, subscriptions, loading } = useCustomer();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleManageSubscription = async () => {
-    try {
-      await createPortalSession();
-    } catch (error) {
-      console.error('Error opening subscription portal:', error);
-      alert('Failed to open subscription management. Please try again.');
-    }
-  };
+  const { current: currentSubscription, canceled: canceledSubscriptions } = 
+    categorizeSubscriptions(subscriptions);
+
+    const BILLING_PORTAL_URL = {
+      development: 'https://billing.stripe.com/p/login/test_9AQdUsf6r1zvdsQbII',
+      production: 'https://billing.stripe.com/p/login/aEU5nQ4AU89XfQsbII'
+    };
+    
+    const handleManageSubscription = () => {
+      const isDevelopment = process.env.NODE_ENV === 'development';
+      const portalUrl = isDevelopment ? BILLING_PORTAL_URL.development : BILLING_PORTAL_URL.production;
+      window.open(portalUrl, '_blank');
+    };
 
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
     try {
-      // Delete user's patterns
       const { error: patternsError } = await supabase
         .from('patterns')
         .delete()
@@ -69,7 +90,6 @@ export default function AccountSettings() {
 
       if (patternsError) throw patternsError;
 
-      // Delete user's profile
       const { error: profileError } = await supabase
         .from('profiles')
         .delete()
@@ -77,11 +97,9 @@ export default function AccountSettings() {
 
       if (profileError) throw profileError;
 
-      // Delete user account
       const { error: deleteError } = await supabase.auth.admin.deleteUser(user?.id || '');
       if (deleteError) throw deleteError;
 
-      // Sign out and redirect
       await signOut();
       navigate('/');
     } catch (error) {
@@ -93,7 +111,7 @@ export default function AccountSettings() {
     }
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex items-center space-x-2">
@@ -112,7 +130,6 @@ export default function AccountSettings() {
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Account Information */}
           <div>
             <h2 className="text-lg font-medium mb-4">Account Information</h2>
             <div className="bg-gray-50 p-4 rounded-md">
@@ -131,32 +148,132 @@ export default function AccountSettings() {
             </div>
           </div>
 
-          {/* Subscription Information */}
           <div>
-            <h2 className="text-lg font-medium mb-4">Subscription</h2>
+            <h2 className="text-lg font-medium mb-4">Subscription Status</h2>
             <div className="bg-gray-50 p-4 rounded-md">
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <div className="font-medium">
-                    Current Plan: {plan.charAt(0).toUpperCase() + plan.slice(1)}
+                  <div className="font-medium text-lg">
+                    {!currentSubscription && (
+                      <span className="text-gray-600">Free Plan</span>
+                    )}
+                    {currentSubscription?.status === 'active' && (
+                      <span className="text-green-600">Active Subscription</span>
+                    )}
+                    {currentSubscription?.status === 'trial' && (
+                      <span className="text-blue-600">Trial Period</span>
+                    )}
+                    {currentSubscription?.status === 'canceling' && (
+                      <span className="text-amber-600">Subscription Ending</span>
+                    )}
                   </div>
                   <div className="text-sm text-gray-600">
-                    Status: {isActive ? 'Active' : 'Inactive'}
+                    {currentSubscription?.message || 'No active subscription'}
                   </div>
                 </div>
-                {(isActive || plan !== 'free') && (
-                  <button
-                    onClick={handleManageSubscription}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
-                  >
-                    Manage Subscription
-                  </button>
-                )}
+                <button
+                  onClick={handleManageSubscription}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+                >
+                  Manage Subscription
+                </button>
               </div>
+
+              {currentSubscription && (
+                <div className="flex items-center text-sm text-gray-600 mt-2">
+                  <PiClock className="w-4 h-4 mr-2" />
+                  {currentSubscription.daysRemaining} days remaining
+                  {currentSubscription.status === 'active' && currentSubscription.renewsAt && (
+                    <>
+                      <PiCalendar className="w-4 h-4 ml-4 mr-2" />
+                      Renews on {formatDate(currentSubscription.subscription.current_period_end)}
+                    </>
+                  )}
+                  {currentSubscription.status === 'canceling' && currentSubscription.endsAt && (
+                    <>
+                      <PiCalendar className="w-4 h-4 ml-4 mr-2" />
+                      Ends on {formatDate(currentSubscription.subscription.current_period_end)}
+                    </>
+                  )}
+                </div>
+              )}
+
+              {canceledSubscriptions.length > 0 && (
+                <div className="mt-4 border-t pt-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Previous Subscriptions</h3>
+                  <div className="space-y-2">
+                    {canceledSubscriptions.map((sub) => (
+                      <div key={sub.id} className="text-sm text-gray-600">
+                        <div className="flex items-center">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            Canceled
+                          </span>
+                          <span className="ml-2">
+                            {formatDate(sub.current_period_start)} - {formatDate(sub.current_period_end)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Danger Zone */}
+          <div>
+            <h2 className="text-lg font-medium mb-4">Payment Methods</h2>
+            <div className="bg-gray-50 p-4 rounded-md">
+              {paymentMethods.length === 0 ? (
+                <p className="text-gray-600">No payment methods on file</p>
+              ) : (
+                <div className="space-y-4">
+                  {paymentMethods.map((method) => (
+                    <div key={method.id} className="flex items-center">
+                      <PiCreditCard className="w-5 h-5 text-gray-500 mr-2" />
+                      <span className="font-medium">{method.brand}</span>
+                      <span className="ml-2">•••• {method.last4}</span>
+                      <span className="ml-2 text-gray-500">
+                        Expires {method.expMonth}/{method.expYear}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-medium mb-4">Billing History</h2>
+            <div className="bg-gray-50 p-4 rounded-md">
+              {invoices.length === 0 ? (
+                <p className="text-gray-600">No billing history available</p>
+              ) : (
+                <div className="space-y-4">
+                  {invoices.map((invoice) => (
+                    <div key={invoice.id} className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <PiReceipt className="w-5 h-5 text-gray-500 mr-2" />
+                        <span className="font-medium">
+                          {formatCurrency(invoice.amount_paid, invoice.currency || 'USD')}
+                        </span>
+                        <span className="ml-2 text-gray-500">
+                          {formatDate(invoice.created)}
+                        </span>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        invoice.status === 'paid'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {invoice.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
           <div>
             <h2 className="text-lg font-medium mb-4 text-red-600">Danger Zone</h2>
             <div className="bg-red-50 p-4 rounded-md border border-red-200">
