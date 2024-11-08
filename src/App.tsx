@@ -9,6 +9,8 @@ import Home from './pages/Home';
 import PatternBuilder from './pages/PatternBuilder';
 import SavedPatterns from './pages/SavedPatterns';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import EmailConfirmation from './pages/EmailConfirmation';
 import Pricing from './pages/Pricing';
 import Blog from './pages/Blog';
@@ -52,7 +54,7 @@ export default function App() {
         }
 
         authListener = supabase.auth.onAuthStateChange(async (event, session) => {
-          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          if (event === ' <boltAction type="file" filePath="src/App.tsx">SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             await checkAuth();
             await refreshProfile();
           } else if (event === 'SIGNED_OUT') {
@@ -108,6 +110,8 @@ export default function App() {
                 <Route path="/pattern-builder/:id" element={<PatternBuilder />} />
                 <Route path="/saved-patterns" element={<SavedPatterns />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/auth/confirm" element={<EmailConfirmation />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/blog" element={<Blog />} />

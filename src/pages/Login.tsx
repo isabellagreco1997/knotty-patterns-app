@@ -1,12 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
-import { PiLockSimple, PiEnvelope, PiCheckCircle, PiWarning } from 'react-icons/pi';
+import { PiLockSimple, PiEnvelope, PiCheckCircle, PiWarning, PiEye, PiEyeSlash } from 'react-icons/pi';
+
+interface PasswordRequirement {
+  label: string;
+  test: (password: string) => boolean;
+}
+
+const passwordRequirements: PasswordRequirement[] = [
+  {
+    label: "At least 8 characters long",
+    test: (password) => password.length >= 8
+  },
+  {
+    label: "Contains at least one uppercase letter",
+    test: (password) => /[A-Z]/.test(password)
+  },
+  {
+    label: "Contains at least one lowercase letter",
+    test: (password) => /[a-z]/.test(password)
+  },
+  {
+    label: "Contains at least one number",
+    test: (password) => /\d/.test(password)
+  },
+  {
+    label: "Contains at least one special character",
+    test: (password) => /[!@#$%^&*(),.?":{}|<>]/.test(password)
+  }
+];
 
 export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [confirmEmailSent, setConfirmEmailSent] = useState(false);
   const navigate = useNavigate();
@@ -21,9 +52,25 @@ export default function Login() {
     }
   }, [user, navigate, location]);
 
+  const validatePassword = (password: string): boolean => {
+    return passwordRequirements.every(req => req.test(password));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (isSignUp) {
+      if (!validatePassword(password)) {
+        setError('Password does not meet requirements');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+    }
     
     try {
       if (isSignUp) {
@@ -122,6 +169,8 @@ export default function Login() {
                 onClick={() => {
                   setIsSignUp(!isSignUp);
                   setError('');
+                  setPassword('');
+                  setConfirmPassword('');
                 }}
                 className="text-primary-600 hover:text-primary-500 font-medium"
               >
@@ -180,15 +229,94 @@ export default function Login() {
                     <input
                       id="password"
                       name="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                      className="appearance-none relative block w-full pl-10 pr-10 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
                       placeholder="Password"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showPassword ? (
+                        <PiEyeSlash className="h-5 w-5 text-gray-400" />
+                      ) : (
+                        <PiEye className="h-5 w-5 text-gray-400" />
+                      )}
+                    </button>
                   </div>
                 </div>
+
+                {isSignUp && (
+                  <>
+                    <div>
+                      <label htmlFor="confirmPassword" className="sr-only">
+                        Confirm Password
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <PiLockSimple className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          type={showConfirmPassword ? "text" : "password"}
+                          required
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="appearance-none relative block w-full pl-10 pr-10 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm"
+                          placeholder="Confirm Password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showConfirmPassword ? (
+                            <PiEyeSlash className="h-5 w-5 text-gray-400" />
+                          ) : (
+                            <PiEye className="h-5 w-5 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-700">Password requirements:</p>
+                      <ul className="space-y-1">
+                        {passwordRequirements.map((req, index) => (
+                          <li
+                            key={index}
+                            className={`text-sm flex items-center ${
+                              req.test(password) ? 'text-green-600' : 'text-gray-500'
+                            }`}
+                          >
+                            {req.test(password) ? (
+                              <PiCheckCircle className="w-4 h-4 mr-2" />
+                            ) : (
+                              <div className="w-4 h-4 mr-2 border border-gray-300 rounded-full" />
+                            )}
+                            {req.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+
+                {!isSignUp && (
+                  <div className="flex items-center justify-end">
+                    <Link
+                      to="/forgot-password"
+                      className="text-sm text-primary-600 hover:text-primary-500"
+                    >
+                      Forgot your password?
+                    </Link>
+                  </div>
+                )}
               </div>
 
               <button
