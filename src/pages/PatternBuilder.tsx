@@ -12,9 +12,16 @@ import PatternSettings from '../components/pattern-builder/PatternSettings';
 import StitchGuide from '../components/pattern-builder/StitchGuide';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import CrochetPreview from '../components/pattern-builder/CrochetPreview';
+import { updateSections } from '../helpers/updateSections';
+
 import AddSectionModal from '../components/pattern-builder/AddSectionModal';
 import { PiPlus, PiCaretDown, PiTrash, PiSpinner, PiWarning, PiPencil, PiCheck } from 'react-icons/pi';
 import type { Round, Pattern, PatternSection } from '../types/pattern';
+import PatternSettingsCard from '../components/pattern-builder/PatternSettingsCard';
+import SectionsManagement from '../components/pattern-builder/SectionsManagement';
+import CustomTextInput from '../components/pattern-builder/CustomTextInput';
+import PatternPreviewArea from '../components/pattern-builder/PatternPreviewArea';
+import { generateFirstRound } from '../components/pattern-builder/patternHelpers';
 
 export default function PatternBuilder() {
   const { id } = useParams();
@@ -27,7 +34,7 @@ export default function PatternBuilder() {
   const [customText, setCustomText] = useState('');
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
   const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
-  
+
   const [pattern, setPattern] = useState<Pattern>({
     name: 'Untitled Pattern',
     description: '',
@@ -53,29 +60,11 @@ export default function PatternBuilder() {
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [editingSectionName, setEditingSectionName] = useState('');
 
-  // Add this new function to handle section name updates
-  const handleUpdateSectionName = (sectionId: string, newName: string) => {
-    if (!newName.trim()) return;
-    
-    setPattern(prev => ({
-      ...prev,
-      sections: prev.sections.map(section =>
-        section.id === sectionId
-          ? { ...section, name: newName.trim() }
-          : section
-      ),
-      updatedAt: new Date(),
-    }));
-    setEditingSectionId(null);
-    setEditingSectionName('');
-  };
-
-
   // Load existing pattern if ID is provided
   useEffect(() => {
     async function loadPattern() {
       if (!id) return;
-      
+
       setIsLoading(true);
       try {
         const { data, error } = await supabase
@@ -135,42 +124,42 @@ export default function PatternBuilder() {
   const hasActualRounds = currentSection?.rounds.some(round => !round.isText);
 
   // All your existing handler functions remain the same
- // Update the handleSave function in PatternBuilder.tsx
-const handleSave = async () => {
-  if (!user) {
-    navigate('/login?redirect=/pattern-builder');
-    return;
-  }
-
-  setIsSaving(true);
-  setSaveError(null);
-
-  try {
-    const patternToSave = {
-      ...pattern,
-      userId: user.id,
-      updatedAt: new Date()
-    };
-
-    if (id) {
-      await updatePattern(patternToSave);
-    } else {
-      await addPattern(patternToSave, user.isPremium);
+  // Update the handleSave function in PatternBuilder.tsx
+  const handleSave = async () => {
+    if (!user) {
+      navigate('/login?redirect=/pattern-builder');
+      return;
     }
 
-    // Show success message
-    const successMessage = document.createElement('div');
-    successMessage.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
-    successMessage.textContent = 'Pattern saved successfully!';
-    document.body.appendChild(successMessage);
-    setTimeout(() => successMessage.remove(), 3000);
-  } catch (error) {
-    console.error('Failed to save pattern:', error);
-    setSaveError(error instanceof Error ? error.message : 'Failed to save pattern');
-  } finally {
-    setIsSaving(false);
-  }
-};
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      const patternToSave = {
+        ...pattern,
+        userId: user.id,
+        updatedAt: new Date()
+      };
+
+      if (id) {
+        await updatePattern(patternToSave);
+      } else {
+        await addPattern(patternToSave, user.isPremium);
+      }
+
+      // Show success message
+      const successMessage = document.createElement('div');
+      successMessage.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
+      successMessage.textContent = 'Pattern saved successfully!';
+      document.body.appendChild(successMessage);
+      setTimeout(() => successMessage.remove(), 3000);
+    } catch (error) {
+      console.error('Failed to save pattern:', error);
+      setSaveError(error instanceof Error ? error.message : 'Failed to save pattern');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleAddSection = (name: string) => {
     const newSection: PatternSection = {
@@ -198,66 +187,26 @@ const handleSave = async () => {
     }
   };
 
-  const handlePatternStart = (type: 'magic-ring' | 'chain' | 'custom' | 'stitch', config: { count: number; text: string; stitchType: string }) => {
+  const handlePatternStart = (
+    type: 'magic-ring' | 'chain' | 'custom' | 'stitch',
+    config: { count: number; text: string; stitchType: string }
+  ) => {
     if (!currentSectionId) return;
 
-    let firstRound: Round;
+    const firstRound = generateFirstRound(type, config);
 
-    switch (type) {
-      case 'magic-ring':
-        firstRound = {
-          id: '1',
-          stitches: [{
-            id: '1',
-            type: 'sc',
-            count: config.count,
-          }],
-          notes: `Magic ring with ${config.count} sc (${config.count} sts)`,
-        };
-        break;
-      case 'chain':
-        firstRound = {
-          id: '1',
-          stitches: [{
-            id: '1',
-            type: 'ch',
-            count: config.count,
-          }],
-          notes: `Chain ${config.count} (${config.count} sts)`,
-        };
-        break;
-      case 'stitch':
-        firstRound = {
-          id: '1',
-          stitches: [{
-            id: '1',
-            type: config.stitchType,
-            count: config.count,
-          }],
-          notes: `${config.count} ${config.stitchType} (${config.count} sts)`,
-        };
-        break;
-      case 'custom':
-        firstRound = {
-          id: '1',
-          stitches: [],
-          notes: config.text,
-          isText: true,
-        };
-        break;
-      default:
-        return;
-    }
+    if (!firstRound) return;
 
-    setPattern(prev => ({
+    setPattern((prev) => ({
       ...prev,
-      sections: prev.sections.map(section => 
+      sections: prev.sections.map((section) =>
         section.id === currentSectionId
           ? { ...section, rounds: [...section.rounds, firstRound] }
           : section
-      )
+      ),
+      updatedAt: new Date(),
     }));
-    
+
     setCurrentRound({
       id: '2',
       stitches: [],
@@ -308,6 +257,10 @@ const handleSave = async () => {
     });
   };
 
+  const boundUpdateSections = (sections: PatternSection[]) => {
+    updateSections(setPattern, sections);
+  };
+
   const deleteStitch = (stitchId: string) => {
     setCurrentRound({
       ...currentRound,
@@ -344,7 +297,7 @@ const handleSave = async () => {
 
   const completeRound = (updatedRound: Round) => {
     if (!currentSectionId || updatedRound.stitches.length === 0) return;
-    
+
     setPattern(prev => ({
       ...prev,
       sections: prev.sections.map(section =>
@@ -367,7 +320,7 @@ const handleSave = async () => {
 
     const section = pattern.sections.find(s => s.id === currentSectionId);
     const round = section?.rounds.find(r => r.id === roundId);
-    
+
     if (round) {
       setEditingRoundId(roundId);
       setCurrentRound(round);
@@ -418,7 +371,7 @@ const handleSave = async () => {
       ...prev,
       sections: prev.sections.map(section => {
         if (section.id !== currentSectionId) return section;
-        
+
         const newRounds = Array.from(section.rounds);
         const [removed] = newRounds.splice(startIndex, 1);
         newRounds.splice(endIndex, 0, removed);
@@ -434,6 +387,10 @@ const handleSave = async () => {
       updatedAt: new Date(),
     }));
   };
+
+  
+
+
 
   if (isLoading) {
     return (
@@ -459,203 +416,37 @@ const handleSave = async () => {
           {/* Main Content Area */}
           <div className="space-y-6">
             {/* Pattern Settings Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="p-6">
-                <PatternSettings
-                  pattern={pattern}
-                  onUpdate={updatePatternSettings}
-                />
-              </div>
-            </div>
+            <PatternSettingsCard pattern={pattern} onUpdate={updatePatternSettings} />
 
-
-       
-
-           {/* Sections Management Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Pattern Sections</h2>
-            <button
-              onClick={() => setShowAddSectionModal(true)}
-              className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              <PiPlus className="w-4 h-4 mr-2" />
-              Add Section
-            </button>
-          </div>
-
-          {pattern.sections.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-              <PiWarning className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Add a section to start building your pattern</p>
-              <button
-                onClick={() => setShowAddSectionModal(true)}
-                className="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-              >
-                <PiPlus className="w-4 h-4 mr-2" />
-                Add Your First Section
-              </button>
-            </div>
-          ) : (
-            <DragDropContext onDragEnd={handleSectionDragEnd}>
-              <Droppable droppableId="sections">
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="space-y-2"
-                  >
-                    {pattern.sections.map((section, index) => (
-                      <Draggable
-                        key={section.id}
-                        draggableId={section.id}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`flex items-center justify-between p-4 rounded-xl border-2 transition-colors ${
-                              section.id === currentSectionId
-                                ? 'border-primary-500 bg-primary-50'
-                                : snapshot.isDragging
-                                ? 'border-primary-200 bg-primary-50'
-                                : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className="flex items-center flex-1">
-                              <button
-                                onClick={() => setCurrentSectionId(section.id)}
-                                className="mr-3"
-                              >
-                                <PiCaretDown className={`w-5 h-5 transition-transform ${
-                                  section.id === currentSectionId ? 'transform rotate-180' : ''
-                                }`} />
-                              </button>
-
-                              {editingSectionId === section.id ? (
-                                <div className="flex items-center flex-1">
-                                  <input
-                                    type="text"
-                                    value={editingSectionName}
-                                    onChange={(e) => setEditingSectionName(e.target.value)}
-                                    className="flex-1 px-2 py-1 border border-primary-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
-                                    autoFocus
-                                    onKeyPress={(e) => {
-                                      if (e.key === 'Enter') {
-                                        handleUpdateSectionName(section.id, editingSectionName);
-                                      }
-                                    }}
-                                  />
-                                  <div className="flex items-center ml-2">
-                                    <button
-                                      onClick={() => handleUpdateSectionName(section.id, editingSectionName)}
-                                      className="p-1 text-green-600 hover:bg-green-50 rounded-full"
-                                    >
-                                      <PiCheck className="w-5 h-5" />
-                                    </button>
-                                    <button
-                                      onClick={() => {
-                                        setEditingSectionId(null);
-                                        setEditingSectionName('');
-                                      }}
-                                      className="p-1 text-gray-600 hover:bg-gray-100 rounded-full"
-                                    >
-                                      {/* <PiX className="w-5 h-5" /> */}
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="flex items-center flex-1">
-                                  <span className="font-medium text-lg">{section.name}</span>
-                                  <span className="ml-3 text-sm text-gray-500">
-                                    ({section.rounds.length} rounds)
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="flex items-center space-x-2">
-                              {editingSectionId !== section.id && (
-                                <button
-                                  onClick={() => {
-                                    setEditingSectionId(section.id);
-                                    setEditingSectionName(section.name);
-                                  }}
-                                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                                >
-                                  <PiPencil className="w-5 h-5" />
-                                </button>
-                              )}
-                              <button
-                                onClick={() => handleDeleteSection(section.id)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                              >
-                                <PiTrash className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          )}
-        </div>
-      </div>
+            <SectionsManagement
+              pattern={pattern}
+              currentSectionId={currentSectionId}
+              setCurrentSectionId={setCurrentSectionId}
+              handleAddSection={handleAddSection}
+              handleDeleteSection={handleDeleteSection}
+              handleSectionDragEnd={handleSectionDragEnd}
+              onUpdateSections={boundUpdateSections}
+            />
 
             {currentSectionId && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-6">
-            <h2 className="text-xl font-semibold">Add custom text</h2>
-            <div className="mb-8">
-                      <div className="flex items-end gap-2">
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            This will create a new line but it won't be counted as a round
-                          </label>
-                          <input
-                            type="text"
-                            value={customText}
-                            onChange={(e) => setCustomText(e.target.value)}
-                            placeholder="Enter notes, comments, or instructions..."
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                          />
-                        </div>
-                        <button
-                          onClick={() => addCustomText(customText)}
-                          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                        >
-                          Add Text
-                        </button>
-                      </div>
-                    </div>
-                    </div>
-                    </div>
+              <CustomTextInput onAddText={addCustomText} />
             )}
 
-        
+
 
             {currentSectionId && (
               <>
                 {/* Pattern Building Area */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                   <div className="p-6">
-                  <h2 className="text-xl font-semibold pb-6">Start you pattern</h2>
+                    <h2 className="text-xl font-semibold pb-6">Start you pattern</h2>
 
                     {!hasActualRounds && (
                       <PatternStarter onStart={handlePatternStart} />
                     )}
 
-                  
-
                     <StitchPanel onStitchSelect={addStitch} />
-                    
+
                     <CurrentRound
                       round={currentRound}
                       onComplete={completeRound}
@@ -672,58 +463,19 @@ const handleSave = async () => {
               </>
             )}
 
-            {/* Save Button */}
-           
           </div>
 
-          {/* Pattern Preview Area */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Pattern Preview</h2>
-                <PatternDisplay
-                  pattern={pattern}
-                  rounds={currentSection?.rounds || []}
-                  onEdit={editRound}
-                  onDelete={deleteRound}
-                  onReorder={handleReorderRounds}
-                  language="en"
-                />
-              </div>
-              <div className="m-3 mx-6 ">
-              <PatternExport pattern={pattern} rounds={currentSection?.rounds || []} />
-              </div>
-
-              <div className="m-6 mx-6">
-                  {saveError && (
-                    <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-200">
-                      {saveError}
-                    </div>
-                  )}
-
-                  <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className=" w-full inline-flex justify-center items-center px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium"
-                  >
-                    {isSaving ? (
-                      <>
-                        <PiSpinner className="w-5 h-5 mr-2 animate-spin" />
-                        Saving Pattern...
-                      </>
-                    ) : (
-                      'Save Pattern'
-                    )}
-                  </button>
-                </div>
-
-            </div>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="p-6">
-                <StitchGuide />
-              </div>
-            </div>
-          </div>
+          <PatternPreviewArea
+            pattern={pattern}
+            rounds={currentSection?.rounds || []}
+            onEdit={editRound}
+            onDelete={deleteRound}
+            onReorder={handleReorderRounds}
+            saveError={saveError}
+            handleSave={handleSave}
+            isSaving={isSaving}
+            language="en"
+          />
         </div>
       </div>
 
