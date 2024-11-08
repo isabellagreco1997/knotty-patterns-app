@@ -19,13 +19,7 @@ function StitchGuide() {
           ))}
         </div>
       </div>
-      <div className="mt-6">
-        <img
-          src="https://images.unsplash.com/photo-1604940500627-d3f44d1d21c7?auto=format&fit=crop&q=80&w=400&h=300"
-          alt="Crochet Stitches"
-          className="w-full rounded-md"
-        />
-      </div>
+      
     </div>
   );
 }

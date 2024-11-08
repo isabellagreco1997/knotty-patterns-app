@@ -221,18 +221,20 @@ export default function CurrentRound({
         </div>
       )}
 
-      <RoundNotes
+      {/* <RoundNotes
         notes={round.notes || ''}
         onChange={onUpdateNotes}
-      />
+      /> */}
 
+<div>
       <button
         onClick={handleComplete}
         className="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
       >
         <PiPlus className="w-4 h-4 mr-2" />
-        Complete Round
+        Add Round
       </button>
+      </div>
     </div>
   );
 }

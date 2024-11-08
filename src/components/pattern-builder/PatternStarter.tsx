@@ -19,7 +19,6 @@ export default function PatternStarter({ onStart }: PatternStarterProps) {
     <div className="mb-6 space-y-6">
       {/* Start Options - Always Visible */}
       <div className="p-4 border border-primary-200 rounded-lg bg-primary-50">
-        <h3 className="text-lg font-medium mb-3">Start Your Pattern</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           <button
             onClick={() => handleTypeSelect('magic-ring')}

@@ -430,6 +430,9 @@ const handleSave = async () => {
               </div>
             </div>
 
+
+       
+
             {/* Sections Management Card */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="p-6">
@@ -495,19 +498,14 @@ const handleSave = async () => {
             </div>
 
             {currentSectionId && (
-              <>
-                {/* Pattern Building Area */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                  <div className="p-6">
-                    {!hasActualRounds && (
-                      <PatternStarter onStart={handlePatternStart} />
-                    )}
-
-                    <div className="mb-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6">
+            <h2 className="text-xl font-semibold">Add custom text</h2>
+            <div className="mb-8">
                       <div className="flex items-end gap-2">
                         <div className="flex-1">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Add Custom Text
+                            This will create a new line but it won't be counted as a round
                           </label>
                           <input
                             type="text"
@@ -525,6 +523,24 @@ const handleSave = async () => {
                         </button>
                       </div>
                     </div>
+                    </div>
+                    </div>
+            )}
+
+        
+
+            {currentSectionId && (
+              <>
+                {/* Pattern Building Area */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6">
+                  <h2 className="text-xl font-semibold pb-6">Start you pattern</h2>
+
+                    {!hasActualRounds && (
+                      <PatternStarter onStart={handlePatternStart} />
+                    )}
+
+                  
 
                     <StitchPanel onStitchSelect={addStitch} />
                     
@@ -539,33 +555,13 @@ const handleSave = async () => {
                       onUpdateFooterNote={updateFooterNote}
                     />
 
-                    <PatternExport pattern={pattern} rounds={currentSection?.rounds || []} />
                   </div>
                 </div>
               </>
             )}
 
             {/* Save Button */}
-            {saveError && (
-              <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-200">
-                {saveError}
-              </div>
-            )}
-
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="w-full inline-flex justify-center items-center px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium"
-            >
-              {isSaving ? (
-                <>
-                  <PiSpinner className="w-5 h-5 mr-2 animate-spin" />
-                  Saving Pattern...
-                </>
-              ) : (
-                'Save Pattern'
-              )}
-            </button>
+           
           </div>
 
           {/* Pattern Preview Area */}
@@ -582,6 +578,33 @@ const handleSave = async () => {
                   language="en"
                 />
               </div>
+              <div className="m-3 mx-6 ">
+              <PatternExport pattern={pattern} rounds={currentSection?.rounds || []} />
+              </div>
+
+              <div className="m-6 mx-6">
+                  {saveError && (
+                    <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-200">
+                      {saveError}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className=" w-full inline-flex justify-center items-center px-6 py-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium"
+                  >
+                    {isSaving ? (
+                      <>
+                        <PiSpinner className="w-5 h-5 mr-2 animate-spin" />
+                        Saving Pattern...
+                      </>
+                    ) : (
+                      'Save Pattern'
+                    )}
+                  </button>
+                </div>
+
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="p-6">
