@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import StitchButton from './StitchButton';
 import { stitchTypes } from '../../data/stitches';
-import { PiPlus, PiX } from 'react-icons/pi';
+import { PiPlus, PiX, PiSparkle } from 'react-icons/pi';
+import { useSubscriptionStatus } from '../../hooks/useSubscriptionStatus';
 
 interface StitchPanelProps {
   onStitchSelect: (type: string) => void;
@@ -10,6 +12,8 @@ interface StitchPanelProps {
 function StitchPanel({ onStitchSelect }: StitchPanelProps) {
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customStitch, setCustomStitch] = useState('');
+  const { status: subscriptionStatus } = useSubscriptionStatus();
+  const isPremium = subscriptionStatus === 'active';
 
   const handleCustomStitchAdd = () => {
     if (customStitch.trim()) {
@@ -36,13 +40,28 @@ function StitchPanel({ onStitchSelect }: StitchPanelProps) {
             onClick={onStitchSelect}
           />
         ))}
-        <button
-          onClick={() => setShowCustomInput(true)}
-          className="px-3 py-2 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
-        >
-          <PiPlus className="w-4 h-4 mr-1" />
-          Custom
-        </button>
+        {isPremium ? (
+          <button
+            onClick={() => setShowCustomInput(true)}
+            className="px-3 py-2 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-md text-sm font-medium transition-colors flex items-center justify-center"
+          >
+            <PiPlus className="w-4 h-4 mr-1" />
+            Custom
+          </button>
+        ) : (
+          <div className="group relative">
+            <Link
+              to="/pricing"
+              className="px-3 py-2 bg-gray-50 text-gray-400 rounded-md text-sm font-medium transition-colors flex items-center justify-center cursor-not-allowed"
+            >
+              <PiSparkle className="w-4 h-4 mr-1" />
+              Custom
+            </Link>
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              Available with Premium
+            </div>
+          </div>
+        )}
       </div>
 
       {showCustomInput && (

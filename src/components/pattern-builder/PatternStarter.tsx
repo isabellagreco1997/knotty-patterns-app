@@ -19,7 +19,7 @@ export default function PatternStarter({ onStart }: PatternStarterProps) {
     <div className="mb-6 space-y-6">
       {/* Start Options - Always Visible */}
       <div className="p-4 border border-primary-200 rounded-lg bg-primary-50">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           <button
             onClick={() => handleTypeSelect('magic-ring')}
             className={`px-4 py-3 rounded-md border transition-colors ${
@@ -59,19 +59,7 @@ export default function PatternStarter({ onStart }: PatternStarterProps) {
               Single Stitch
             </div>
           </button>
-          <button
-            onClick={() => handleTypeSelect('custom')}
-            className={`px-4 py-3 rounded-md border transition-colors ${
-              selectedType === 'custom'
-                ? 'bg-primary-600 text-white border-primary-600'
-                : 'bg-white text-neutral-700 border-neutral-300 hover:bg-neutral-50'
-            }`}
-          >
-            <div className="flex items-center justify-center">
-              <PiTextT className="w-4 h-4 mr-2" />
-              Custom Text
-            </div>
-          </button>
+         
         </div>
       </div>
 

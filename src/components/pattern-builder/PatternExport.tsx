@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { PiDownload, PiPrinter, PiCopy, PiFilePdf } from 'react-icons/pi';
-import type { Round, Pattern, Stitch } from '../../types/pattern';
+import { Link } from 'react-router-dom';
+import { PiDownload, PiPrinter, PiCopy, PiFilePdf, PiSparkle } from 'react-icons/pi';
+import { useSubscriptionStatus } from '../../hooks/useSubscriptionStatus';
+import type { Round, Pattern } from '../../types/pattern';
 import jsPDF from 'jspdf';
-
 interface PatternExportProps {
   pattern: Pattern;
   rounds: Round[];
@@ -192,6 +193,8 @@ function PDFPreviewModal({ isOpen, onClose, pattern }: { isOpen: boolean; onClos
 
 export default function PatternExport({ pattern }: PatternExportProps) {
   const [showPDFPreview, setShowPDFPreview] = useState(false);
+  const { status: subscriptionStatus } = useSubscriptionStatus();
+  const isPremium = subscriptionStatus === 'active';
 
   const handleCopy = () => {
     const content = generateFormattedPattern(pattern);
@@ -199,19 +202,39 @@ export default function PatternExport({ pattern }: PatternExportProps) {
   };
 
   const handleDownload = () => {
+    if (!isPremium) return;
     const pdf = generatePDF(pattern);
     pdf.save('crochet-pattern.pdf');
   };
 
   const handlePrint = () => {
+    if (!isPremium) return;
     const pdf = generatePDF(pattern);
     pdf.autoPrint();
     window.open(pdf.output('bloburl'), '_blank');
   };
 
+  const PremiumFeatureButton = ({ onClick, icon, text }: { onClick: () => void, icon: React.ReactNode, text: string }) => (
+    <div className="group relative">
+      <Link
+        to="/pricing"
+        className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-400 bg-gray-50 cursor-not-allowed"
+      >
+        {icon}
+        {text}
+      </Link>
+      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+        Available with Premium
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full">
+          <div className="border-8 border-transparent border-t-gray-800"></div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <>
-      <div className="mt-6 flex space-x-2">
+      <div className="mt-6 flex flex-wrap gap-2">
         <button
           onClick={handleCopy}
           className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
@@ -219,34 +242,59 @@ export default function PatternExport({ pattern }: PatternExportProps) {
           <PiCopy className="w-4 h-4 mr-2" />
           Copy
         </button>
-        <button
-          onClick={handleDownload}
-          className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-        >
-          <PiDownload className="w-4 h-4 mr-2" />
-          Download PDF
-        </button>
-        <button
-          onClick={handlePrint}
-          className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-        >
-          <PiPrinter className="w-4 h-4 mr-2" />
-          Print
-        </button>
-        <button
-          onClick={() => setShowPDFPreview(true)}
-          className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
-        >
-          <PiFilePdf className="w-4 h-4 mr-2" />
-          PDF Preview
-        </button>
+
+        {isPremium ? (
+          <>
+            <button
+              onClick={handleDownload}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+            >
+              <PiDownload className="w-4 h-4 mr-2" />
+              Download PDF
+            </button>
+            <button
+              onClick={handlePrint}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+            >
+              <PiPrinter className="w-4 h-4 mr-2" />
+              Print
+            </button>
+            <button
+              onClick={() => setShowPDFPreview(true)}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50"
+            >
+              <PiFilePdf className="w-4 h-4 mr-2" />
+              PDF Preview
+            </button>
+          </>
+        ) : (
+          <>
+            <PremiumFeatureButton
+              onClick={() => {}}
+              icon={<PiDownload className="w-4 h-4 mr-2" />}
+              text="Download PDF"
+            />
+            <PremiumFeatureButton
+              onClick={() => {}}
+              icon={<PiPrinter className="w-4 h-4 mr-2" />}
+              text="Print"
+            />
+            <PremiumFeatureButton
+              onClick={() => {}}
+              icon={<PiFilePdf className="w-4 h-4 mr-2" />}
+              text="PDF Preview"
+            />
+          </>
+        )}
       </div>
 
-      <PDFPreviewModal
-        isOpen={showPDFPreview}
-        onClose={() => setShowPDFPreview(false)}
-        pattern={pattern}
-      />
+      {isPremium && (
+        <PDFPreviewModal
+          isOpen={showPDFPreview}
+          onClose={() => setShowPDFPreview(false)}
+          pattern={pattern}
+        />
+      )}
     </>
   );
 }
