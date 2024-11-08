@@ -13,6 +13,8 @@ import StitchGuide from '../components/pattern-builder/StitchGuide';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import CrochetPreview from '../components/pattern-builder/CrochetPreview';
 import { updateSections } from '../helpers/updateSections';
+import { useCurrentRound } from '../hooks/useCurrentRound';
+
 
 import AddSectionModal from '../components/pattern-builder/AddSectionModal';
 import { PiPlus, PiCaretDown, PiTrash, PiSpinner, PiWarning, PiPencil, PiCheck } from 'react-icons/pi';
@@ -22,18 +24,29 @@ import SectionsManagement from '../components/pattern-builder/SectionsManagement
 import CustomTextInput from '../components/pattern-builder/CustomTextInput';
 import PatternPreviewArea from '../components/pattern-builder/PatternPreviewArea';
 import { generateFirstRound } from '../components/pattern-builder/patternHelpers';
+import { useSavePattern } from '../hooks/useSavePattern';
 
 export default function PatternBuilder() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { addPattern, updatePattern } = usePatternStore();
-  const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const [customText, setCustomText] = useState('');
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
   const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
+
+  const {
+    currentRound,
+    setCurrentRound,
+    addStitch,
+    updateStitchCount,
+    deleteStitch,
+    updateStitchNote,
+    updateHeaderNote,
+    updateFooterNote,
+    updateNotes,
+    resetCurrentRound,
+  } = useCurrentRound();
 
   const [pattern, setPattern] = useState<Pattern>({
     name: 'Untitled Pattern',
@@ -48,17 +61,9 @@ export default function PatternBuilder() {
     userId: user?.id || '',
   });
 
-  const [currentRound, setCurrentRound] = useState<Round>({
-    id: '1',
-    stitches: [],
-    notes: '',
-  });
 
   const [editingRoundId, setEditingRoundId] = useState<string | null>(null);
 
-
-  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
-  const [editingSectionName, setEditingSectionName] = useState('');
 
   // Load existing pattern if ID is provided
   useEffect(() => {
@@ -123,43 +128,14 @@ export default function PatternBuilder() {
   const currentSection = pattern.sections.find(s => s.id === currentSectionId);
   const hasActualRounds = currentSection?.rounds.some(round => !round.isText);
 
-  // All your existing handler functions remain the same
-  // Update the handleSave function in PatternBuilder.tsx
-  const handleSave = async () => {
-    if (!user) {
-      navigate('/login?redirect=/pattern-builder');
-      return;
-    }
 
-    setIsSaving(true);
-    setSaveError(null);
-
-    try {
-      const patternToSave = {
-        ...pattern,
-        userId: user.id,
-        updatedAt: new Date()
-      };
-
-      if (id) {
-        await updatePattern(patternToSave);
-      } else {
-        await addPattern(patternToSave, user.isPremium);
-      }
-
-      // Show success message
-      const successMessage = document.createElement('div');
-      successMessage.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
-      successMessage.textContent = 'Pattern saved successfully!';
-      document.body.appendChild(successMessage);
-      setTimeout(() => successMessage.remove(), 3000);
-    } catch (error) {
-      console.error('Failed to save pattern:', error);
-      setSaveError(error instanceof Error ? error.message : 'Failed to save pattern');
-    } finally {
-      setIsSaving(false);
-    }
-  };
+  const { handleSave, isSaving, saveError } = useSavePattern({
+    pattern,
+    user,
+    patternId: id,
+    updatePattern,
+    addPattern,
+  });
 
   const handleAddSection = (name: string) => {
     const newSection: PatternSection = {
@@ -236,64 +212,15 @@ export default function PatternBuilder() {
     setCustomText('');
   };
 
-  const addStitch = (type: string) => {
-    const newStitch = {
-      id: Math.random().toString(36).substr(2, 9),
-      type,
-      count: 1,
-    };
-    setCurrentRound({
-      ...currentRound,
-      stitches: [...currentRound.stitches, newStitch],
-    });
-  };
 
-  const updateStitchCount = (stitchId: string, count: number) => {
-    setCurrentRound({
-      ...currentRound,
-      stitches: currentRound.stitches.map((s) =>
-        s.id === stitchId ? { ...s, count } : s
-      ),
-    });
-  };
+
 
   const boundUpdateSections = (sections: PatternSection[]) => {
     updateSections(setPattern, sections);
   };
 
-  const deleteStitch = (stitchId: string) => {
-    setCurrentRound({
-      ...currentRound,
-      stitches: currentRound.stitches.filter((s) => s.id !== stitchId),
-    });
-  };
 
-  const updateStitchNote = (stitchId: string, note: any) => {
-    setCurrentRound({
-      ...currentRound,
-      stitches: currentRound.stitches.map((s) =>
-        s.id === stitchId ? { ...s, note } : s
-      ),
-    });
-  };
 
-  const updateHeaderNote = (note: string) => {
-    setCurrentRound({
-      ...currentRound,
-      headerNote: note,
-    });
-  };
-
-  const updateFooterNote = (note: string) => {
-    setCurrentRound({
-      ...currentRound,
-      footerNote: note,
-    });
-  };
-
-  const updateNotes = (notes: string) => {
-    setCurrentRound({ ...currentRound, notes });
-  };
 
   const completeRound = (updatedRound: Round) => {
     if (!currentSectionId || updatedRound.stitches.length === 0) return;
