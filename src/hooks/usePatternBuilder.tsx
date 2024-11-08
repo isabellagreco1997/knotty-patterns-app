@@ -10,23 +10,19 @@ import { updateSections } from '../helpers/updateSections';
 import type { Pattern, PatternSection, Round } from '../types/pattern';
 import { DropResult } from 'react-beautiful-dnd';
 
-export const usePatternBuilder = () => {
-  // Router Params and Navigation
-  const { id } = useParams();
-  const navigate = useNavigate();
+const AUTOSAVE_KEY = 'knottypatterns_autosave';
 
-  // Stores
-  const { user } = useAuthStore();
-  const { addPattern, updatePattern } = usePatternStore();
+const getInitialPattern = (): Pattern => {
+  const savedPattern = localStorage.getItem(AUTOSAVE_KEY);
+  if (savedPattern) {
+    try {
+      return JSON.parse(savedPattern);
+    } catch (error) {
+      console.error('Error parsing saved pattern:', error);
+    }
+  }
 
-  // State Variables
-  const [isLoading, setIsLoading] = useState(false);
-  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
-  const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
-  const [editingRoundId, setEditingRoundId] = useState<string | null>(null);
-
-  // Pattern State
-  const [pattern, setPattern] = useState<Pattern>({
+  return {
     name: 'Untitled Pattern',
     description: '',
     difficulty: 'beginner',
@@ -36,10 +32,21 @@ export const usePatternBuilder = () => {
     notes: [],
     createdAt: new Date(),
     updatedAt: new Date(),
-    userId: user?.id || '',
-  });
+    userId: '',
+  };
+};
 
-  // Custom Hooks
+export const usePatternBuilder = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const { addPattern, updatePattern } = usePatternStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+  const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
+  const [editingRoundId, setEditingRoundId] = useState<string | null>(null);
+  const [pattern, setPattern] = useState<Pattern>(getInitialPattern());
+
   const {
     currentRound,
     setCurrentRound,
@@ -60,6 +67,13 @@ export const usePatternBuilder = () => {
     updatePattern,
     addPattern,
   });
+
+  // Autosave pattern changes
+  useEffect(() => {
+    if (!id) { // Only autosave if this is a new pattern
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(pattern));
+    }
+  }, [pattern, id]);
 
   // Load existing pattern if ID is provided
   useEffect(() => {
@@ -94,8 +108,8 @@ export const usePatternBuilder = () => {
           };
 
           setPattern(loadedPattern);
+          localStorage.removeItem(AUTOSAVE_KEY); // Clear autosave when loading existing pattern
 
-          // Set the first section as current if exists
           if (data.sections && data.sections.length > 0) {
             setCurrentSectionId(data.sections[0].id);
           }
@@ -121,11 +135,21 @@ export const usePatternBuilder = () => {
     }
   }, [user]);
 
-  // Derived Variables
+  const startNewPattern = () => {
+    if (window.confirm('Are you sure you want to start a new pattern? Any unsaved changes will be lost.')) {
+      localStorage.removeItem(AUTOSAVE_KEY);
+      setPattern(getInitialPattern());
+      setCurrentSectionId(null);
+      setEditingRoundId(null);
+      resetCurrentRound('1');
+      navigate('/pattern-builder');
+    }
+  };
+
+  // Rest of the code remains exactly the same...
   const currentSection = pattern.sections.find((s) => s.id === currentSectionId);
   const hasActualRounds = currentSection?.rounds.some((round) => !round.isText);
 
-  // Handlers for Sections
   const handleAddSection = (name: string) => {
     const newSection: PatternSection = {
       id: Math.random().toString(36).substr(2, 9),
@@ -170,7 +194,6 @@ export const usePatternBuilder = () => {
     }));
   };
 
-  // Handlers for Pattern Start
   const handlePatternStart = (
     type: 'magic-ring' | 'chain' | 'custom' | 'stitch',
     config: { count: number; text: string; stitchType: string }
@@ -198,7 +221,6 @@ export const usePatternBuilder = () => {
     });
   };
 
-  // Handlers for Custom Text
   const addCustomText = (text: string) => {
     if (!text.trim() || !currentSectionId) return;
 
@@ -220,7 +242,6 @@ export const usePatternBuilder = () => {
     }));
   };
 
-  // Handlers for Rounds
   const completeRound = (updatedRound: Round) => {
     if (!currentSectionId || updatedRound.stitches.length === 0) return;
 
@@ -291,7 +312,6 @@ export const usePatternBuilder = () => {
     }));
   };
 
-  // Handler for Pattern Settings
   const updatePatternSettings = (settings: Partial<Pattern>) => {
     setPattern((prev) => ({
       ...prev,
@@ -300,9 +320,7 @@ export const usePatternBuilder = () => {
     }));
   };
 
-  // Return all state and handlers
   return {
-    // State
     pattern,
     isLoading,
     isSaving,
@@ -313,12 +331,8 @@ export const usePatternBuilder = () => {
     hasActualRounds,
     editingRoundId,
     currentRound,
-
-    // State Updaters
     setShowAddSectionModal,
     setCurrentSectionId,
-
-    // Handlers
     handleAddSection,
     handleDeleteSection,
     boundUpdateSections,
@@ -331,8 +345,7 @@ export const usePatternBuilder = () => {
     handleReorderRounds,
     updatePatternSettings,
     handleSave,
-
-    // Round Handlers
+    startNewPattern,
     addStitch,
     updateStitchCount,
     deleteStitch,

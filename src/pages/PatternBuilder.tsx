@@ -14,7 +14,7 @@ import AddSectionModal from '../components/pattern-builder/AddSectionModal';
 import { usePatternBuilder } from '../hooks/usePatternBuilder';
 
 // Icons
-import { PiSpinner } from 'react-icons/pi';
+import { PiSpinner, PiPlus } from 'react-icons/pi';
 
 // Main Component
 export default function PatternBuilder() {
@@ -48,6 +48,7 @@ export default function PatternBuilder() {
     handleReorderRounds,
     updatePatternSettings,
     handleSave,
+    startNewPattern,
 
     // Round Handlers
     addStitch,
@@ -76,9 +77,18 @@ export default function PatternBuilder() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-[90rem] mx-auto px-4">
         {/* Header Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Pattern Builder</h1>
-          <p className="mt-2 text-gray-600">Create and edit your crochet pattern</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Pattern Builder</h1>
+            <p className="mt-2 text-gray-600">Create and edit your crochet pattern</p>
+          </div>
+          <button
+            onClick={startNewPattern}
+            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <PiPlus className="w-4 h-4 mr-2" />
+            New Pattern
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
