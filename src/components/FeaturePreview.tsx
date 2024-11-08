@@ -32,7 +32,7 @@ export default function FeaturePreview() {
                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
                   </div>
                 </div>
-                <div className="relative w-full h-[400px] md:h-[400px] h-[200px]">
+                <div className="relative w-full h-[400px] md:h-[400px] h-[200px]" style={{backgroundColor:"rgb(249 250 251 / var(--tw-bg-opacity))"}}>
   <img
     src={Mock}
     alt="Pattern Builder Interface"
