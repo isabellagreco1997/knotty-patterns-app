@@ -10,6 +10,7 @@ import PatternDisplay from '../components/pattern-builder/PatternDisplay';
 import PatternExport from '../components/pattern-builder/PatternExport';
 import PatternSettings from '../components/pattern-builder/PatternSettings';
 import StitchGuide from '../components/pattern-builder/StitchGuide';
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import CrochetPreview from '../components/pattern-builder/CrochetPreview';
 import AddSectionModal from '../components/pattern-builder/AddSectionModal';
 import { PiPlus, PiCaretDown, PiTrash, PiSpinner, PiWarning } from 'react-icons/pi';
@@ -47,6 +48,27 @@ export default function PatternBuilder() {
   });
 
   const [editingRoundId, setEditingRoundId] = useState<string | null>(null);
+
+   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+  const [editingSectionName, setEditingSectionName] = useState('');
+
+  // Add this new function to handle section name updates
+  const handleUpdateSectionName = (sectionId: string, newName: string) => {
+    if (!newName.trim()) return;
+    
+    setPattern(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === sectionId
+          ? { ...section, name: newName.trim() }
+          : section
+      ),
+      updatedAt: new Date(),
+    }));
+    setEditingSectionId(null);
+    setEditingSectionName('');
+  };
+
 
   // Load existing pattern if ID is provided
   useEffect(() => {
@@ -359,6 +381,21 @@ const handleSave = async () => {
     }
   };
 
+  const handleSectionDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const sections = Array.from(pattern.sections);
+    const [removed] = sections.splice(result.source.index, 1);
+    sections.splice(result.destination.index, 0, removed);
+
+    setPattern(prev => ({
+      ...prev,
+      sections: sections,
+      updatedAt: new Date()
+    }));
+  };
+
+
   const deleteRound = (roundId: string) => {
     if (!currentSectionId) return;
 
@@ -435,38 +472,55 @@ const handleSave = async () => {
 
             {/* Sections Management Card */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">Pattern Sections</h2>
-                  <button
-                    onClick={() => setShowAddSectionModal(true)}
-                    className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                  >
-                    <PiPlus className="w-4 h-4 mr-2" />
-                    Add Section
-                  </button>
-                </div>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Pattern Sections</h2>
+        <button
+          onClick={() => setShowAddSectionModal(true)}
+          className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        >
+          <PiPlus className="w-4 h-4 mr-2" />
+          Add Section
+        </button>
+      </div>
 
-                {pattern.sections.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                    <PiWarning className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">Add a section to start building your pattern</p>
-                    <button
-                      onClick={() => setShowAddSectionModal(true)}
-                      className="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                    >
-                      <PiPlus className="w-4 h-4 mr-2" />
-                      Add Your First Section
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {pattern.sections.map((section) => (
+      {pattern.sections.length === 0 ? (
+        <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+          <PiWarning className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600">Add a section to start building your pattern</p>
+          <button
+            onClick={() => setShowAddSectionModal(true)}
+            className="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+          >
+            <PiPlus className="w-4 h-4 mr-2" />
+            Add Your First Section
+          </button>
+        </div>
+      ) : (
+        <DragDropContext onDragEnd={handleSectionDragEnd}>
+          <Droppable droppableId="sections">
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="space-y-2"
+              >
+                {pattern.sections.map((section, index) => (
+                  <Draggable
+                    key={section.id}
+                    draggableId={section.id}
+                    index={index}
+                  >
+                    {(provided, snapshot) => (
                       <div
-                        key={section.id}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
                         className={`flex items-center justify-between p-4 rounded-xl border-2 transition-colors ${
                           section.id === currentSectionId
                             ? 'border-primary-500 bg-primary-50'
+                            : snapshot.isDragging
+                            ? 'border-primary-200 bg-primary-50'
                             : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
                         }`}
                       >
@@ -491,11 +545,17 @@ const handleSave = async () => {
                           <PiTrash className="w-5 h-5" />
                         </button>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
               </div>
-            </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      )}
+    </div>
+  </div>
 
             {currentSectionId && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
