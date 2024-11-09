@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PiPlus, PiTrash, PiNote, PiX } from 'react-icons/pi';
 import type { Round, Stitch } from '../../types/pattern';
 import StitchCount from './StitchCount';
@@ -28,8 +28,14 @@ export default function CurrentRound({
   const [showHeaderNote, setShowHeaderNote] = useState(false);
   const [showFooterNote, setShowFooterNote] = useState(false);
   const [editingStitchId, setEditingStitchId] = useState<string | null>(null);
-  const [isRepeating, setIsRepeating] = useState(false);
-  const [repeatCount, setRepeatCount] = useState(6);
+  const [isRepeating, setIsRepeating] = useState(round.isRepeating || false);
+  const [repeatCount, setRepeatCount] = useState(round.repeatCount || 6);
+
+  // Update state when round changes (e.g., when editing an existing round)
+  useEffect(() => {
+    setIsRepeating(round.isRepeating || false);
+    setRepeatCount(round.repeatCount || 6);
+  }, [round]);
 
   function calculateTotalStitches(stitches: Stitch[], repeats: number = 1): number {
     const singleRepeatTotal = stitches.reduce((sum, stitch) => {
@@ -72,6 +78,7 @@ export default function CurrentRound({
       updatedRound = {
         ...round,
         isRepeating: false,
+        repeatCount: undefined,
         notes: `${totalStitches} sts`
       };
     }
@@ -111,9 +118,8 @@ export default function CurrentRound({
             key={stitch.id}
             className="group relative"
           >
-        
             <div className="flex items-center space-x-2 px-2 py-1 bg-primary-100 text-primary-700 rounded-md text-sm">
-            {stitch.note?.beforeNote && (
+              {stitch.note?.beforeNote && (
                 <span className="text-xs text-primary-600">
                   {stitch.note.beforeNote}
                 </span>
@@ -128,7 +134,6 @@ export default function CurrentRound({
                   ({stitch.count * 2} sts)
                 </span>
               )}
-           
               {stitch.note?.afterNote && (
                 <span className="text-xs text-primary-600">
                   {stitch.note.afterNote}
@@ -191,8 +196,6 @@ export default function CurrentRound({
         ))}
       </div>
 
-    
-
       <button
         onClick={() => setShowFooterNote(!showFooterNote)}
         className="mt-4 inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-primary-600"
@@ -242,6 +245,7 @@ export default function CurrentRound({
           )}
         </div>
       )}
+
       <div>
         <button
           onClick={handleComplete}
