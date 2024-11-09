@@ -23,6 +23,9 @@ export default function SelectionModeToggle({
         <PiRepeat className="w-4 h-4 mr-2" />
         {isSelectingStitches ? 'Cancel Selection' : 'Select Stitches'}
       </button>
+      <span className="text-xs text-gray-400">
+      Select the stitches you want to include in a repetition group
+  </span>
 
       {isSelectingStitches && (
         <span className="text-sm text-gray-600">
