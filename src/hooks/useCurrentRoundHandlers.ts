@@ -62,8 +62,16 @@ export function useCurrentRoundHandlers({ round, onComplete }: UseCurrentRoundHa
     };
 
     onComplete(updatedRound);
+
+    // Reset all states after completing the round
     setSelectedStitches([]);
     setIsSelectingStitches(false);
+    setRepetitionGroups([]); // Reset repetition groups
+    setIsRepeating(false);   // Reset repeating state
+    setRepeatCount(6);       // Reset repeat count
+    setShowHeaderNote(false);
+    setShowFooterNote(false);
+    setEditingStitchId(null);
   };
 
   const handleSelectionToggle = (isSelecting: boolean) => {

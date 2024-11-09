@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Stitch, Round } from '../types/pattern';
+import { Stitch, Round, RepetitionGroup } from '../types/pattern';
 
 interface UseCurrentRoundReturn {
   currentRound: Round;
@@ -7,7 +7,7 @@ interface UseCurrentRoundReturn {
   addStitch: (type: string) => void;
   updateStitchCount: (stitchId: string, count: number) => void;
   deleteStitch: (stitchId: string) => void;
-  updateStitchNote: (stitchId: string, note: string) => void;
+  updateStitchNote: (stitchId: string, note: any) => void;
   updateHeaderNote: (note: string) => void;
   updateFooterNote: (note: string) => void;
   updateNotes: (notes: string) => void;
@@ -19,6 +19,9 @@ export const useCurrentRound = (initialRoundId: string = '1'): UseCurrentRoundRe
     id: initialRoundId,
     stitches: [],
     notes: '',
+    repetitionGroups: [],
+    isRepeating: false,
+    repeatCount: 6,
   });
 
   const addStitch = (type: string) => {
@@ -46,10 +49,15 @@ export const useCurrentRound = (initialRoundId: string = '1'): UseCurrentRoundRe
     setCurrentRound((prevRound) => ({
       ...prevRound,
       stitches: prevRound.stitches.filter((s) => s.id !== stitchId),
+      // Also remove the stitch from any repetition groups
+      repetitionGroups: prevRound.repetitionGroups?.map(group => ({
+        ...group,
+        stitchIds: group.stitchIds.filter(id => id !== stitchId)
+      })).filter(group => group.stitchIds.length >= 2) || [],
     }));
   };
 
-  const updateStitchNote = (stitchId: string, note: string) => {
+  const updateStitchNote = (stitchId: string, note: any) => {
     setCurrentRound((prevRound) => ({
       ...prevRound,
       stitches: prevRound.stitches.map((s) =>
@@ -84,6 +92,11 @@ export const useCurrentRound = (initialRoundId: string = '1'): UseCurrentRoundRe
       id: nextRoundId,
       stitches: [],
       notes: '',
+      repetitionGroups: [], // Reset repetition groups
+      isRepeating: false,   // Reset repeating state
+      repeatCount: 6,       // Reset repeat count
+      headerNote: '',       // Reset header note
+      footerNote: '',       // Reset footer note
     });
   };
 

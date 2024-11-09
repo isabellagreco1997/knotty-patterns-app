@@ -60,7 +60,7 @@ export const usePatternBuilder = () => {
     resetCurrentRound,
   } = useCurrentRound();
 
-  const { handleSave, isSaving, saveError, setSaveError } = useSavePattern({
+  const { handleSave, isSaving, saveError } = useSavePattern({
     pattern,
     user,
     patternId: id,
@@ -68,14 +68,12 @@ export const usePatternBuilder = () => {
     addPattern,
   });
 
-  // Autosave pattern changes
   useEffect(() => {
-    if (!id) { // Only autosave if this is a new pattern
+    if (!id) {
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(pattern));
     }
   }, [pattern, id]);
 
-  // Load existing pattern if ID is provided
   useEffect(() => {
     async function loadPattern() {
       if (!id) return;
@@ -108,7 +106,7 @@ export const usePatternBuilder = () => {
           };
 
           setPattern(loadedPattern);
-          localStorage.removeItem(AUTOSAVE_KEY); // Clear autosave when loading existing pattern
+          localStorage.removeItem(AUTOSAVE_KEY);
 
           if (data.sections && data.sections.length > 0) {
             setCurrentSectionId(data.sections[0].id);
@@ -116,7 +114,6 @@ export const usePatternBuilder = () => {
         }
       } catch (error) {
         console.error('Error loading pattern:', error);
-        setSaveError('Failed to load pattern');
       } finally {
         setIsLoading(false);
       }
@@ -125,7 +122,6 @@ export const usePatternBuilder = () => {
     loadPattern();
   }, [id]);
 
-  // Update user ID when user changes
   useEffect(() => {
     if (user) {
       setPattern((prev) => ({
@@ -135,20 +131,64 @@ export const usePatternBuilder = () => {
     }
   }, [user]);
 
-  const startNewPattern = () => {
-    if (window.confirm('Are you sure you want to start a new pattern? Any unsaved changes will be lost.')) {
-      localStorage.removeItem(AUTOSAVE_KEY);
-      setPattern(getInitialPattern());
-      setCurrentSectionId(null);
-      setEditingRoundId(null);
-      resetCurrentRound('1');
-      navigate('/pattern-builder');
+  const editRound = (roundId: string) => {
+    if (!currentSectionId) return;
+
+    const section = pattern.sections.find((s) => s.id === currentSectionId);
+    const round = section?.rounds.find((r) => r.id === roundId);
+
+    if (round) {
+      setEditingRoundId(roundId);
+      setCurrentRound({
+        ...round,
+        repetitionGroups: round.repetitionGroups || [],
+        isRepeating: round.isRepeating || false,
+        repeatCount: round.repeatCount || 6,
+      });
+
+      setPattern((prev) => ({
+        ...prev,
+        sections: prev.sections.map((section) =>
+          section.id === currentSectionId
+            ? { ...section, rounds: section.rounds.filter((r) => r.id !== roundId) }
+            : section
+        ),
+      }));
     }
   };
 
-  // Rest of the code remains exactly the same...
-  const currentSection = pattern.sections.find((s) => s.id === currentSectionId);
-  const hasActualRounds = currentSection?.rounds.some((round) => !round.isText);
+  const completeRound = (updatedRound: Round) => {
+    if (!currentSectionId || updatedRound.stitches.length === 0) return;
+
+    const roundToAdd = {
+      ...updatedRound,
+      repetitionGroups: updatedRound.repetitionGroups || [],
+      isRepeating: updatedRound.isRepeating || false,
+      repeatCount: updatedRound.repeatCount || 6,
+    };
+
+    setPattern((prev) => ({
+      ...prev,
+      sections: prev.sections.map((section) =>
+        section.id === currentSectionId
+          ? { ...section, rounds: [...section.rounds, roundToAdd] }
+          : section
+      ),
+      updatedAt: new Date(),
+    }));
+
+    // Reset the current round with all properties cleared
+    setCurrentRound({
+      id: Math.random().toString(36).substr(2, 9),
+      stitches: [],
+      notes: '',
+      repetitionGroups: [], // Reset repetition groups
+      isRepeating: false,   // Reset repeating state
+      repeatCount: 6,       // Reset repeat count
+      headerNote: '',       // Reset header note
+      footerNote: '',       // Reset footer note
+    });
+  };
 
   const handleAddSection = (name: string) => {
     const newSection: PatternSection = {
@@ -218,6 +258,9 @@ export const usePatternBuilder = () => {
       id: '2',
       stitches: [],
       notes: '',
+      repetitionGroups: [],
+      isRepeating: false,
+      repeatCount: 6,
     });
   };
 
@@ -240,46 +283,6 @@ export const usePatternBuilder = () => {
       ),
       updatedAt: new Date(),
     }));
-  };
-
-  const completeRound = (updatedRound: Round) => {
-    if (!currentSectionId || updatedRound.stitches.length === 0) return;
-
-    setPattern((prev) => ({
-      ...prev,
-      sections: prev.sections.map((section) =>
-        section.id === currentSectionId
-          ? { ...section, rounds: [...section.rounds, updatedRound] }
-          : section
-      ),
-      updatedAt: new Date(),
-    }));
-
-    setCurrentRound({
-      id: Math.random().toString(36).substr(2, 9),
-      stitches: [],
-      notes: '',
-    });
-  };
-
-  const editRound = (roundId: string) => {
-    if (!currentSectionId) return;
-
-    const section = pattern.sections.find((s) => s.id === currentSectionId);
-    const round = section?.rounds.find((r) => r.id === roundId);
-
-    if (round) {
-      setEditingRoundId(roundId);
-      setCurrentRound(round);
-      setPattern((prev) => ({
-        ...prev,
-        sections: prev.sections.map((section) =>
-          section.id === currentSectionId
-            ? { ...section, rounds: section.rounds.filter((r) => r.id !== roundId) }
-            : section
-        ),
-      }));
-    }
   };
 
   const deleteRound = (roundId: string) => {
@@ -319,6 +322,20 @@ export const usePatternBuilder = () => {
       updatedAt: new Date(),
     }));
   };
+
+  const startNewPattern = () => {
+    if (window.confirm('Are you sure you want to start a new pattern? Any unsaved changes will be lost.')) {
+      localStorage.removeItem(AUTOSAVE_KEY);
+      setPattern(getInitialPattern());
+      setCurrentSectionId(null);
+      setEditingRoundId(null);
+      resetCurrentRound('1');
+      navigate('/pattern-builder');
+    }
+  };
+
+  const currentSection = pattern.sections.find((s) => s.id === currentSectionId);
+  const hasActualRounds = currentSection?.rounds.some((round) => !round.isText);
 
   return {
     pattern,

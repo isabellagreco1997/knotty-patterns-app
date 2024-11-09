@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import { PiPencil, PiTrash, PiNote, PiWarning } from 'react-icons/pi';
-import type { Round, Pattern } from '../../types/pattern';
+import type { Round, Pattern, Stitch, RepetitionGroup } from '../../types/pattern';
 
 interface PatternDisplayProps {
   pattern: Pattern;
@@ -27,67 +27,97 @@ const translations = {
   },
 };
 
-function formatPatternHeader(pattern: Pattern): string {
-  let header = `${pattern.name}\n\n`;
-  
-  if (pattern.description) {
-    header += `${pattern.description}\n\n`;
-  }
-  
-  header += `Difficulty: ${pattern.difficulty}\n`;
-  header += `Hook Size: ${pattern.hookSize}\n`;
-  header += `Yarn Weight: ${pattern.yarnWeight}\n\n`;
-  
-  return header;
-}
-
 function formatRoundInstructions(round: Round): string {
   if (round.isText) {
     return round.notes || '';
   }
 
-  const stitchPattern = round.stitches.map(s => {
-    const note = s.note || {};
-    const parts = [];
-
-    if (note.beforeNote) parts.push(note.beforeNote);
-    if (note.before) parts.push(note.before);
-
-    if (s.type === 'skip') {
-      const skipType = note.skipType || 'sc';
-      parts.push(`skip ${s.count} ${skipType}`);
-    } else {
-      parts.push(`${s.count} ${s.type}`);
-    }
-
-    if (note.after) parts.push(note.after);
-    if (note.afterNote) parts.push(note.afterNote);
-
-    return parts.join(' ');
-  }).join(', ');
-
-  const totalStitches = calculateTotalStitches(round);
-
-  if (round.isRepeating && round.repeatCount) {
-    return `(${stitchPattern}) * ${round.repeatCount}x (${totalStitches} sts)`;
+  const stitchToGroup = new Map<string, RepetitionGroup>();
+  if (round.repetitionGroups) {
+    round.repetitionGroups.forEach(group => {
+      group.stitchIds.forEach(id => {
+        stitchToGroup.set(id, group);
+      });
+    });
   }
 
-  return `${stitchPattern} (${totalStitches} sts)`;
+  const processedGroups = new Set<string>();
+  let pattern = '';
+  let currentGroup: RepetitionGroup | null = null;
+  let currentGroupStitches: string[] = [];
+
+  round.stitches.forEach((stitch) => {
+    const group = stitchToGroup.get(stitch.id);
+
+    if (group !== currentGroup) {
+      if (currentGroup && currentGroupStitches.length > 0 && !processedGroups.has(currentGroup.id)) {
+        if (pattern) pattern += ', ';
+        pattern += `(${currentGroupStitches.join(', ')}) * ${currentGroup.count}`;
+        processedGroups.add(currentGroup.id);
+        currentGroupStitches = [];
+      }
+      
+      if (group && !processedGroups.has(group.id)) {
+        currentGroup = group;
+        currentGroupStitches = [];
+      } else {
+        currentGroup = null;
+      }
+    }
+
+    const beforeNote = stitch.note?.beforeNote ? `${stitch.note.beforeNote} ` : '';
+    const afterNote = stitch.note?.afterNote ? ` ${stitch.note.afterNote}` : '';
+    const stitchText = stitch.type === 'dec'
+      ? `${beforeNote}dec ${stitch.count} (${stitch.count * 2} sts)${afterNote}`
+      : `${beforeNote}${stitch.count} ${stitch.type}${afterNote}`;
+
+    if (currentGroup && !processedGroups.has(currentGroup.id)) {
+      currentGroupStitches.push(stitchText);
+    } else if (!group || processedGroups.has(group.id)) {
+      if (pattern) pattern += ', ';
+      pattern += stitchText;
+    }
+  });
+
+  if (currentGroup && currentGroupStitches.length > 0 && !processedGroups.has(currentGroup.id)) {
+    if (pattern) pattern += ', ';
+    pattern += `(${currentGroupStitches.join(', ')}) * ${currentGroup.count}`;
+  }
+
+  const totalStitches = calculateTotalStitches(round);
+  const repeatText = round.isRepeating && round.repeatCount ? ` * ${round.repeatCount}x` : '';
+  return `${pattern}${repeatText} (${totalStitches} sts)`;
 }
 
 function calculateTotalStitches(round: Round): number {
   if (round.isText) return 0;
 
-  const singleRepeatTotal = round.stitches.reduce((total, stitch) => {
+  const baseStitches = round.stitches.reduce((total, stitch) => {
+    if (round.repetitionGroups?.some(g => g.stitchIds.includes(stitch.id))) {
+      return total;
+    }
     if (stitch.type === 'skip') return total;
     if (stitch.type === 'inc') return total + (stitch.count * 2);
     if (stitch.type === 'dec') return total + Math.ceil(stitch.count / 2);
     return total + stitch.count;
   }, 0);
 
-  return round.isRepeating && round.repeatCount 
-    ? singleRepeatTotal * round.repeatCount 
-    : singleRepeatTotal;
+  const groupStitches = round.repetitionGroups?.reduce((total, group) => {
+    const groupTotal = group.stitchIds.reduce((sum, stitchId) => {
+      const stitch = round.stitches.find(s => s.id === stitchId);
+      if (!stitch) return sum;
+      if (stitch.type === 'skip') return sum;
+      if (stitch.type === 'inc') return sum + (stitch.count * 2);
+      if (stitch.type === 'dec') return sum + Math.ceil(stitch.count / 2);
+      return sum + stitch.count;
+    }, 0);
+    return total + (groupTotal * group.count);
+  }, 0) || 0;
+
+  const totalBeforeRepeat = baseStitches + groupStitches;
+  return round.isRepeating && round.repeatCount
+    ? totalBeforeRepeat * round.repeatCount
+    : totalBeforeRepeat;
 }
 
 function getRoundNumber(rounds: Round[], currentIndex: number): number {
