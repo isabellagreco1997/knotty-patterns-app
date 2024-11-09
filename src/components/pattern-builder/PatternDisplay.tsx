@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { PiPencil, PiTrash, PiNote } from 'react-icons/pi';
+import { PiPencil, PiTrash, PiNote, PiWarning } from 'react-icons/pi';
 import type { Round, Pattern } from '../../types/pattern';
 
 interface PatternDisplayProps {
@@ -103,6 +103,9 @@ export default function PatternDisplay({
   language 
 }: PatternDisplayProps) {
   const [expandedNotes, setExpandedNotes] = useState<string[]>([]);
+  const [showDragMessage, setShowDragMessage] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const toggleNotes = (roundId: string) => {
     setExpandedNotes(prev => 
@@ -112,13 +115,53 @@ export default function PatternDisplay({
     );
   };
 
+  const handleDragStart = () => {
+    if (!rounds) {
+      setShowDragMessage(true);
+      setTimeout(() => setShowDragMessage(false), 3000);
+      return false;
+    }
+    return true;
+  };
+
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
     onReorder(result.source.index, result.destination.index);
   };
 
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setTooltipPosition({
+      x: e.clientX,
+      y: e.clientY
+    });
+  };
+
   return (
     <div>
+      {showDragMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-amber-50 text-amber-800 px-4 py-2 rounded-lg border border-amber-200 flex items-center shadow-lg">
+          <PiWarning className="w-5 h-5 mr-2" />
+          Please select a section to reorder rounds
+        </div>
+      )}
+
+      {showTooltip && (
+        <div 
+          className="fixed z-50 pointer-events-none"
+          style={{
+            left: tooltipPosition.x + 10,
+            top: tooltipPosition.y - 30,
+          }}
+        >
+          <div className="bg-primary-600 text-white text-sm px-3 py-1.5 rounded shadow-lg whitespace-nowrap">
+            Select this section to reorder rounds
+            <div className="absolute -left-1 top-1/2 transform -translate-y-1/2 -translate-x-full">
+              <div className="border-8 border-transparent border-r-primary-600"></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="text-gray-800">
         <div className="mb-6 whitespace-pre-wrap">
           <div className="text-2xl font-semibold mb-2">{pattern.name}</div>
@@ -138,8 +181,8 @@ export default function PatternDisplay({
               {section.name}
             </div>
 
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId={`section-${section.id}`}>
+            <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+              <Droppable droppableId={`section-${section.id}`} isDropDisabled={section.rounds !== rounds}>
                 {(provided) => (
                   <div
                     {...provided.droppableProps}
@@ -151,6 +194,7 @@ export default function PatternDisplay({
                         key={round.id} 
                         draggableId={`round-${round.id}`}
                         index={index}
+                        isDragDisabled={section.rounds !== rounds}
                       >
                         {(provided, snapshot) => (
                           <div
@@ -158,8 +202,18 @@ export default function PatternDisplay({
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={`group relative p-4 rounded-md ${
-                              round.isText ? 'bg-primary-50' : snapshot.isDragging ? 'bg-primary-50' : 'bg-gray-50 hover:bg-gray-100'
+                              round.isText ? 'bg-primary-50' : 
+                              snapshot.isDragging ? 'bg-primary-50' : 
+                              section.rounds === rounds ? 'bg-gray-50 hover:bg-gray-100 cursor-grab' : 
+                              'bg-gray-50 hover:bg-gray-100 cursor-not-allowed'
                             }`}
+                            onMouseEnter={() => {
+                              if (section.rounds !== rounds) {
+                                setShowTooltip(true);
+                              }
+                            }}
+                            onMouseLeave={() => setShowTooltip(false)}
+                            onMouseMove={handleMouseMove}
                           >
                             {round.headerNote && (
                               <div className="text-sm text-gray-600 italic mb-2">

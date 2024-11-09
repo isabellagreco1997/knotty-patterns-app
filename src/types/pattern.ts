@@ -4,7 +4,17 @@ export interface Stitch {
   id: string;
   type: string;
   count: number;
-  note?: any;
+  note?: {
+    beforeNote?: string;
+    afterNote?: string;
+  };
+  repetitionGroupId?: string;
+}
+
+export interface RepetitionGroup {
+  id: string;
+  count: number;
+  stitchIds: string[];
 }
 
 export interface Round {
@@ -16,6 +26,7 @@ export interface Round {
   isText?: boolean;
   isRepeating?: boolean;
   repeatCount?: number;
+  repetitionGroups?: RepetitionGroup[];
 }
 
 export interface PatternSection {

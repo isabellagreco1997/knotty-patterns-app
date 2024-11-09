@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PiPlus, PiTrash, PiNote, PiTextT, PiRepeat } from 'react-icons/pi';
+import { PiPlus, PiTrash, PiNote, PiX } from 'react-icons/pi';
 import type { Round, Stitch } from '../../types/pattern';
 import StitchCount from './StitchCount';
 import RoundNotes from './RoundNotes';
@@ -35,7 +35,7 @@ export default function CurrentRound({
     const singleRepeatTotal = stitches.reduce((sum, stitch) => {
       if (stitch.type === 'skip') return sum;
       if (stitch.type === 'inc') return sum + (stitch.count * 2);
-      if (stitch.type === 'dec') return sum - stitch.count; // Each dec reduces stitch count by 1
+      if (stitch.type === 'dec') return sum - stitch.count;
       return sum + stitch.count;
     }, 0);
     return singleRepeatTotal * repeats;
@@ -43,8 +43,8 @@ export default function CurrentRound({
 
   function formatStitchPattern(stitches: Stitch[]): string {
     return stitches.map(s => {
-      const beforeNote = s.beforeNote ? `${s.beforeNote} ` : '';
-      const afterNote = s.afterNote ? ` ${s.afterNote}` : '';
+      const beforeNote = s.note?.beforeNote ? `${s.note.beforeNote} ` : '';
+      const afterNote = s.note?.afterNote ? ` ${s.note.afterNote}` : '';
       if (s.type === 'dec') {
         return `${beforeNote}dec ${s.count} (${s.count * 2} sts worked)${afterNote}`;
       }
@@ -89,7 +89,7 @@ export default function CurrentRound({
         onClick={() => setShowHeaderNote(!showHeaderNote)}
         className="mb-2 inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-primary-600"
       >
-        <PiTextT className="w-4 h-4 mr-1" />
+        <PiNote className="w-4 h-4 mr-1" />
         {showHeaderNote ? 'Hide Header Note' : 'Add Header Note'}
       </button>
 
@@ -111,7 +111,13 @@ export default function CurrentRound({
             key={stitch.id}
             className="group relative"
           >
+        
             <div className="flex items-center space-x-2 px-2 py-1 bg-primary-100 text-primary-700 rounded-md text-sm">
+            {stitch.note?.beforeNote && (
+                <span className="text-xs text-primary-600">
+                  {stitch.note.beforeNote}
+                </span>
+              )}
               <StitchCount
                 count={stitch.count}
                 onChange={(count) => onUpdateCount(stitch.id, count)}
@@ -120,6 +126,12 @@ export default function CurrentRound({
               {stitch.type === 'dec' && (
                 <span className="text-xs text-primary-500">
                   ({stitch.count * 2} sts)
+                </span>
+              )}
+           
+              {stitch.note?.afterNote && (
+                <span className="text-xs text-primary-600">
+                  {stitch.note.afterNote}
                 </span>
               )}
               <button
@@ -138,6 +150,15 @@ export default function CurrentRound({
             
             {editingStitchId === stitch.id && (
               <div className="absolute z-10 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg p-2 space-y-2">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-gray-700">Stitch Notes</span>
+                  <button
+                    onClick={() => setEditingStitchId(null)}
+                    className="p-1 hover:bg-gray-100 rounded-full"
+                  >
+                    <PiX className="w-4 h-4" />
+                  </button>
+                </div>
                 <div>
                   <label className="block text-xs text-gray-600 mb-1">Note Before Stitch</label>
                   <input
@@ -170,6 +191,28 @@ export default function CurrentRound({
         ))}
       </div>
 
+    
+
+      <button
+        onClick={() => setShowFooterNote(!showFooterNote)}
+        className="mt-4 inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-primary-600"
+      >
+        <PiNote className="w-4 h-4 mr-1" />
+        {showFooterNote ? 'Hide Footer Note' : 'Add Footer Note'}
+      </button>
+
+      {showFooterNote && (
+        <div className="mt-2">
+          <input
+            type="text"
+            value={round.footerNote || ''}
+            onChange={(e) => onUpdateFooterNote(e.target.value)}
+            placeholder="Add a note below this round..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+          />
+        </div>
+      )}
+      
       {round.stitches.length > 0 && (
         <div className="mt-4 flex items-center space-x-4">
           <label className="flex items-center space-x-2">
@@ -184,7 +227,6 @@ export default function CurrentRound({
           
           {isRepeating && (
             <div className="flex items-center space-x-2">
-              <PiRepeat className="w-4 h-4 text-gray-500" />
               <input
                 type="number"
                 value={repeatCount}
@@ -200,41 +242,35 @@ export default function CurrentRound({
           )}
         </div>
       )}
+      <div>
+        <button
+          onClick={handleComplete}
+          className="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+        >
+          <PiPlus className="w-4 h-4 mr-2" />
+          Add Round
+        </button>
+      </div>
 
-      <button
-        onClick={() => setShowFooterNote(!showFooterNote)}
-        className="mt-4 inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-primary-600"
-      >
-        <PiTextT className="w-4 h-4 mr-1" />
-        {showFooterNote ? 'Hide Footer Note' : 'Add Footer Note'}
-      </button>
-
-      {showFooterNote && (
-        <div className="mt-2">
-          <input
-            type="text"
-            value={round.footerNote || ''}
-            onChange={(e) => onUpdateFooterNote(e.target.value)}
-            placeholder="Add a note below this round..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          />
+      {/* Preview of current round */}
+      {round.stitches.length > 0 && (
+        <div className="mt-4 p-4 bg-gray-50 rounded-md">
+          <h3 className="text-sm font-medium text-gray-700 mb-2">Current Round Preview</h3>
+          <div className="space-y-2 text-sm text-gray-600">
+            {round.headerNote && (
+              <p className="italic">{round.headerNote}</p>
+            )}
+            <p>
+              {formatStitchPattern(round.stitches)}
+              {isRepeating && repeatCount > 1 && ` * ${repeatCount}x`}
+              {` (${calculateTotalStitches(round.stitches, isRepeating ? repeatCount : 1)} sts)`}
+            </p>
+            {round.footerNote && (
+              <p className="italic">{round.footerNote}</p>
+            )}
+          </div>
         </div>
       )}
-
-      {/* <RoundNotes
-        notes={round.notes || ''}
-        onChange={onUpdateNotes}
-      /> */}
-
-<div>
-      <button
-        onClick={handleComplete}
-        className="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
-      >
-        <PiPlus className="w-4 h-4 mr-2" />
-        Add Round
-      </button>
-      </div>
     </div>
   );
 }
