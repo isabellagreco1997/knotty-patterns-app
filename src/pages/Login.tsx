@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { PiLockSimple, PiEnvelope, PiCheckCircle, PiWarning, PiEye, PiEyeSlash } from 'react-icons/pi';
+import ResendEmailButton from '../components/ResendEmailButton';
 
 interface PasswordRequirement {
   label: string;
@@ -140,15 +141,21 @@ export default function Login() {
                 </p>
               </div>
             )}
-            <button
-              onClick={() => {
-                setConfirmEmailSent(false);
-                setIsSignUp(false);
-              }}
-              className="mt-6 text-primary-600 hover:text-primary-500"
-            >
-              Back to login
-            </button>
+            <div className="mt-6 space-y-4">
+              <ResendEmailButton 
+                email={email}
+                onError={(errorMessage) => setError(errorMessage)}
+              />
+              <button
+                onClick={() => {
+                  setConfirmEmailSent(false);
+                  setIsSignUp(false);
+                }}
+                className="text-primary-600 hover:text-primary-500"
+              >
+                Back to login
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -156,7 +163,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="bg-white p-8 rounded-xl shadow-lg">
