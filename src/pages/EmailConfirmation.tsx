@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { verifyEmail } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { PiCheckCircle, PiWarning } from 'react-icons/pi';
 import ResendEmailButton from '../components/ResendEmailButton';
 
@@ -15,37 +15,30 @@ export default function EmailConfirmation() {
     const userEmail = localStorage.getItem('sb-auth-email');
     setEmail(userEmail);
 
-    // Get the token from the URL
-    const token = searchParams.get('token');
-    const type = searchParams.get('type');
-    
-    if (!token || !type) {
-      setStatus('error');
-      setError('Invalid confirmation link');
-      return;
-    }
-
-    async function confirmEmail() {
+    // Check if we have a session
+    async function checkSession() {
       try {
-        const { data, error } = await verifyEmail(token);
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) throw sessionError;
 
-        if (error) {
-          throw error;
+        if (session?.user?.email_confirmed_at || session?.user?.confirmed_at) {
+          setStatus('success');
+          setTimeout(() => {
+            navigate('/login');
+          }, 3000);
+        } else {
+          setStatus('error');
+          setError('Email verification pending. Please check your inbox and click the verification link.');
         }
-
-        setStatus('success');
-        // Redirect to login after 3 seconds
-        setTimeout(() => {
-          navigate('/login');
-        }, 3000);
       } catch (err) {
         setStatus('error');
         setError(err instanceof Error ? err.message : 'Failed to verify email');
       }
     }
 
-    confirmEmail();
-  }, [searchParams, navigate]);
+    checkSession();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -71,13 +64,13 @@ export default function EmailConfirmation() {
         {status === 'error' && (
           <>
             <PiWarning className="w-12 h-12 text-red-500 mx-auto" />
-            <h2 className="mt-4 text-xl font-semibold text-gray-900">Verification Failed</h2>
+            <h2 className="mt-4 text-xl font-semibold text-gray-900">Verification Status</h2>
             <p className="mt-2 text-red-600">{error}</p>
           </>
         )}
 
-        {/* Resend confirmation section - always visible */}
-        {email && status !== 'success' && (
+        {/* Resend confirmation section - show only if verification failed */}
+        {email && status === 'error' && (
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-gray-600 mb-4">Haven't received the confirmation email?</p>
             <ResendEmailButton 

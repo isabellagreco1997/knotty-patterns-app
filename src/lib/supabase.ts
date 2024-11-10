@@ -69,19 +69,6 @@ export async function checkSupabaseConnection() {
   }
 }
 
-export async function verifyEmail(token: string) {
-  try {
-    const { data, error } = await supabase.auth.verifyOtp({
-      token_hash: token,
-      type: 'signup'
-    });
-    return { data, error };
-  } catch (error) {
-    console.error('Email verification failed:', error);
-    return { data: null, error };
-  }
-}
-
 export async function savePattern(pattern: any) {
   const { data, error } = await supabase
     .from('patterns')
