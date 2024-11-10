@@ -73,7 +73,7 @@ export async function verifyEmail(token: string) {
   try {
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: token,
-      type: 'email'
+      type: 'signup'
     });
     return { data, error };
   } catch (error) {

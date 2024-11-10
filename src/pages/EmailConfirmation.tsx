@@ -1,32 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { verifyEmail } from '../lib/supabase';
-import { PiCheckCircle, PiWarning, PiSpinner } from 'react-icons/pi';
-import { supabase } from '../lib/supabase';
+import { PiCheckCircle, PiWarning } from 'react-icons/pi';
+import ResendEmailButton from '../components/ResendEmailButton';
 
 export default function EmailConfirmation() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
   const [error, setError] = useState<string | null>(null);
-  const [isResending, setIsResending] = useState(false);
-  const [resendSuccess, setResendSuccess] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('access_token');
     const userEmail = localStorage.getItem('sb-auth-email');
     setEmail(userEmail);
+
+    // Get the token from the URL
+    const token = searchParams.get('token');
+    const type = searchParams.get('type');
     
-    if (!token) {
+    if (!token || !type) {
       setStatus('error');
-      setError('No confirmation token found');
+      setError('Invalid confirmation link');
       return;
     }
 
     async function confirmEmail() {
       try {
+        const { data, error } = await verifyEmail(token);
+
+        if (error) {
+          throw error;
+        }
+
         setStatus('success');
         // Redirect to login after 3 seconds
         setTimeout(() => {
@@ -40,33 +46,6 @@ export default function EmailConfirmation() {
 
     confirmEmail();
   }, [searchParams, navigate]);
-
-  const handleResendConfirmation = async () => {
-    if (!email) {
-      setError('No email address found');
-      return;
-    }
-
-    setIsResending(true);
-    setError(null);
-    setResendSuccess(false);
-
-    try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email,
-      });
-
-      if (error) throw error;
-
-      setResendSuccess(true);
-      setTimeout(() => setResendSuccess(false), 5000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to resend confirmation email');
-    } finally {
-      setIsResending(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -101,32 +80,10 @@ export default function EmailConfirmation() {
         {email && status !== 'success' && (
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-gray-600 mb-4">Haven't received the confirmation email?</p>
-            <button
-              onClick={handleResendConfirmation}
-              disabled={isResending}
-              className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isResending ? (
-                <>
-                  <PiSpinner className="w-4 h-4 mr-2 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                'Resend Confirmation Email'
-              )}
-            </button>
-            
-            {resendSuccess && (
-              <p className="mt-4 text-green-600">
-                Confirmation email has been resent. Please check your inbox.
-              </p>
-            )}
-
-            {error && !resendSuccess && (
-              <p className="mt-4 text-red-600">
-                {error}
-              </p>
-            )}
+            <ResendEmailButton 
+              email={email}
+              onError={(errorMessage) => setError(errorMessage)}
+            />
           </div>
         )}
 
