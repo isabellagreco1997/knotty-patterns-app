@@ -111,7 +111,7 @@ const testimonials = [
     image: "https://images.unsplash.com/photo-1582838038154-a88f9a755f89?auto=format&fit=crop&q=80&w=100"
   },
   {
-    quote: "As a beginner, this tool helped me understand pattern creation. The 3D preview is amazing!",
+    quote: "As a beginner, this tool helped me understand pattern creation.",
     author: "Emily R.",
     role: "Hobbyist Crocheter",
     image: "https://images.unsplash.com/photo-1615646589661-0e7bc0b2b6c3?auto=format&fit=crop&q=80&w=100"
