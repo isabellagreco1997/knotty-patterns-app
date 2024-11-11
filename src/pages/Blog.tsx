@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PiCalendar, PiUser, PiArrowRight, PiSpinner } from 'react-icons/pi';
 import { getBlogPosts, BlogPost } from '../lib/contentful';
+import SEOHead from '../components/SEOHead';
 
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
