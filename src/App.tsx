@@ -14,6 +14,7 @@ import ResetPassword from './pages/ResetPassword';
 import EmailConfirmation from './pages/EmailConfirmation';
 import Pricing from './pages/Pricing';
 import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import AccountSettings from './pages/AccountSettings';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
@@ -54,7 +55,7 @@ export default function App() {
         }
 
         authListener = supabase.auth.onAuthStateChange(async (event, session) => {
-          if (event === ' <boltAction type="file" filePath="src/App.tsx">SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             await checkAuth();
             await refreshProfile();
           } else if (event === 'SIGNED_OUT') {
@@ -115,6 +116,7 @@ export default function App() {
                 <Route path="/auth/confirm" element={<EmailConfirmation />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/account" element={<AccountSettings />} />
               </Routes>
             </CustomerProvider>

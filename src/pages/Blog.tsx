@@ -1,38 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PiCalendar, PiUser, PiArrowRight } from 'react-icons/pi';
-
-const blogPosts = [
-  {
-    id: 1,
-    title: "10 Essential Tips for Amigurumi Beginners",
-    excerpt: "Master the basics of amigurumi with these beginner-friendly tips and tricks that will help you create adorable crochet creatures.",
-    image: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&q=80&w=600",
-    author: "Emma Thompson",
-    date: "2024-02-20",
-    category: "Tutorials"
-  },
-  {
-    id: 2,
-    title: "Understanding Crochet Pattern Terminology",
-    excerpt: "A comprehensive guide to reading and understanding crochet patterns, from basic abbreviations to complex instructions.",
-    image: "https://images.pexels.com/photos/7585853/pexels-photo-7585853.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    author: "Sarah Parker",
-    date: "2024-02-18",
-    category: "Education"
-  },
-  {
-    id: 3,
-    title: "Color Theory in Crochet Projects",
-    excerpt: "Learn how to choose and combine colors effectively to create stunning crochet projects that catch the eye.",
-    image: "https://images.unsplash.com/photo-1612870466688-277d0f8f5082?auto=format&fit=crop&q=80&w=600",
-    author: "Michael Chen",
-    date: "2024-02-15",
-    category: "Design"
-  }
-];
+import { PiCalendar, PiUser, PiArrowRight, PiSpinner } from 'react-icons/pi';
+import { getBlogPosts, BlogPost } from '../lib/contentful';
 
 export default function Blog() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        const data = await getBlogPosts();
+        setPosts(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load blog posts');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadPosts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center space-x-2">
+          <PiSpinner className="w-8 h-8 animate-spin text-primary-600" />
+          <span>Loading posts...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-20 bg-gradient-to-b from-primary-50 to-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Oops!</h1>
+            <p className="text-lg text-gray-600">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="py-20 bg-gradient-to-b from-primary-50 to-white">
       <div className="max-w-7xl mx-auto px-4">
@@ -44,33 +58,41 @@ export default function Blog() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {blogPosts.map((post) => (
-            <article key={post.id} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="w-full h-48 object-cover"
-              />
+          {posts.map((post) => (
+            <article key={post.sys.id} className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow overflow-hidden">
+              {post.fields.featuredImage && (
+                <img
+                  src={`https:${post.fields.featuredImage.fields.file.url}`}
+                  alt={post.fields.featuredImage.fields.title}
+                  className="w-full h-48 object-cover"
+                />
+              )}
               <div className="p-6">
                 <div className="flex items-center text-sm text-gray-500 mb-4">
                   <span className="inline-flex items-center">
                     <PiCalendar className="w-4 h-4 mr-1" />
-                    {new Date(post.date).toLocaleDateString()}
+                    {new Date(post.fields.publishedDate).toLocaleDateString()}
                   </span>
-                  <span className="mx-2">•</span>
-                  <span className="inline-flex items-center">
-                    <PiUser className="w-4 h-4 mr-1" />
-                    {post.author}
-                  </span>
+                  {post.fields.author && (
+                    <>
+                      <span className="mx-2">•</span>
+                      <span className="inline-flex items-center">
+                        <PiUser className="w-4 h-4 mr-1" />
+                        {post.fields.author.fields.name}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                  {post.title}
+                  {post.fields.title}
                 </h2>
-                <p className="text-gray-600 mb-4">
-                  {post.excerpt}
-                </p>
+                {post.fields.shortDescription && (
+                  <p className="text-gray-600 mb-4">
+                    {post.fields.shortDescription}
+                  </p>
+                )}
                 <Link
-                  to={`/blog/${post.id}`}
+                  to={`/blog/${post.fields.slug}`}
                   className="inline-flex items-center text-primary-500 hover:text-primary-600 font-medium"
                 >
                   Read More
