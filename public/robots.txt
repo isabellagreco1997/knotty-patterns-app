@@ -1,4 +1,19 @@
 User-agent: *
 Allow: /
 
+# Sitemaps
 Sitemap: https://knottypatterns.com/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
+
+# Important pages
+Allow: /pattern-builder
+Allow: /blog
+Allow: /pricing
+
+# Prevent crawling of certain paths
+Disallow: /api/
+Disallow: /admin/
+Disallow: /account/
+Disallow: /auth/

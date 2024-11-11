@@ -7,6 +7,7 @@ interface SEOHeadProps {
   image?: string;
   url?: string;
   type?: string;
+  schema?: object;
 }
 
 export default function SEOHead({
@@ -14,9 +15,30 @@ export default function SEOHead({
   description,
   image = '/social-preview.png',
   url = 'https://knottypatterns.com',
-  type = 'website'
+  type = 'website',
+  schema
 }: SEOHeadProps) {
   const fullTitle = `${title} | KnottyPatterns`;
+
+  const defaultSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "KnottyPatterns",
+    "description": "Create, save, and share your crochet patterns with our intuitive pattern builder",
+    "url": "https://knottypatterns.com",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "KnottyPatterns",
+      "url": "https://knottypatterns.com"
+    }
+  };
 
   return (
     <Helmet>
@@ -39,32 +61,22 @@ export default function SEOHead({
       <meta name="twitter:image" content={image} />
 
       {/* Additional SEO Meta Tags */}
-      <meta name="keywords" content="crochet patterns, amigurumi, pattern maker, crochet designer, pattern generator, crochet tools" />
+      <meta name="keywords" content="crochet patterns, amigurumi, pattern maker, crochet designer, pattern generator, crochet tools, knitting patterns" />
       <meta name="author" content="KnottyPatterns" />
-      <meta name="robots" content="index, follow" />
+      <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+      {/* Mobile Meta Tags */}
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+      <meta name="theme-color" content="#7C3AED" />
 
       {/* Structured Data */}
       <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          "name": "KnottyPatterns",
-          "description": "Create, save, and share your crochet patterns with our intuitive pattern builder",
-          "url": "https://knottypatterns.com",
-          "applicationCategory": "UtilityApplication",
-          "operatingSystem": "Web",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-          },
-          "creator": {
-            "@type": "Organization",
-            "name": "KnottyPatterns",
-            "url": "https://knottypatterns.com"
-          }
-        })}
+        {JSON.stringify(schema || defaultSchema)}
       </script>
+
+      {/* Preconnect to Important Origins */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
     </Helmet>
   );
 }

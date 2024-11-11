@@ -13,15 +13,15 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://knottypatterns.com/pricing</loc>
-    <lastmod>2024-02-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://knottypatterns.com/blog</loc>
     <lastmod>2024-02-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://knottypatterns.com/pricing</loc>
+    <lastmod>2024-02-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>
