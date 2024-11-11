@@ -9,6 +9,8 @@ interface PatternExportProps {
   rounds: Round[];
 }
 
+
+
 const translations = {
   round: 'Round',
   stitches: 'sts',
@@ -71,6 +73,7 @@ function formatRoundInstructions(round: Round): string {
   return `${stitchPattern} (${totalStitches} ${translations.stitches})`;
 }
 
+
 function calculateTotalStitches(round: Round): number {
   if (round.isText) return 0;
 
@@ -85,6 +88,7 @@ function calculateTotalStitches(round: Round): number {
 function getRoundNumber(rounds: Round[], currentIndex: number): number {
   return rounds.slice(0, currentIndex + 1).filter(r => !r.isText).length;
 }
+
 
 function generateFormattedPattern(pattern: Pattern): string {
   let formattedContent = formatPatternHeader(pattern);
@@ -192,13 +196,17 @@ function PDFPreviewModal({ isOpen, onClose, pattern }: { isOpen: boolean; onClos
 }
 
 export default function PatternExport({ pattern }: PatternExportProps) {
+  const [copyMessage, setCopyMessage] = useState('');
   const [showPDFPreview, setShowPDFPreview] = useState(false);
   const { status: subscriptionStatus } = useSubscriptionStatus();
   const isPremium = subscriptionStatus === 'active';
 
   const handleCopy = () => {
     const content = generateFormattedPattern(pattern);
-    navigator.clipboard.writeText(content);
+    navigator.clipboard.writeText(content).then(() => {
+      setCopyMessage('Copied to clipboard!');
+      setTimeout(() => setCopyMessage(''), 10000); // Clear message after 2 seconds
+    });
   };
 
   const handleDownload = () => {
@@ -234,6 +242,8 @@ export default function PatternExport({ pattern }: PatternExportProps) {
 
   return (
     <>
+    {copyMessage && <div className="text-green-600 text-sm">{copyMessage}</div>}
+
       <div className="mt-6 flex flex-wrap gap-2">
         <button
           onClick={handleCopy}

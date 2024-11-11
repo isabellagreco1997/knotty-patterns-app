@@ -56,6 +56,9 @@ export default {
           900: '#18181B'
         }
       },
+      animation: {
+        'bounce': 'bounce 2s infinite'
+      }
     },
   },
   plugins: [],

@@ -68,7 +68,7 @@ function formatRoundInstructions(round: Round): string {
     const beforeNote = stitch.note?.beforeNote ? `${stitch.note.beforeNote} ` : '';
     const afterNote = stitch.note?.afterNote ? ` ${stitch.note.afterNote}` : '';
     const stitchText = stitch.type === 'dec'
-      ? `${beforeNote}dec ${stitch.count} (${stitch.count * 2} sts)${afterNote}`
+      ? `${beforeNote}dec  ${afterNote}`
       : `${beforeNote}${stitch.count} ${stitch.type}${afterNote}`;
 
     if (currentGroup && !processedGroups.has(currentGroup.id)) {
