@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { PiLockSimple, PiEnvelope, PiCheckCircle, PiWarning, PiEye, PiEyeSlash } from 'react-icons/pi';
 import ResendEmailButton from '../components/ResendEmailButton';
+import FeedbackBanner from '../components/FeedbackBanner';
 
 interface PasswordRequirement {
   label: string;
@@ -163,6 +164,7 @@ export default function Login() {
   }
 
   return (
+    <>
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
@@ -346,7 +348,14 @@ export default function Login() {
             </form>
           </div>
         </div>
+
       </div>
+      
     </div>
+    <div>
+            <FeedbackBanner />
+            </div>
+            </>
+
   );
 }

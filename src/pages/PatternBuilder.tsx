@@ -9,6 +9,7 @@ import CurrentRound from '../components/pattern-builder/CurrentRound';
 import AddSectionModal from '../components/pattern-builder/AddSectionModal';
 import { usePatternBuilder } from '../hooks/usePatternBuilder';
 import { PiSpinner, PiPlus, PiWarning } from 'react-icons/pi';
+import FeedbackBanner from '../components/FeedbackBanner';
 
 export default function PatternBuilder() {
   const {
@@ -181,6 +182,8 @@ export default function PatternBuilder() {
         onClose={() => setShowAddSectionModal(false)}
         onAdd={handleAddSection}
       />
+          <FeedbackBanner />
+
     </div>
   );
 }

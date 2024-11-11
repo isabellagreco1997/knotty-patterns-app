@@ -7,6 +7,7 @@ import { PiMagicWand, PiDevices, PiDownload ,PiSparkle, PiHeart, PiTrophy, PiTex
 import SEOHead from '../components/SEOHead';
 import Mock from '../../public/mock.png'
 import FeaturePreview from '../components/FeaturePreview';
+import FeedbackBanner from '../components/FeedbackBanner';
 
 const carouselImages = [
   {
@@ -521,6 +522,9 @@ export default function Home() {
           </Link>
         </ScrollFadeIn>
       </section>
+
+      <FeedbackBanner />
+
     </div>
   );
 }
