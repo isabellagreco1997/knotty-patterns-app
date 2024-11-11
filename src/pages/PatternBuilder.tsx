@@ -10,6 +10,7 @@ import AddSectionModal from '../components/pattern-builder/AddSectionModal';
 import { usePatternBuilder } from '../hooks/usePatternBuilder';
 import { PiSpinner, PiPlus, PiWarning } from 'react-icons/pi';
 import FeedbackBanner from '../components/FeedbackBanner';
+import SEOHead from '../components/SEOHead';
 
 export default function PatternBuilder() {
   const {
@@ -58,6 +59,24 @@ export default function PatternBuilder() {
   }
 
   return (
+    <>
+      <SEOHead 
+        title="Pattern Builder - Create Your Crochet Pattern"
+        description="Design professional crochet patterns with our easy-to-use pattern builder. Features include stitch counting, pattern export, and more."
+        type="web_application"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "KnottyPatterns Pattern Builder",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Web",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        }}
+      />
     <div className="min-h-screen bg-gray-50">
       {/* Fixed Header */}
       <div className=" top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
@@ -185,5 +204,6 @@ export default function PatternBuilder() {
           <FeedbackBanner />
 
     </div>
+    </>
   );
 }

@@ -1,8 +1,28 @@
 import React from 'react';
 import PricingCards from '../components/PricingCards';
+import SEOHead from '../components/SEOHead';
 
 export default function Pricing() {
   return (
+    <>
+     <SEOHead 
+        title="Pricing Plans - KnottyPatterns"
+        description="Choose the perfect plan for your crochet journey. Free and premium options available with features like unlimited patterns, PDF export, and more."
+        type="product"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "KnottyPatterns Premium",
+          "description": "Premium crochet pattern creation tools",
+          "offers": {
+            "@type": "AggregateOffer",
+            "lowPrice": "0",
+            "highPrice": "8",
+            "priceCurrency": "USD",
+            "offerCount": "2"
+          }
+        }}
+      />
     <div className="py-20 bg-gradient-to-b from-primary-50 to-white">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
@@ -33,5 +53,6 @@ export default function Pricing() {
         </div>
       </div>
     </div>
+    </>
   );
 }

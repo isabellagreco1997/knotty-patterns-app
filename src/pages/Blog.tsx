@@ -48,6 +48,19 @@ export default function Blog() {
   }
 
   return (
+    <>
+    <SEOHead 
+        title="Crochet Blog - Tips, Tutorials & Inspiration"
+        description="Discover crochet tips, tutorials, and inspiration. Learn new techniques, find free patterns, and improve your crochet skills."
+        type="blog"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          "name": "KnottyPatterns Blog",
+          "description": "Crochet tips, tutorials, and inspiration",
+          "url": "https://knottypatterns.com/blog"
+        }}
+      />
     <div className="py-20 bg-gradient-to-b from-primary-50 to-white">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
@@ -104,5 +117,6 @@ export default function Blog() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -142,7 +142,24 @@ const team = [
 export default function Home() {
   return (
      <div className="w-full">
-
+    <SEOHead 
+        title="Create Beautiful Crochet Patterns"
+        description="Design and share professional crochet patterns with our intuitive pattern builder. Perfect for beginners and experienced crocheters alike."
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "KnottyPatterns",
+          "description": "Create and share crochet patterns online",
+          "url": "https://knottypatterns.com",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Web",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        }}
+      />
         {/* Hero Section */}
         <section className="relative h-screen min-h-[600px] max-h-[1000px]">
           <ImageCarousel images={carouselImages}>
