@@ -4,7 +4,6 @@ import { createClient } from '@supabase/supabase-js';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-console.log('process.env.NODE_ENV', process.env.NODE_ENV);
 // Get the appropriate keys based on environment
 const stripeSecretKey = isDevelopment
   ? process.env.VITE_TEST_STRIPE_SECRET_KEY

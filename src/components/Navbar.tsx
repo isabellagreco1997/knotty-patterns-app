@@ -20,7 +20,6 @@ const Navbar: React.FC = () => {
 
  
   const { customer, paymentMethods, invoices, subscriptions, loading, error } = useCustomer();
-  console.log(invoices, 'invoices')
 
 
   const closeMenu = () => {

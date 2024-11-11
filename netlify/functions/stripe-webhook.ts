@@ -9,7 +9,6 @@ const stripeSecretKey = isDevelopment
   ? process.env.VITE_TEST_STRIPE_SECRET_KEY
   : process.env.VITE_STRIPE_SECRET_KEY;
 
-  console.log('isabella', process.env.VITE_TEST_STRIPE_SECRET_KEY )
 
 if (!stripeSecretKey) {
   throw new Error('Stripe secret key is not set');
@@ -77,18 +76,13 @@ export const handler: Handler = async (event) => {
       );
     }
 
-    console.log('Event type:', eventData.type);
 
     if (eventData.type === 'checkout.session.completed' || isInternalCall) {
       const session = eventData.data.object;
       const customerEmail = session.customer_details?.email;
       const supabaseUserId = session.metadata?.supabase_user_id;
 
-      console.log('Session data:', {
-        customerEmail,
-        supabaseUserId,
-        metadata: session.metadata
-      });
+  
 
       if (!customerEmail) {
         throw new Error('Missing customer email');

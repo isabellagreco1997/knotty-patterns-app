@@ -161,7 +161,6 @@ const responseData = {
     })),
   };
 
-  console.log('isa',responseData )
 
 
   // Return the response

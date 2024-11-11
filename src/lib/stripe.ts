@@ -180,7 +180,6 @@ export async function getCustomerDetails() {
         throw new Error(errorData.error || 'Failed to fetch customer details');
       }
       const data = await response.json();
-      console.log('Customer Details:', data);
       return data;
     } catch (error) {
       console.error('Error fetching customer details:', error.message);
