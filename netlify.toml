@@ -4,9 +4,16 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "/blog/*"
+  to = "/blog/:splat"
+  status = 200
+  force = false
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
 [build.environment]
   NODE_VERSION = "18"
@@ -23,6 +30,5 @@
   node_bundler = "esbuild"
   external_node_modules = ["stripe", "contentful"]
 
-# Scheduled function for sitemap generation
 [functions."scheduled-sitemap"]
   schedule = "@daily"

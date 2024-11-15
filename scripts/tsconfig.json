@@ -9,8 +9,12 @@
       "isolatedModules": true,
       "types": ["node"],
       "outDir": "../dist/scripts",
-      "allowJs": true
+      "allowJs": true,
+      "baseUrl": ".",
+      "paths": {
+        "../src/*": ["../src/*"]
+      }
     },
-    "include": ["./**/*"],
+    "include": ["./**/*", "../src/utils/sitemap.ts"],
     "exclude": ["node_modules"]
   }

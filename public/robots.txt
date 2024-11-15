@@ -9,7 +9,7 @@ Crawl-delay: 10
 
 # Important pages
 Allow: /pattern-builder
-Allow: /blog
+Allow: /blog/
 Allow: /pricing
 
 # Prevent crawling of certain paths
@@ -17,3 +17,6 @@ Disallow: /api/
 Disallow: /admin/
 Disallow: /account/
 Disallow: /auth/
+
+# Allow crawling of blog posts
+Allow: /blog/*
