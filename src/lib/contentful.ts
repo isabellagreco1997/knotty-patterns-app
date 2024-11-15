@@ -49,7 +49,7 @@ export interface BlogPost {
         title: string;
       };
     };
-    content: any; // Rich text content
+    content: any;
     relatedBlogPosts?: Array<{
       fields: BlogPost['fields'];
     }>;
@@ -75,13 +75,75 @@ export async function getBlogPost(slug: string) {
   try {
     const response = await client.getEntries<BlogPost>({
       content_type: 'pageBlogPost',
-      'fields.slug': slug,
+      'fields.slug[match]': slug,
       include: 2,
     });
+
+    if (!response.items.length) {
+      throw new Error('Post not found');
+    }
 
     return response.items[0];
   } catch (error) {
     console.error('Error fetching blog post:', error);
+    throw error;
+  }
+}
+
+export async function createBlogPost(post: any) {
+  try {
+    const entry = await client.getSpace(import.meta.env.VITE_CONTENTFUL_SPACE_ID!).then(space => 
+      space.createEntry('pageBlogPost', {
+        fields: post
+      })
+    );
+    
+    // Trigger sitemap regeneration via Netlify function
+    await fetch('/.netlify/functions/generate-sitemap', {
+      method: 'POST'
+    });
+    
+    return entry;
+  } catch (error) {
+    console.error('Error creating blog post:', error);
+    throw error;
+  }
+}
+
+export async function updateBlogPost(id: string, updates: any) {
+  try {
+    const space = await client.getSpace(import.meta.env.VITE_CONTENTFUL_SPACE_ID!);
+    const entry = await space.getEntry(id);
+    
+    Object.keys(updates).forEach(key => {
+      entry.fields[key] = updates[key];
+    });
+    
+    const updatedEntry = await entry.update();
+    
+    // Trigger sitemap regeneration via Netlify function
+    await fetch('/.netlify/functions/generate-sitemap', {
+      method: 'POST'
+    });
+    
+    return updatedEntry;
+  } catch (error) {
+    console.error('Error updating blog post:', error);
+    throw error;
+  }
+}
+
+export async function deleteBlogPost(id: string) {
+  try {
+    const space = await client.getSpace(import.meta.env.VITE_CONTENTFUL_SPACE_ID!);
+    await space.getEntry(id).then(entry => entry.delete());
+    
+    // Trigger sitemap regeneration via Netlify function
+    await fetch('/.netlify/functions/generate-sitemap', {
+      method: 'POST'
+    });
+  } catch (error) {
+    console.error('Error deleting blog post:', error);
     throw error;
   }
 }

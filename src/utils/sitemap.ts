@@ -54,8 +54,7 @@ export async function getBlogUrls(): Promise<SitemapUrl[]> {
     const entries = await client.getEntries<BlogPost>({
       content_type: 'pageBlogPost',
       order: '-fields.publishedDate',
-      include: 1,
-      'fields.status': 'published'
+      include: 1
     });
 
     return entries.items.map(post => ({

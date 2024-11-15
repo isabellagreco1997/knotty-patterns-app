@@ -45,6 +45,13 @@ const richTextOptions = {
     [BLOCKS.HR]: () => (
       <hr className="my-12 border-t-2 border-gray-100 w-1/3 mx-auto" />
     ),
+    [BLOCKS.TABLE]: (node: any, children: React.ReactNode) => (
+      <div className="my-8 overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
+          {children}
+        </table>
+      </div>
+    ),
     [BLOCKS.EMBEDDED_ASSET]: (node: any) => {
       const { title, description, file } = node.data.target.fields;
       const imageUrl = file?.url;
@@ -68,13 +75,6 @@ const richTextOptions = {
         </figure>
       );
     },
-    [BLOCKS.TABLE]: (node: any, children: React.ReactNode) => (
-      <div className="my-8 overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
-          {children}
-        </table>
-      </div>
-    ),
     [INLINES.HYPERLINK]: (node: any, children: React.ReactNode) => {
       const { uri } = node.data;
       const isExternal = uri.startsWith('http');
@@ -181,7 +181,6 @@ export default function BlogPostPage() {
       />
 
       <article className="min-h-screen bg-white">
-        {/* Hero Section */}
         {post.fields.featuredImage && (
           <div className="relative h-[60vh] min-h-[400px] max-h-[600px]">
             <img
@@ -193,9 +192,7 @@ export default function BlogPostPage() {
           </div>
         )}
 
-        {/* Content Container */}
         <div className="max-w-4xl mx-auto px-4 -mt-32 relative z-10">
-          {/* Back to Blog Link */}
           <Link
             to="/blog"
             className="inline-flex items-center px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full text-sm font-medium text-gray-600 hover:bg-white transition-colors mb-6"
@@ -204,9 +201,7 @@ export default function BlogPostPage() {
             Back to Blog
           </Link>
 
-          {/* Article Card */}
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-            {/* Tags */}
             {post.fields.tags && (
               <div className="flex flex-wrap gap-2 mb-6">
                 {post.fields.tags.map(tag => (
@@ -218,12 +213,10 @@ export default function BlogPostPage() {
               </div>
             )}
 
-            {/* Title */}
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               {post.fields.title}
             </h1>
 
-            {/* Meta Information */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-8 pb-8 border-b">
               <div className="flex items-center">
                 <PiCalendar className="w-4 h-4 mr-2" />
@@ -241,7 +234,6 @@ export default function BlogPostPage() {
                 </div>
               )}
 
-              {/* Share Button */}
               <div className="relative ml-auto">
                 <button
                   onClick={handleShare}
@@ -258,12 +250,10 @@ export default function BlogPostPage() {
               </div>
             </div>
 
-            {/* Content */}
             <div className="prose prose-lg max-w-none">
               {documentToReactComponents(post.fields.content, richTextOptions)}
             </div>
 
-            {/* Social Share */}
             <div className="mt-12 pt-8 border-t">
               <h3 className="text-lg font-semibold mb-4">Share this article</h3>
               <div className="flex space-x-4">
@@ -297,7 +287,6 @@ export default function BlogPostPage() {
             </div>
           </div>
 
-          {/* Related Posts */}
           {post.fields.relatedBlogPosts && post.fields.relatedBlogPosts.length > 0 && (
             <div className="mt-12">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Posts</h2>
