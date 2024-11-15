@@ -21,4 +21,8 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["stripe"]
+  external_node_modules = ["stripe", "contentful"]
+
+# Scheduled function for sitemap generation
+[functions."scheduled-sitemap"]
+  schedule = "@daily"
