@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { PiCalendar, PiUser, PiArrowLeft, PiSpinner, PiTag, PiShare, PiCopy, PiTwitterLogo, PiFacebookLogo } from 'react-icons/pi';
 import { getBlogPost, BlogPost } from '../lib/contentful';
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
-import { BLOCKS, MARKS } from '@contentful/rich-text-types';
+import { BLOCKS, MARKS, INLINES } from '@contentful/rich-text-types';
 import SEOHead from '../components/SEOHead';
 
 const richTextOptions = {
@@ -45,6 +45,29 @@ const richTextOptions = {
     [BLOCKS.HR]: () => (
       <hr className="my-12 border-t-2 border-gray-100 w-1/3 mx-auto" />
     ),
+    [BLOCKS.EMBEDDED_ASSET]: (node: any) => {
+      const { title, description, file } = node.data.target.fields;
+      const imageUrl = file?.url;
+      if (!imageUrl) return null;
+
+      return (
+        <figure className="my-8">
+          <div className="rounded-lg overflow-hidden bg-gray-100">
+            <img
+              src={`https:${imageUrl}`}
+              alt={description || title}
+              className="w-full h-auto object-cover"
+              loading="lazy"
+            />
+          </div>
+          {description && (
+            <figcaption className="mt-2 text-sm text-center text-gray-600 italic">
+              {description}
+            </figcaption>
+          )}
+        </figure>
+      );
+    },
     [BLOCKS.TABLE]: (node: any, children: React.ReactNode) => (
       <div className="my-8 overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg">
@@ -52,6 +75,19 @@ const richTextOptions = {
         </table>
       </div>
     ),
+    [INLINES.HYPERLINK]: (node: any, children: React.ReactNode) => {
+      const { uri } = node.data;
+      const isExternal = uri.startsWith('http');
+      return (
+        <a
+          href={uri}
+          className="text-primary-600 hover:text-primary-700 underline"
+          {...(isExternal && { target: "_blank", rel: "noopener noreferrer" })}
+        >
+          {children}
+        </a>
+      );
+    },
   },
 };
 
