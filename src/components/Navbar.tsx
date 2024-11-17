@@ -18,9 +18,7 @@ const Navbar: React.FC = () => {
     }
   };
 
- 
-  const { customer, paymentMethods, invoices, subscriptions, loading, error } = useCustomer();
-
+  const { customer, loading: customerLoading } = useCustomer();
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -28,8 +26,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-white shadow-sm">
-
-      <div className=" mx-auto px-4">
+      <div className="mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2">
             <PiScissors className="w-8 h-8 text-primary-500" />

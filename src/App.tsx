@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
@@ -50,12 +50,14 @@ export default function App() {
           return;
         }
 
+        // Check for existing session
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           await checkAuth();
           await refreshProfile();
         }
 
+        // Set up auth state listener
         authListener = supabase.auth.onAuthStateChange(async (event, session) => {
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             await checkAuth();

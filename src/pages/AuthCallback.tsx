@@ -2,9 +2,11 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { PiSpinner } from 'react-icons/pi';
+import { useAuthStore } from '../stores/useAuthStore';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
+  const { checkAuth } = useAuthStore();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -36,6 +38,9 @@ export default function AuthCallback() {
             ]);
           }
 
+          // Update auth store state
+          await checkAuth();
+
           // Redirect to the intended destination or pattern builder
           const redirectTo = localStorage.getItem('auth_redirect') || '/pattern-builder';
           localStorage.removeItem('auth_redirect'); // Clean up
@@ -50,7 +55,7 @@ export default function AuthCallback() {
     };
 
     handleAuthCallback();
-  }, [navigate]);
+  }, [navigate, checkAuth]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
