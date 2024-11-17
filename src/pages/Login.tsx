@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { PiLockSimple, PiEnvelope, PiCheckCircle, PiWarning, PiEye, PiEyeSlash, PiGoogleLogo } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
-import { PiLockSimple, PiEnvelope, PiCheckCircle, PiWarning, PiEye, PiEyeSlash } from 'react-icons/pi';
+import { supabase } from '../lib/supabase';
 import ResendEmailButton from '../components/ResendEmailButton';
 import FeedbackBanner from '../components/FeedbackBanner';
 
@@ -87,6 +88,25 @@ export default function Login() {
       }
     } catch (err: any) {
       setError(err.message);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) throw error;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
     }
   };
 
@@ -198,7 +218,24 @@ export default function Login() {
               </div>
             )}
 
-            <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <button
+              onClick={handleGoogleSignIn}
+              className="mt-6 w-full flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <PiGoogleLogo className="w-5 h-5 mr-2 text-red-500" />
+              Continue with Google
+            </button>
+
+            <div className="mt-6 relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with email</span>
+              </div>
+            </div>
+
+            <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
               {error && (
                 <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
                   {error}
@@ -345,17 +382,25 @@ export default function Login() {
                   isSignUp ? 'Sign up' : 'Sign in'
                 )}
               </button>
+
+              {isSignUp && (
+                <p className="text-xs text-gray-500 text-center">
+                  By signing up, you agree to our{' '}
+                  <Link to="/privacy-policy" className="text-primary-600 hover:text-primary-500">
+                    Privacy Policy
+                  </Link>
+                  {' and '}
+                  <Link to="/terms" className="text-primary-600 hover:text-primary-500">
+                    Terms of Service
+                  </Link>
+                </p>
+              )}
             </form>
           </div>
         </div>
-
       </div>
-      
     </div>
-    <div>
-            <FeedbackBanner />
-            </div>
-            </>
-
+    <FeedbackBanner />
+    </>
   );
 }

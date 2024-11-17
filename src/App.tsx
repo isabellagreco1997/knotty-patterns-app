@@ -12,10 +12,12 @@ import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import EmailConfirmation from './pages/EmailConfirmation';
+import AuthCallback from './pages/AuthCallback';
 import Pricing from './pages/Pricing';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import AccountSettings from './pages/AccountSettings';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
 import { CustomerProvider } from './context/CustomerContext';
@@ -114,10 +116,12 @@ export default function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/auth/confirm" element={<EmailConfirmation />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/account" element={<AccountSettings />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               </Routes>
             </CustomerProvider>
           </main>

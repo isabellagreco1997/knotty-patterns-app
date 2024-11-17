@@ -14,7 +14,8 @@ export const supabase = (!isDevelopment || (supabaseUrl && supabaseAnonKey))
         detectSessionInUrl: true,
         storage: localStorage,
         storageKey: 'sb-auth-token',
-        flowType: 'pkce'
+        flowType: 'pkce',
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
       global: {
         // Add request monitoring

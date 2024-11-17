@@ -50,7 +50,6 @@ export const useAuthStore = create<AuthState>()(
             user: state.user ? { ...state.user, isPremium } : null
           }));
 
-          // Clear subscription cache when status is updated
           clearSubscriptionCache(currentUser.id);
         } catch (error) {
           console.error('Error updating premium status:', error);
@@ -256,7 +255,6 @@ export const useAuthStore = create<AuthState>()(
           localStorage.removeItem('auth-storage');
           localStorage.removeItem('sb-auth-email');
           
-          // Clear subscription cache on sign out
           clearSubscriptionCache();
           
           set({
