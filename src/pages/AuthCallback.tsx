@@ -14,6 +14,9 @@ export default function AuthCallback() {
         if (error) throw error;
         
         if (session) {
+          // Store email in localStorage for Stripe
+          localStorage.setItem('sb-auth-email', session.user.email!);
+
           // Check if profile exists
           const { data: profile } = await supabase
             .from('profiles')
@@ -33,7 +36,10 @@ export default function AuthCallback() {
             ]);
           }
 
-          navigate('/pattern-builder');
+          // Redirect to the intended destination or pattern builder
+          const redirectTo = localStorage.getItem('auth_redirect') || '/pattern-builder';
+          localStorage.removeItem('auth_redirect'); // Clean up
+          navigate(redirectTo);
         } else {
           navigate('/login');
         }

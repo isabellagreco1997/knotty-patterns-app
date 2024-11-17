@@ -66,6 +66,9 @@ export const useAuthStore = create<AuthState>()(
             return;
           }
 
+          // Ensure email is stored for Stripe
+          localStorage.setItem('sb-auth-email', session.user.email!);
+
           const { data: profileData, error } = await supabase
             .from('profiles')
             .select('*')
@@ -79,8 +82,6 @@ export const useAuthStore = create<AuthState>()(
           }
 
           if (profileData) {
-            localStorage.setItem('sb-auth-email', session.user.email!);
-
             set({
               user: {
                 id: session.user.id,

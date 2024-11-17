@@ -58,6 +58,7 @@ export default function Login() {
   const validatePassword = (password: string): boolean => {
     return passwordRequirements.every(req => req.test(password));
   };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +94,12 @@ export default function Login() {
 
   const handleGoogleSignIn = async () => {
     try {
+      // Store the current URL or intended destination
+      const redirectTo = new URLSearchParams(location.search).get('redirect');
+      if (redirectTo) {
+        localStorage.setItem('auth_redirect', redirectTo);
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
