@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
-  PiUser, 
-  PiSignOut, 
   PiList, 
   PiX, 
+  PiUser, 
+  PiSignOut, 
   PiGear, 
-  PiRobot, 
-  PiMagicWand,
+  PiMagicWand, 
+  PiBook,
   PiCaretDown,
   PiPencilSimple,
   PiFolder,
-  PiBook,
-  PiHouse,
-  PiPlus
+  PiHouse
 } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 
@@ -22,7 +20,6 @@ export default function Navbar() {
   const [isMyPatternsMenuOpen, setIsMyPatternsMenuOpen] = useState(false);
   const [isLearnMenuOpen, setIsLearnMenuOpen] = useState(false);
   const { user, signOut } = useAuthStore();
-  const navigate = useNavigate();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -30,7 +27,6 @@ export default function Navbar() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate('/login');
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -38,10 +34,10 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-[1320px] mx-auto px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-3">
             <img src="/logo.svg" alt="KnottyPatterns" className="w-8 h-8" />
             <span className="text-xl font-bold text-primary-500">KnottyPatterns</span>
           </Link>
@@ -59,13 +55,13 @@ export default function Navbar() {
           </button>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-6">
             {user ? (
               <>
                 {/* Dashboard */}
                 <Link
                   to="/dashboard"
-                  className={`px-4 py-2 rounded-lg font-medium ${
+                  className={`px-3 py-2 rounded-lg font-medium ${
                     isActive('/dashboard')
                       ? 'bg-primary-100 text-primary-700'
                       : 'text-primary-600 hover:bg-primary-50'
@@ -81,7 +77,7 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setIsMyPatternsMenuOpen(!isMyPatternsMenuOpen)}
-                    className={`px-4 py-2 rounded-lg flex items-center space-x-2 ${
+                    className={`px-3 py-2 rounded-lg flex items-center space-x-2 ${
                       isMyPatternsMenuOpen || isActive('/pattern-builder') || isActive('/saved-patterns') || isActive('/generated-patterns')
                         ? 'bg-gray-100 text-gray-900'
                         : 'text-gray-700 hover:bg-gray-50'
@@ -93,30 +89,36 @@ export default function Navbar() {
                   </button>
 
                   {isMyPatternsMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
                       <Link
                         to="/pattern-builder"
-                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setIsMyPatternsMenuOpen(false)}
                       >
-                        <PiPlus className="w-4 h-4 mr-2" />
-                        New Pattern
+                        <div className="flex items-center">
+                          <PiPencilSimple className="w-4 h-4 mr-2" />
+                          New Pattern
+                        </div>
                       </Link>
                       <Link
                         to="/saved-patterns"
-                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setIsMyPatternsMenuOpen(false)}
                       >
-                        <PiFolder className="w-4 h-4 mr-2" />
-                        Saved Patterns
+                        <div className="flex items-center">
+                          <PiFolder className="w-4 h-4 mr-2" />
+                          Saved Patterns
+                        </div>
                       </Link>
                       <Link
                         to="/generated-patterns"
-                        className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setIsMyPatternsMenuOpen(false)}
                       >
-                        <PiRobot className="w-4 h-4 mr-2" />
-                        AI Generated Patterns
+                        <div className="flex items-center">
+                          <PiMagicWand className="w-4 h-4 mr-2" />
+                          AI Generated
+                        </div>
                       </Link>
                     </div>
                   )}
@@ -125,7 +127,7 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/pattern-builder"
-                className={`px-4 py-2 rounded-lg ${
+                className={`px-3 py-2 rounded-lg ${
                   isActive('/pattern-builder')
                     ? 'bg-gray-100 text-gray-900'
                     : 'text-gray-700 hover:bg-gray-50'
@@ -141,7 +143,7 @@ export default function Navbar() {
             {/* AI Generator */}
             <Link
               to="/get-inspiration"
-              className={`px-4 py-2 rounded-lg ${
+              className={`px-3 py-2 rounded-lg ${
                 isActive('/get-inspiration')
                   ? 'bg-gray-100 text-gray-900'
                   : 'text-gray-700 hover:bg-gray-50'
@@ -157,7 +159,7 @@ export default function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setIsLearnMenuOpen(!isLearnMenuOpen)}
-                className={`px-4 py-2 rounded-lg flex items-center space-x-2 ${
+                className={`px-3 py-2 rounded-lg flex items-center space-x-2 ${
                   isLearnMenuOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -167,22 +169,16 @@ export default function Navbar() {
               </button>
 
               {isLearnMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50">
                   <Link
                     to="/stitch-glossary"
-                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setIsLearnMenuOpen(false)}
                   >
-                    <PiBook className="w-4 h-4 mr-2" />
-                    Stitch Glossary
-                  </Link>
-                  <Link
-                    to="/blog"
-                    className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50"
-                    onClick={() => setIsLearnMenuOpen(false)}
-                  >
-                    <PiBook className="w-4 h-4 mr-2" />
-                    Blog
+                    <div className="flex items-center">
+                      <PiBook className="w-4 h-4 mr-2" />
+                      Stitch Glossary
+                    </div>
                   </Link>
                 </div>
               )}
@@ -191,7 +187,7 @@ export default function Navbar() {
             {/* Pricing */}
             <Link
               to="/pricing"
-              className={`px-4 py-2 rounded-lg ${
+              className={`px-3 py-2 rounded-lg ${
                 isActive('/pricing')
                   ? 'bg-gray-100 text-gray-900'
                   : 'text-gray-700 hover:bg-gray-50'
@@ -202,13 +198,13 @@ export default function Navbar() {
 
             {/* User Menu */}
             {user ? (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <Link
                   to="/account"
                   className="inline-flex items-center px-3 py-2 border border-primary-300 text-sm font-medium rounded-md text-primary-500 hover:bg-primary-50 transition-colors"
                 >
                   <PiGear className="w-4 h-4 mr-2" />
-                  {user.email}
+                  <span className="max-w-[120px] truncate">{user.email}</span>
                 </Link>
                 <button
                   onClick={handleSignOut}
@@ -231,143 +227,129 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4">
-            <div className="space-y-2">
-              {user && (
-                <Link
-                  to="/dashboard"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <div className="flex items-center">
-                    <PiHouse className="w-4 h-4 mr-2" />
-                    Dashboard
-                  </div>
-                </Link>
-              )}
+        <div
+          className={`md:hidden ${
+            isMenuOpen ? 'block' : 'hidden'
+          } border-t border-gray-200 py-2`}
+        >
+          <div className="flex flex-col space-y-1 px-2 pb-3 pt-2">
+            {user && (
+              <Link
+                to="/dashboard"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+              >
+                <PiHouse className="w-4 h-4 mr-2" />
+                Dashboard
+              </Link>
+            )}
 
-              {/* Pattern Builder / My Patterns */}
-              {user ? (
-                <>
-                  <div className="px-4 py-2">
-                    <div className="font-medium text-gray-700 mb-2">My Patterns</div>
-                    <div className="space-y-2 pl-4">
-                      <Link
-                        to="/pattern-builder"
-                        className="block text-gray-600 hover:text-gray-900"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <PiPlus className="w-4 h-4 inline mr-2" />
-                        New Pattern
-                      </Link>
-                      <Link
-                        to="/saved-patterns"
-                        className="block text-gray-600 hover:text-gray-900"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <PiFolder className="w-4 h-4 inline mr-2" />
-                        Saved Patterns
-                      </Link>
-                      <Link
-                        to="/generated-patterns"
-                        className="block text-gray-600 hover:text-gray-900"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <PiRobot className="w-4 h-4 inline mr-2" />
-                        AI Generated Patterns
-                      </Link>
-                    </div>
-                  </div>
-                </>
-              ) : (
+            {/* Mobile My Patterns Section */}
+            {user && (
+              <div className="border-t border-gray-100 my-2 pt-2">
+                <div className="px-3 py-2 text-sm font-medium text-gray-500">My Patterns</div>
                 <Link
                   to="/pattern-builder"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
                   onClick={() => setIsMenuOpen(false)}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
                 >
-                  <PiPencilSimple className="w-4 h-4 inline mr-2" />
-                  Pattern Builder
+                  <PiPencilSimple className="w-4 h-4 mr-2" />
+                  New Pattern
                 </Link>
-              )}
-
-              {/* AI Generator */}
-              <Link
-                to="/get-inspiration"
-                className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <PiMagicWand className="w-4 h-4 inline mr-2" />
-                AI Generator
-              </Link>
-
-              {/* Learn Section */}
-              <div className="px-4 py-2">
-                <div className="font-medium text-gray-700 mb-2">Learn</div>
-                <div className="space-y-2 pl-4">
-                  <Link
-                    to="/stitch-glossary"
-                    className="block text-gray-600 hover:text-gray-900"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <PiBook className="w-4 h-4 inline mr-2" />
-                    Stitch Glossary
-                  </Link>
-                  <Link
-                    to="/blog"
-                    className="block text-gray-600 hover:text-gray-900"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <PiBook className="w-4 h-4 inline mr-2" />
-                    Blog
-                  </Link>
-                </div>
-              </div>
-
-              {/* Pricing */}
-              <Link
-                to="/pricing"
-                className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Pricing
-              </Link>
-
-              {/* User Menu */}
-              {user ? (
-                <>
-                  <Link
-                    to="/account"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <PiGear className="w-4 h-4 inline mr-2" />
-                    Account Settings
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleSignOut();
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
-                  >
-                    <PiSignOut className="w-4 h-4 inline mr-2" />
-                    Sign Out
-                  </button>
-                </>
-              ) : (
                 <Link
-                  to="/login"
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+                  to="/saved-patterns"
                   onClick={() => setIsMenuOpen(false)}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
                 >
-                  <PiUser className="w-4 h-4 inline mr-2" />
-                  Sign In
+                  <PiFolder className="w-4 h-4 mr-2" />
+                  Saved Patterns
                 </Link>
-              )}
+                <Link
+                  to="/generated-patterns"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+                >
+                  <PiMagicWand className="w-4 h-4 mr-2" />
+                  AI Generated
+                </Link>
+              </div>
+            )}
+
+            {!user && (
+              <Link
+                to="/pattern-builder"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+              >
+                <PiPencilSimple className="w-4 h-4 mr-2" />
+                Pattern Builder
+              </Link>
+            )}
+
+            <Link
+              to="/get-inspiration"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+            >
+              <PiMagicWand className="w-4 h-4 mr-2" />
+              AI Generator
+            </Link>
+
+            {/* Mobile Learn Section */}
+            <div className="border-t border-gray-100 my-2 pt-2">
+              <div className="px-3 py-2 text-sm font-medium text-gray-500">Learn</div>
+              <Link
+                to="/stitch-glossary"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+              >
+                <PiBook className="w-4 h-4 mr-2" />
+                Stitch Glossary
+              </Link>
             </div>
+
+            <Link
+              to="/pricing"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+            >
+              Pricing
+            </Link>
+
+            {user ? (
+              <>
+                <div className="border-t border-gray-100 my-2"></div>
+                <Link
+                  to="/account"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+                >
+                  <PiGear className="w-4 h-4 mr-2" />
+                  Account Settings
+                </Link>
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMenuOpen(false);
+                  }}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium text-left w-full flex items-center"
+                >
+                  <PiSignOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+              >
+                <PiUser className="w-4 h-4 mr-2" />
+                Sign In
+              </Link>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
