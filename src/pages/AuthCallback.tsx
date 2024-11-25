@@ -41,8 +41,8 @@ export default function AuthCallback() {
           // Update auth store state
           await checkAuth();
 
-          // Redirect to the intended destination or pattern builder
-          const redirectTo = localStorage.getItem('auth_redirect') || '/pattern-builder';
+          // Redirect to the intended destination or dashboard
+          const redirectTo = localStorage.getItem('auth_redirect') || '/dashboard';
           localStorage.removeItem('auth_redirect'); // Clean up
           navigate(redirectTo);
         } else {

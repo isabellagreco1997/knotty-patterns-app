@@ -26,6 +26,7 @@ import GeneratedPatterns from './pages/GeneratedPatterns';
 import AILanding from './pages/AILanding';
 import StitchGlossary from './pages/StitchGlossary';
 import StitchDetail from './pages/StitchDetail';
+import Dashboard from './pages/Dashboard';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -116,6 +117,7 @@ export default function App() {
             <CustomerProvider>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/pattern-builder" element={<PatternBuilder />} />
                 <Route path="/pattern-builder/:id" element={<PatternBuilder />} />
                 <Route path="/saved-patterns" element={<SavedPatterns />} />

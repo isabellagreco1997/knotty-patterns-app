@@ -50,7 +50,7 @@ export default function Login() {
 
   useEffect(() => {
     if (user) {
-      const redirectTo = new URLSearchParams(location.search).get('redirect') || '/pattern-builder';
+      const redirectTo = new URLSearchParams(location.search).get('redirect') || '/dashboard';
       navigate(redirectTo);
     }
   }, [user, navigate, location]);
@@ -84,7 +84,7 @@ export default function Login() {
         }
       } else {
         await signIn(email, password);
-        const redirectTo = new URLSearchParams(location.search).get('redirect') || '/pattern-builder';
+        const redirectTo = new URLSearchParams(location.search).get('redirect') || '/dashboard';
         navigate(redirectTo);
       }
     } catch (err: any) {
@@ -97,7 +97,7 @@ export default function Login() {
       // Store the current URL or intended destination
       const redirectTo = new URLSearchParams(location.search).get('redirect');
       if (redirectTo) {
-        localStorage.setItem('auth_redirect', redirectTo);
+        localStorage.setItem('auth_redirect', '/dashboard');
       }
 
       const { error } = await supabase.auth.signInWithOAuth({
