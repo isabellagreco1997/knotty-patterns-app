@@ -1,12 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PiScissors, PiUser, PiSignOut, PiList, PiX, PiGear, PiRobot, PiMagicWand } from 'react-icons/pi';
+import { 
+  PiScissors, 
+  PiUser, 
+  PiSignOut, 
+  PiList, 
+  PiX, 
+  PiGear, 
+  PiRobot, 
+  PiMagicWand,
+  PiCaretDown,
+  PiPencilSimple,
+  PiFolder
+} from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useCustomer } from '../hooks/useCustomer';
 
 const Navbar: React.FC = () => {
   const { user, signOut } = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAIMenuOpen, setIsAIMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -22,6 +35,7 @@ const Navbar: React.FC = () => {
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+    setIsAIMenuOpen(false);
   };
 
   return (
@@ -49,46 +63,72 @@ const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center space-x-4">
             <Link
               to="/pattern-builder"
-              className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
+              className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
             >
+              <PiPencilSimple className="w-4 h-4 mr-1" />
               Pattern Builder
             </Link>
+            
+            {user && (
+              <>
+                {/* AI Tools Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsAIMenuOpen(!isAIMenuOpen)}
+                    className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+                  >
+                    <PiRobot className="w-4 h-4 mr-1" />
+                    AI Tools
+                    <PiCaretDown className={`w-4 h-4 ml-1 transform transition-transform ${isAIMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* AI Tools Dropdown Menu */}
+                  {isAIMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                      <Link
+                        to="/get-inspiration"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 flex items-center"
+                        onClick={() => setIsAIMenuOpen(false)}
+                      >
+                        <PiMagicWand className="w-4 h-4 mr-2" />
+                        Get Inspiration
+                      </Link>
+                      <Link
+                        to="/generated-patterns"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 flex items-center"
+                        onClick={() => setIsAIMenuOpen(false)}
+                      >
+                        <PiFolder className="w-4 h-4 mr-2" />
+                        AI Patterns
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                <Link
+                  to="/saved-patterns"
+                  className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+                >
+                  <PiFolder className="w-4 h-4 mr-1" />
+                  My Patterns
+                </Link>
+              </>
+            )}
+
             <Link
               to="/pricing"
               className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
             >
               Pricing
             </Link>
+            
             <Link
               to="/blog"
               className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
             >
               Blog
             </Link>
-            <Link
-              to="/get-inspiration"
-              className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
-            >
-              <PiRobot className="w-4 h-4 mr-1" />
-              Get Inspiration
-            </Link>
-            {user && (
-              <>
-                <Link
-                  to="/saved-patterns"
-                  className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  My Patterns
-                </Link>
-                <Link
-                  to="/generated-patterns"
-                  className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
-                >
-                  <PiMagicWand className="w-4 h-4 mr-1" />
-                  AI Patterns
-                </Link>
-              </>
-            )}
+
             {user ? (
               <div className="flex items-center space-x-2">
                 <Link
@@ -128,10 +168,45 @@ const Navbar: React.FC = () => {
             <Link
               to="/pattern-builder"
               onClick={closeMenu}
-              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
             >
+              <PiPencilSimple className="w-4 h-4 mr-2" />
               Pattern Builder
             </Link>
+
+            {user && (
+              <>
+                <div className="border-t border-gray-100 my-2 pt-2">
+                  <div className="px-3 py-2 text-sm font-medium text-gray-500">AI Tools</div>
+                  <Link
+                    to="/get-inspiration"
+                    onClick={closeMenu}
+                    className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+                  >
+                    <PiMagicWand className="w-4 h-4 mr-2" />
+                    Get Inspiration
+                  </Link>
+                  <Link
+                    to="/generated-patterns"
+                    onClick={closeMenu}
+                    className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+                  >
+                    <PiFolder className="w-4 h-4 mr-2" />
+                    AI Patterns
+                  </Link>
+                </div>
+
+                <Link
+                  to="/saved-patterns"
+                  onClick={closeMenu}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+                >
+                  <PiFolder className="w-4 h-4 mr-2" />
+                  My Patterns
+                </Link>
+              </>
+            )}
+
             <Link
               to="/pricing"
               onClick={closeMenu}
@@ -139,6 +214,7 @@ const Navbar: React.FC = () => {
             >
               Pricing
             </Link>
+            
             <Link
               to="/blog"
               onClick={closeMenu}
@@ -146,51 +222,26 @@ const Navbar: React.FC = () => {
             >
               Blog
             </Link>
-            <Link
-              to="/get-inspiration"
-              onClick={closeMenu}
-              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
-            >
-              <PiRobot className="w-4 h-4 mr-2" />
-              Get Inspiration
-            </Link>
-            {user && (
-              <>
-                <Link
-                  to="/saved-patterns"
-                  onClick={closeMenu}
-                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
-                >
-                  My Patterns
-                </Link>
-                <Link
-                  to="/generated-patterns"
-                  onClick={closeMenu}
-                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
-                >
-                  <PiMagicWand className="w-4 h-4 mr-2" />
-                  AI Patterns
-                </Link>
-              </>
-            )}
+
             {user ? (
               <>
+                <div className="border-t border-gray-100 my-2"></div>
                 <Link
                   to="/account"
                   onClick={closeMenu}
-                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
                 >
-                  <PiGear className="w-4 h-4 inline mr-2" />
-                  Settings
+                  <PiGear className="w-4 h-4 mr-2" />
+                  Account Settings
                 </Link>
                 <button
                   onClick={() => {
                     handleSignOut();
                     closeMenu();
                   }}
-                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium text-left w-full"
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium text-left w-full flex items-center"
                 >
-                  <PiSignOut className="w-4 h-4 inline mr-2" />
+                  <PiSignOut className="w-4 h-4 mr-2" />
                   Sign Out
                 </button>
               </>
@@ -198,9 +249,9 @@ const Navbar: React.FC = () => {
               <Link
                 to="/login"
                 onClick={closeMenu}
-                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
               >
-                <PiUser className="w-4 h-4 inline mr-2" />
+                <PiUser className="w-4 h-4 mr-2" />
                 Sign In
               </Link>
             )}
