@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import ImageCarousel from '../components/ImageCarousel';
 import PricingCards from '../components/PricingCards';
 import ScrollFadeIn from '../components/ScrollFadeIn';
-import { PiMagicWand, PiDevices, PiDownload ,PiSparkle, PiHeart, PiTrophy, PiTextT, PiPencilSimple, PiQuotes, PiStar, PiArrowRight, PiCircle, PiCheck, PiShare } from 'react-icons/pi';
+import { PiMagicWand, PiDevices, PiDownload, PiSparkle, PiHeart, PiTrophy, PiTextT, PiPencilSimple, PiQuotes, PiStar, PiArrowRight, PiCircle, PiCheck, PiShare, PiRobot } from 'react-icons/pi';
 import SEOHead from '../components/SEOHead';
 import Mock from '../../public/mock.png'
 import FeaturePreview from '../components/FeaturePreview';
@@ -32,24 +32,23 @@ const carouselImages = [
   }
 ];
 
-
 const howItWorksSections = [
   {
     step: 1,
-    icon: <PiCircle className="w-8 h-8" />,
-    title: "Start Your Pattern",
-    description: "Begin with a magic ring or chain for your amigurumi. Our intuitive interface guides you through the initial setup.",
+    icon: <PiRobot className="w-8 h-8" />,
+    title: "Get Inspired",
+    description: "Start with AI-generated design ideas or create your own pattern from scratch. Our AI assistant helps spark creativity.",
     color: "from-rose-500 to-pink-600",
     features: [
-      "Magic ring starter",
-      "Chain foundation",
-      "Custom text options"
+      "AI pattern generation",
+      "Design visualization",
+      "Pattern suggestions"
     ]
   },
   {
     step: 2,
     icon: <PiTextT className="w-8 h-8" />,
-    title: "Build Round by Round",
+    title: "Build Your Pattern",
     description: "Create your pattern with our comprehensive stitch library. Add increases, decreases, and notes as you go.",
     color: "from-violet-500 to-purple-600",
     features: [
@@ -74,50 +73,50 @@ const howItWorksSections = [
 
 const features = [
   {
+    icon: <PiRobot className="w-8 h-8" />,
+    label: "AI-Powered Design",
+    description: "Get inspired with AI-generated pattern ideas and designs. Transform your concepts into detailed patterns instantly.",
+    color: "from-rose-500 to-pink-600",
+    benefits: ["Pattern generation", "Design visualization", "Quick prototyping"]
+  },
+  {
     icon: <PiSparkle className="w-8 h-8" />,
     label: "Intuitive Design",
     description: "Create patterns effortlessly with our user-friendly interface designed specifically for crocheters.",
-    color: "from-rose-500 to-pink-600",
+    color: "from-violet-500 to-purple-600",
     benefits: ["Drag-and-drop interface", "Real-time preview", "Mobile-friendly"]
   },
   {
     icon: <PiTrophy className="w-8 h-8" />,
     label: "Professional Tools",
     description: "Access advanced features that help you create detailed, professional-quality patterns.",
-    color: "from-violet-500 to-purple-600",
+    color: "from-blue-500 to-indigo-600",
     benefits: ["Stitch library", "Pattern versioning", "Export options"]
   },
   {
     icon: <PiHeart className="w-8 h-8" />,
     label: "Growing Community",
     description: "Join a vibrant community of crochet enthusiasts and share your creative patterns.",
-    color: "from-blue-500 to-indigo-600",
-    benefits: ["Pattern sharing", "Community feedback", "Inspiration gallery"]
-  },
-  {
-    icon: <PiStar className="w-8 h-8" />,
-    label: "Regular Updates",
-    description: "Enjoy continuous improvements and new features added based on community feedback.",
     color: "from-emerald-500 to-green-600",
-    benefits: ["Monthly updates", "New stitches", "Enhanced tools"]
+    benefits: ["Pattern sharing", "Community feedback", "Inspiration gallery"]
   }
 ];
 
 const testimonials = [
   {
-    quote: "This pattern builder has revolutionized how I create and share my crochet designs. It's intuitive and powerful!",
+    quote: "The AI pattern generator is amazing! It helps me quickly prototype new ideas before I start crocheting.",
     author: "Sarah M.",
     role: "Professional Pattern Designer",
     image: "https://images.unsplash.com/photo-1582838038154-a88f9a755f89?auto=format&fit=crop&q=80&w=100"
   },
   {
-    quote: "As a beginner, this tool helped me understand pattern creation.",
+    quote: "As a beginner, this tool helped me understand pattern creation. The AI suggestions are really helpful!",
     author: "Emily R.",
     role: "Hobbyist Crocheter",
     image: "https://images.unsplash.com/photo-1615646589661-0e7bc0b2b6c3?auto=format&fit=crop&q=80&w=100"
   },
   {
-    quote: "The best investment for my crochet journey. The premium features are worth every penny.",
+    quote: "The best investment for my crochet journey. The AI features and premium tools are worth every penny.",
     author: "Michael K.",
     role: "Amigurumi Artist",
     image: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&q=80&w=100"
@@ -143,13 +142,13 @@ export default function Home() {
   return (
      <div className="w-full">
     <SEOHead 
-        title="Create Beautiful Crochet Patterns"
-        description="Design and share professional crochet patterns with our intuitive pattern builder. Perfect for beginners and experienced crocheters alike."
+        title="Create Beautiful Crochet Patterns with AI"
+        description="Design and share professional crochet patterns with our intuitive pattern builder and AI-powered design assistant. Perfect for beginners and experienced crocheters alike."
         schema={{
           "@context": "https://schema.org",
           "@type": "WebApplication",
           "name": "KnottyPatterns",
-          "description": "Create and share crochet patterns online",
+          "description": "Create and share crochet patterns online with AI assistance",
           "url": "https://knottypatterns.com",
           "applicationCategory": "DesignApplication",
           "operatingSystem": "Web",
@@ -167,7 +166,7 @@ export default function Home() {
               <div className="max-w-4xl mx-auto px-4 text-center">
                 <ScrollFadeIn direction="up" delay={200}>
                   <span className="inline-block px-6 py-2 rounded-full bg-white/10 backdrop-blur-sm text-white/90 text-sm font-medium mb-8 border border-white/20">
-                    Welcome to KnottyPatterns
+                    Now with AI-Powered Pattern Generation
                   </span>
                 </ScrollFadeIn>
                 
@@ -181,24 +180,25 @@ export default function Home() {
                 
                 <ScrollFadeIn direction="up" delay={600}>
                   <p className="text-xl sm:text-2xl text-white/90 mb-12 max-w-2xl mx-auto font-light">
-                    Design, save, and share your patterns with our intuitive builder
+                    Design, save, and share your patterns with our intuitive builder and AI assistant
                   </p>
                 </ScrollFadeIn>
                 
                 <ScrollFadeIn direction="up" delay={800}>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full">
                     <Link
-                      to="/pattern-builder"
+                      to="/get-inspiration"
                       className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-primary-500 rounded-xl hover:bg-primary-600 transition-all transform hover:scale-105 hover:shadow-lg"
+                    >
+                      <PiRobot className="w-5 h-5 mr-2" />
+                      Try AI Pattern Generation
+                    </Link>
+                    <Link
+                      to="/pattern-builder"
+                      className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-primary-700 bg-white rounded-xl hover:bg-primary-50 transition-all transform hover:scale-105 hover:shadow-lg"
                     >
                       <PiPencilSimple className="w-5 h-5 mr-2" />
                       Start Creating
-                    </Link>
-                    <Link
-                      to="/pricing"
-                      className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-primary-700 bg-white rounded-xl hover:bg-primary-50 transition-all transform hover:scale-105 hover:shadow-lg"
-                    >
-                      View Pricing
                     </Link>
                   </div>
                 </ScrollFadeIn>
@@ -219,7 +219,7 @@ export default function Home() {
                 Create in Three Simple Steps
               </h2>
               <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-                Our pattern builder makes it easy to bring your crochet ideas to life
+                From AI-generated ideas to finished patterns, we make it easy to bring your crochet designs to life
               </p>
             </div>
           </ScrollFadeIn>
@@ -277,11 +277,11 @@ export default function Home() {
           <ScrollFadeIn delay={600}>
             <div className="text-center mt-16">
               <Link
-                to="/pattern-builder"
+                to="/get-inspiration"
                 className="inline-flex items-center px-8 py-4 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all transform hover:scale-105 hover:shadow-lg"
               >
-                <PiPencilSimple className="w-5 h-5 mr-2" />
-                Start Creating Your Pattern
+                <PiRobot className="w-5 h-5 mr-2" />
+                Try AI Pattern Generation
               </Link>
             </div>
           </ScrollFadeIn>
@@ -302,7 +302,7 @@ export default function Home() {
                   Crafted for Crocheters
                 </h2>
                 <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-                  Our pattern builder combines powerful features with ease of use, making pattern creation a joy
+                  Our pattern builder combines AI assistance with powerful features, making pattern creation a joy
                 </p>
               </div>
             </ScrollFadeIn>
@@ -530,12 +530,13 @@ export default function Home() {
       <section className="py-20 bg-primary-600 text-white">
         <ScrollFadeIn className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Creating?</h2>
-          <p className="text-xl mb-8">Join our community of crochet enthusiasts and start creating beautiful patterns today.</p>
+          <p className="text-xl mb-8">Try our AI-powered pattern generator and join our community of crochet enthusiasts today.</p>
           <Link
-            to="/pattern-builder"
+            to="/get-inspiration"
             className="inline-flex items-center px-8 py-4 text-lg font-medium bg-white text-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
           >
-            Try Pattern Builder Free
+            <PiRobot className="w-5 h-5 mr-2" />
+            Try AI Pattern Generation
           </Link>
         </ScrollFadeIn>
       </section>
