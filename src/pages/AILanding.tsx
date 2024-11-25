@@ -2,6 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { PiLightning, PiRobot, PiMagicWand, PiPencilSimple, PiArrowRight, PiSparkle, PiHeart, PiHandshake, PiLightbulb, PiShieldCheck } from 'react-icons/pi';
 import SEOHead from '../components/SEOHead';
+import Strawberry from './strawberry.jpg'
+import Fox from './fox.jpg'
+import Elephant from './elephant.jpg'
 
 const features = [
   {
@@ -45,22 +48,23 @@ const artistBenefits = [
 ];
 
 const showcaseExamples = [
-  {
-    prompt: "Cute baby elephant with a flower crown",
-    image: "https://files.oaiusercontent.com/file-ErHhvnKBSQHd8Zu46TsLim?se=2024-11-25T08%3A46%3A43Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3Df7ce8862-89b1-463f-b7cb-18892aae970b.webp&sig=4TCylArw3VxxoFhSEfreopt86JDYmQTnuCTPpGVVDdc%3D",
-    pattern: "Magic ring with 6 sc\nRound 1: inc in each st (12)\nRound 2: *sc, inc* repeat 6 times (18)..."
-  },
-  {
-    prompt: "Kawaii strawberry with a happy face",
-    image: "https://files.oaiusercontent.com/file-AQBGmTD4hZYWQ9qqcLaF5S?se=2024-11-25T08%3A48%3A49Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D2bb384ce-f6a9-455e-a01c-7edc67186046.webp&sig=MoukmUQm7XDZW0GCCxGOPD0f9MZNoATgcbpiZplseqc%3D",
-    pattern: "Magic ring with 6 sc\nRound 1: inc in each st (12)\nRound 2: sc in each st..."
-  },
-  {
-    prompt: "Small sleeping fox amigurumi",
-    image: "https://files.oaiusercontent.com/file-44YQGEFwuavLDLV67iqBqN?se=2024-11-25T08%3A49%3A29Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D84b7183b-f183-4c57-84cc-c19b069b5688.webp&sig=KYw/ljB81yz8KB1c%2BUm1HJRp1repyHX74iPVe92Is4U%3D",
-    pattern: "Magic ring with 8 sc\nRound 1: inc in each st (16)\nRound 2: *sc, inc* repeat 8 times..."
-  }
-];
+    {
+      prompt: "Cute baby elephant with a flower crown",
+      image: Elephant, 
+      pattern: "Magic ring with 6 sc\nRound 1: inc in each st (12)\nRound 2: *sc, inc* repeat 6 times (18)..."
+    },
+    {
+      prompt: "Kawaii strawberry with a happy face",
+      image: Strawberry, 
+      pattern: "Magic ring with 6 sc\nRound 1: inc in each st (12)\nRound 2: sc in each st..."
+    },
+    {
+      prompt: "Small sleeping fox amigurumi",
+      image: Fox, 
+      pattern: "Magic ring with 8 sc\nRound 1: inc in each st (16)\nRound 2: *sc, inc* repeat 8 times..."
+    }
+  ];
+  
 
 const testimonials = [
   {
