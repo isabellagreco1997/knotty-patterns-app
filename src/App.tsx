@@ -24,6 +24,8 @@ import { CustomerProvider } from './context/CustomerContext';
 import GetInspiration from './pages/GetInspiration';
 import GeneratedPatterns from './pages/GeneratedPatterns';
 import AILanding from './pages/AILanding';
+import StitchGlossary from './pages/StitchGlossary';
+import StitchDetail from './pages/StitchDetail';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -129,6 +131,9 @@ export default function App() {
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/get-inspiration" element={user ? <GetInspiration /> : <AILanding />} />
                 <Route path="/generated-patterns" element={<GeneratedPatterns />} />
+                <Route path="/stitch-glossary" element={<StitchGlossary />} />
+                <Route path="/stitch/:slug" element={<StitchDetail />} />
+
               </Routes>
             </CustomerProvider>
           </main>

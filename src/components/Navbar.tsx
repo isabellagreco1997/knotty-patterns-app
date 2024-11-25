@@ -11,7 +11,9 @@ import {
   PiMagicWand,
   PiCaretDown,
   PiPencilSimple,
-  PiFolder
+  PiFolder,
+  PiBook,
+  PiGraduationCap
 } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useCustomer } from '../hooks/useCustomer';
@@ -20,6 +22,7 @@ const Navbar: React.FC = () => {
   const { user, signOut } = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAIMenuOpen, setIsAIMenuOpen] = useState(false);
+  const [isLearnMenuOpen, setIsLearnMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -36,6 +39,7 @@ const Navbar: React.FC = () => {
   const closeMenu = () => {
     setIsMenuOpen(false);
     setIsAIMenuOpen(false);
+    setIsLearnMenuOpen(false);
   };
 
   return (
@@ -69,7 +73,7 @@ const Navbar: React.FC = () => {
               Pattern Builder
             </Link>
             
-            {/* AI Tools - Show different versions based on auth state */}
+            {/* AI Tools Dropdown */}
             {user ? (
               <div className="relative">
                 <button
@@ -111,6 +115,31 @@ const Navbar: React.FC = () => {
                 AI Pattern Generator
               </Link>
             )}
+
+            {/* Learn Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsLearnMenuOpen(!isLearnMenuOpen)}
+                className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+              >
+                <PiGraduationCap className="w-4 h-4 mr-1" />
+                Learn
+                <PiCaretDown className={`w-4 h-4 ml-1 transform transition-transform ${isLearnMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isLearnMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  <Link
+                    to="/stitch-glossary"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 flex items-center"
+                    onClick={() => setIsLearnMenuOpen(false)}
+                  >
+                    <PiBook className="w-4 h-4 mr-2" />
+                    Stitch Glossary
+                  </Link>
+                </div>
+              )}
+            </div>
 
             {user && (
               <Link
@@ -212,6 +241,19 @@ const Navbar: React.FC = () => {
                 AI Pattern Generator
               </Link>
             )}
+
+            {/* Mobile Learn Section */}
+            <div className="border-t border-gray-100 my-2 pt-2">
+              <div className="px-3 py-2 text-sm font-medium text-gray-500">Learn</div>
+              <Link
+                to="/stitch-glossary"
+                onClick={closeMenu}
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+              >
+                <PiBook className="w-4 h-4 mr-2" />
+                Stitch Glossary
+              </Link>
+            </div>
 
             {user && (
               <Link
