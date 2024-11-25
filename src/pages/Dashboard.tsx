@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   PiPencilSimple, 
@@ -9,18 +9,51 @@ import {
   PiCrown,
   PiTrendUp,
   PiChartLineUp,
-  PiWarning
+  PiWarning,
+  PiMagicWand
 } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 import { usePatternStore } from '../stores/usePatternStore';
 import { useSubscriptionStatus } from '../hooks/useSubscriptionStatus';
+import { supabase } from '../lib/supabase';
 import SEOHead from '../components/SEOHead';
+
+interface GeneratedPattern {
+  id: string;
+  prompt: string;
+  created_at: string;
+}
 
 export default function Dashboard() {
   const { user } = useAuthStore();
   const { patterns, loading } = usePatternStore();
   const { status: subscriptionStatus } = useSubscriptionStatus();
   const isPremium = subscriptionStatus === 'active';
+  const [generatedPatterns, setGeneratedPatterns] = useState<GeneratedPattern[]>([]);
+  const [loadingGenerated, setLoadingGenerated] = useState(true);
+
+  useEffect(() => {
+    async function fetchGeneratedPatterns() {
+      if (!user) return;
+      try {
+        const { data, error } = await supabase
+          .from('generated_patterns')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (error) throw error;
+        setGeneratedPatterns(data || []);
+      } catch (error) {
+        console.error('Error fetching generated patterns:', error);
+      } finally {
+        setLoadingGenerated(false);
+      }
+    }
+
+    fetchGeneratedPatterns();
+  }, [user]);
 
   const quickActions = [
     {
@@ -87,49 +120,103 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Recent Patterns */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Recent Patterns</h2>
-              <Link
-                to="/saved-patterns"
-                className="text-primary-600 hover:text-primary-700 font-medium"
-              >
-                View All
-              </Link>
-            </div>
-
-            {loading ? (
-              <div className="text-center py-8 text-gray-500">Loading patterns...</div>
-            ) : patterns.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-600 mb-4">You haven't created any patterns yet.</p>
+          {/* Recent Patterns Grid */}
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            {/* Regular Patterns */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center">
+                  <PiPencilSimple className="w-5 h-5 text-primary-600 mr-2" />
+                  <h2 className="text-xl font-semibold">Recent Patterns</h2>
+                </div>
                 <Link
-                  to="/pattern-builder"
-                  className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  to="/saved-patterns"
+                  className="text-primary-600 hover:text-primary-700 font-medium"
                 >
-                  <PiPencilSimple className="w-4 h-4 mr-2" />
-                  Create Your First Pattern
+                  View All
                 </Link>
               </div>
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {patterns.slice(0, 3).map((pattern) => (
+
+              {loading ? (
+                <div className="text-center py-8 text-gray-500">Loading patterns...</div>
+              ) : patterns.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600 mb-4">You haven't created any patterns yet.</p>
                   <Link
-                    key={pattern.id}
-                    to={`/pattern-builder/${pattern.id}`}
-                    className="group bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                    to="/pattern-builder"
+                    className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                   >
-                    <h3 className="font-medium text-gray-900 mb-1 group-hover:text-primary-600">
-                      {pattern.name}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      Last updated: {new Date(pattern.updatedAt).toLocaleDateString()}
-                    </p>
+                    <PiPencilSimple className="w-4 h-4 mr-2" />
+                    Create Your First Pattern
                   </Link>
-                ))}
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {patterns.slice(0, 3).map((pattern) => (
+                    <Link
+                      key={pattern.id}
+                      to={`/pattern-builder/${pattern.id}`}
+                      className="group block bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                    >
+                      <h3 className="font-medium text-gray-900 mb-1 group-hover:text-primary-600">
+                        {pattern.name}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Last updated: {new Date(pattern.updatedAt).toLocaleDateString()}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* AI Generated Patterns */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center">
+                  <PiMagicWand className="w-5 h-5 text-primary-600 mr-2" />
+                  <h2 className="text-xl font-semibold">AI Generated Patterns</h2>
+                </div>
+                <Link
+                  to="/generated-patterns"
+                  className="text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  View All
+                </Link>
               </div>
-            )}
+
+              {loadingGenerated ? (
+                <div className="text-center py-8 text-gray-500">Loading patterns...</div>
+              ) : generatedPatterns.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600 mb-4">No AI-generated patterns yet.</p>
+                  <Link
+                    to="/get-inspiration"
+                    className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  >
+                    <PiRobot className="w-4 h-4 mr-2" />
+                    Generate Your First Pattern
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {generatedPatterns.map((pattern) => (
+                    <Link
+                      key={pattern.id}
+                      to={`/generated-patterns`}
+                      className="group block bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                    >
+                      <h3 className="font-medium text-gray-900 mb-1 group-hover:text-primary-600">
+                        {pattern.prompt}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Created: {new Date(pattern.created_at).toLocaleDateString()}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Premium Features & Stats */}
@@ -184,9 +271,9 @@ export default function Dashboard() {
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="text-2xl font-bold text-primary-600 mb-1">
-                    {patterns.filter(p => new Date(p.updatedAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length}
+                    {generatedPatterns.length}
                   </div>
-                  <div className="text-sm text-gray-600">Past 7 Days</div>
+                  <div className="text-sm text-gray-600">AI Generated</div>
                 </div>
               </div>
             </div>
