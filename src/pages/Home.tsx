@@ -140,8 +140,8 @@ const team = [
 
 export default function Home() {
   return (
-     <div className="w-full">
-    <SEOHead 
+    <div className="w-full">
+      <SEOHead 
         title="Create Beautiful Crochet Patterns with AI"
         description="Design and share professional crochet patterns with our intuitive pattern builder and AI-powered design assistant. Perfect for beginners and experienced crocheters alike."
         schema={{
@@ -159,53 +159,121 @@ export default function Home() {
           }
         }}
       />
-        {/* Hero Section */}
-        <section className="relative h-screen min-h-[600px] max-h-[1000px]">
-          <ImageCarousel images={carouselImages}>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="max-w-4xl mx-auto px-4 text-center">
-                <ScrollFadeIn direction="up" delay={200}>
-                  <span className="inline-block px-6 py-2 rounded-full bg-white/10 backdrop-blur-sm text-white/90 text-sm font-medium mb-8 border border-white/20">
-                    Now with AI-Powered Pattern Generation
-                  </span>
-                </ScrollFadeIn>
-                
-                <ScrollFadeIn direction="up" delay={400}>
-                  <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold text-white mb-8 leading-none">
-                    Create Beautiful
-                    <br />
-                    <span className="text-primary-300">Crochet Patterns</span>
-                  </h1>
-                </ScrollFadeIn>
-                
-                <ScrollFadeIn direction="up" delay={600}>
-                  <p className="text-xl sm:text-2xl text-white/90 mb-12 max-w-2xl mx-auto font-light">
-                    Design, save, and share your patterns with our intuitive builder and AI assistant
-                  </p>
-                </ScrollFadeIn>
-                
-                <ScrollFadeIn direction="up" delay={800}>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full">
-                    <Link
-                      to="/get-inspiration"
-                      className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-primary-500 rounded-xl hover:bg-primary-600 transition-all transform hover:scale-105 hover:shadow-lg"
-                    >
-                      <PiRobot className="w-5 h-5 mr-2" />
-                      Try AI Pattern Generation
-                    </Link>
-                    <Link
-                      to="/pattern-builder"
-                      className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-primary-700 bg-white rounded-xl hover:bg-primary-50 transition-all transform hover:scale-105 hover:shadow-lg"
-                    >
-                      <PiPencilSimple className="w-5 h-5 mr-2" />
-                      Start Creating
-                    </Link>
-                  </div>
-                </ScrollFadeIn>
-              </div>
+
+     {/* Hero Section */}
+     <section className="relative min-h-screen bg-gradient-to-br from-rose-50 via-primary-50 to-violet-50 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Geometric Shapes */}
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-br from-primary-200/20 to-primary-300/20 rounded-full mix-blend-multiply animate-float"></div>
+          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-gradient-to-br from-rose-200/20 to-rose-300/20 rounded-full mix-blend-multiply animate-float-delayed"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-gradient-to-br from-violet-200/20 to-violet-300/20 rounded-full mix-blend-multiply animate-float-slow"></div>
+          
+          {/* Decorative Lines */}
+          <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(124, 58, 237, 0.05)" strokeWidth="1"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+        </div>
+
+        {/* Floating Images */}
+        <div className="absolute inset-0 pointer-events-none hidden lg:block">
+          {/* Top Right Image */}
+          <div className="absolute top-[15%] right-[10%] w-64 h-64 transform rotate-6 hover:rotate-0 transition-transform duration-500">
+            <div className="relative w-full h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 to-transparent rounded-2xl"></div>
+              <img
+                src="https://images.pexels.com/photos/7585853/pexels-photo-7585853.jpeg?auto=compress&cs=tinysrgb&w=1024&h=1024&dpr=2&fit=crop"
+                alt="Crochet Example 1"
+                className="w-full h-full object-cover rounded-2xl shadow-lg"
+                loading="eager"
+                style={{ imageRendering: 'crisp-edges' }}
+              />
             </div>
-          </ImageCarousel>
-        </section>
+          </div>
+
+          {/* Bottom Left Image */}
+          <div className="absolute bottom-[20%] left-[5%] w-48 h-48 transform -rotate-12 hover:rotate-0 transition-transform duration-500">
+            <div className="relative w-full h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 to-transparent rounded-2xl"></div>
+              <img
+                src="https://images.pexels.com/photos/10585181/pexels-photo-10585181.jpeg?auto=compress&cs=tinysrgb&w=800&h=800&dpr=2&fit=crop"
+                alt="Crochet Example 2"
+                className="w-full h-full object-cover rounded-2xl shadow-lg"
+                loading="eager"
+                style={{ imageRendering: 'crisp-edges' }}
+              />
+            </div>
+          </div>
+
+          {/* Middle Right Image */}
+          <div className="absolute top-[50%] right-[20%] w-56 h-56 transform rotate-12 hover:rotate-0 transition-transform duration-500">
+            <div className="relative w-full h-full">
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-transparent rounded-2xl"></div>
+              <img
+                src="https://images.pexels.com/photos/10585328/pexels-photo-10585328.jpeg?auto=compress&cs=tinysrgb&w=900&h=900&dpr=2&fit=crop"
+                alt="Crochet Example 3"
+                className="w-full h-full object-cover rounded-2xl shadow-lg"
+                loading="eager"
+                style={{ imageRendering: 'crisp-edges' }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="relative max-w-7xl mx-auto px-4 py-24 flex flex-col items-center justify-center min-h-screen text-center">
+          <ScrollFadeIn direction="up" delay={200}>
+            <span className="inline-block px-6 py-2 rounded-full bg-primary-500/10 text-primary-700 text-sm font-medium mb-8 border border-primary-200">
+              Now with AI-Powered Pattern Generation
+            </span>
+          </ScrollFadeIn>
+          
+          <ScrollFadeIn direction="up" delay={400}>
+            <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold text-gray-900 mb-8 leading-none">
+              Create Beautiful
+              <br />
+              <span className="text-primary-600">Crochet Patterns</span>
+            </h1>
+          </ScrollFadeIn>
+          
+          <ScrollFadeIn direction="up" delay={600}>
+            <p className="text-xl sm:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto font-light">
+              Design, save, and share your patterns with our intuitive builder and AI assistant
+            </p>
+          </ScrollFadeIn>
+          
+          <ScrollFadeIn direction="up" delay={800}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full">
+              <Link
+                to="/get-inspiration"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all transform hover:scale-105 hover:shadow-lg"
+              >
+                <PiRobot className="w-5 h-5 mr-2" />
+                Try AI Pattern Generation
+              </Link>
+              <Link
+                to="/pattern-builder"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-primary-700 bg-white rounded-xl hover:bg-primary-50 transition-all transform hover:scale-105 hover:shadow-lg border border-primary-200"
+              >
+                <PiPencilSimple className="w-5 h-5 mr-2" />
+                Start Creating
+              </Link>
+            </div>
+          </ScrollFadeIn>
+
+          {/* Scroll Indicator */}
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <div className="w-1 h-16 relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-primary-200/0 via-primary-300/50 to-primary-200/0"></div>
+            </div>
+          </div>
+        </div>
+      </section>
 
 <FeaturePreview />
 
