@@ -28,7 +28,19 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["stripe", "contentful"]
+  external_node_modules = ["stripe", "contentful", "openai"]
+  included_files = []
+
+[functions.generate-pattern]
+  timeout = "60 seconds"
+
+[functions.generate-image]
+  timeout = "60 seconds"
 
 [functions."scheduled-sitemap"]
   schedule = "@daily"
+
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200

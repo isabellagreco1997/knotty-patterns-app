@@ -21,6 +21,9 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
 import { CustomerProvider } from './context/CustomerContext';
+import GetInspiration from './pages/GetInspiration';
+import GeneratedPatterns from './pages/GeneratedPatterns';
+import AILanding from './pages/AILanding';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -124,6 +127,8 @@ export default function App() {
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/account" element={<AccountSettings />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/get-inspiration" element={user ? <GetInspiration /> : <AILanding />} />
+                <Route path="/generated-patterns" element={<GeneratedPatterns />} />
               </Routes>
             </CustomerProvider>
           </main>

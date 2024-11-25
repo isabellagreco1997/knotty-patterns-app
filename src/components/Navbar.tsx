@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PiScissors, PiUser, PiSignOut, PiList, PiX, PiGear } from 'react-icons/pi';
+import { PiScissors, PiUser, PiSignOut, PiList, PiX, PiGear, PiRobot, PiMagicWand } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useCustomer } from '../hooks/useCustomer';
 
@@ -65,13 +65,29 @@ const Navbar: React.FC = () => {
             >
               Blog
             </Link>
+            <Link
+              to="/get-inspiration"
+              className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+            >
+              <PiRobot className="w-4 h-4 mr-1" />
+              Get Inspiration
+            </Link>
             {user && (
-              <Link
-                to="/saved-patterns"
-                className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                My Patterns
-              </Link>
+              <>
+                <Link
+                  to="/saved-patterns"
+                  className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  My Patterns
+                </Link>
+                <Link
+                  to="/generated-patterns"
+                  className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+                >
+                  <PiMagicWand className="w-4 h-4 mr-1" />
+                  AI Patterns
+                </Link>
+              </>
             )}
             {user ? (
               <div className="flex items-center space-x-2">
@@ -130,14 +146,32 @@ const Navbar: React.FC = () => {
             >
               Blog
             </Link>
+            <Link
+              to="/get-inspiration"
+              onClick={closeMenu}
+              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+            >
+              <PiRobot className="w-4 h-4 mr-2" />
+              Get Inspiration
+            </Link>
             {user && (
-              <Link
-                to="/saved-patterns"
-                onClick={closeMenu}
-                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
-              >
-                My Patterns
-              </Link>
+              <>
+                <Link
+                  to="/saved-patterns"
+                  onClick={closeMenu}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium"
+                >
+                  My Patterns
+                </Link>
+                <Link
+                  to="/generated-patterns"
+                  onClick={closeMenu}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+                >
+                  <PiMagicWand className="w-4 h-4 mr-2" />
+                  AI Patterns
+                </Link>
+              </>
             )}
             {user ? (
               <>
