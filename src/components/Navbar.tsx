@@ -69,50 +69,57 @@ const Navbar: React.FC = () => {
               Pattern Builder
             </Link>
             
-            {user && (
-              <>
-                {/* AI Tools Dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setIsAIMenuOpen(!isAIMenuOpen)}
-                    className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
-                  >
-                    <PiRobot className="w-4 h-4 mr-1" />
-                    AI Tools
-                    <PiCaretDown className={`w-4 h-4 ml-1 transform transition-transform ${isAIMenuOpen ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {/* AI Tools Dropdown Menu */}
-                  {isAIMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                      <Link
-                        to="/get-inspiration"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 flex items-center"
-                        onClick={() => setIsAIMenuOpen(false)}
-                      >
-                        <PiMagicWand className="w-4 h-4 mr-2" />
-                        Get Inspiration
-                      </Link>
-                      <Link
-                        to="/generated-patterns"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 flex items-center"
-                        onClick={() => setIsAIMenuOpen(false)}
-                      >
-                        <PiFolder className="w-4 h-4 mr-2" />
-                        AI Patterns
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                <Link
-                  to="/saved-patterns"
+            {/* AI Tools - Show different versions based on auth state */}
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsAIMenuOpen(!isAIMenuOpen)}
                   className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
                 >
-                  <PiFolder className="w-4 h-4 mr-1" />
-                  My Patterns
-                </Link>
-              </>
+                  <PiRobot className="w-4 h-4 mr-1" />
+                  AI Tools
+                  <PiCaretDown className={`w-4 h-4 ml-1 transform transition-transform ${isAIMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isAIMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <Link
+                      to="/get-inspiration"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 flex items-center"
+                      onClick={() => setIsAIMenuOpen(false)}
+                    >
+                      <PiMagicWand className="w-4 h-4 mr-2" />
+                      Get Inspiration
+                    </Link>
+                    <Link
+                      to="/generated-patterns"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 flex items-center"
+                      onClick={() => setIsAIMenuOpen(false)}
+                    >
+                      <PiFolder className="w-4 h-4 mr-2" />
+                      AI Patterns
+                    </Link>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/get-inspiration"
+                className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+              >
+                <PiRobot className="w-4 h-4 mr-1" />
+                AI Pattern Generator
+              </Link>
+            )}
+
+            {user && (
+              <Link
+                to="/saved-patterns"
+                className="text-primary-500 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium flex items-center"
+              >
+                <PiFolder className="w-4 h-4 mr-1" />
+                My Patterns
+              </Link>
             )}
 
             <Link
@@ -174,37 +181,47 @@ const Navbar: React.FC = () => {
               Pattern Builder
             </Link>
 
-            {user && (
-              <>
-                <div className="border-t border-gray-100 my-2 pt-2">
-                  <div className="px-3 py-2 text-sm font-medium text-gray-500">AI Tools</div>
-                  <Link
-                    to="/get-inspiration"
-                    onClick={closeMenu}
-                    className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
-                  >
-                    <PiMagicWand className="w-4 h-4 mr-2" />
-                    Get Inspiration
-                  </Link>
-                  <Link
-                    to="/generated-patterns"
-                    onClick={closeMenu}
-                    className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
-                  >
-                    <PiFolder className="w-4 h-4 mr-2" />
-                    AI Patterns
-                  </Link>
-                </div>
-
+            {/* Mobile AI Tools */}
+            {user ? (
+              <div className="border-t border-gray-100 my-2 pt-2">
+                <div className="px-3 py-2 text-sm font-medium text-gray-500">AI Tools</div>
                 <Link
-                  to="/saved-patterns"
+                  to="/get-inspiration"
+                  onClick={closeMenu}
+                  className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+                >
+                  <PiMagicWand className="w-4 h-4 mr-2" />
+                  Get Inspiration
+                </Link>
+                <Link
+                  to="/generated-patterns"
                   onClick={closeMenu}
                   className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
                 >
                   <PiFolder className="w-4 h-4 mr-2" />
-                  My Patterns
+                  AI Patterns
                 </Link>
-              </>
+              </div>
+            ) : (
+              <Link
+                to="/get-inspiration"
+                onClick={closeMenu}
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+              >
+                <PiRobot className="w-4 h-4 mr-2" />
+                AI Pattern Generator
+              </Link>
+            )}
+
+            {user && (
+              <Link
+                to="/saved-patterns"
+                onClick={closeMenu}
+                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+              >
+                <PiFolder className="w-4 h-4 mr-2" />
+                My Patterns
+              </Link>
             )}
 
             <Link
