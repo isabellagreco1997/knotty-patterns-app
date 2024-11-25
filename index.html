@@ -2,42 +2,61 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Create, save, and share your crochet patterns with KnottyPatterns - the intuitive pattern builder for crocheters" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Easily create, save, and share crochet patterns with KnottyPatterns - the ultimate crochet pattern builder." />
     <meta name="theme-color" content="#7C3AED" />
-    <meta name="keywords" content="crochet, patterns, amigurumi, pattern maker, crochet designer, crochet pattern, crochet pattern generator" />
+
+    <!-- Canonical Tag -->
     <link rel="canonical" href="https://www.knottypatterns.com/" />
 
-    
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PPDDNW3XRK"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-      gtag('config', 'G-PPDDNW3XRK');
-    </script>
-    
+    <!-- Preload Key Resources -->
+    <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
+    <link rel="preload" href="/src/main.tsx" as="script" />
+
     <!-- OpenGraph Meta Tags -->
     <meta property="og:title" content="KnottyPatterns - Crochet Pattern Builder" />
     <meta property="og:description" content="Create beautiful crochet patterns with our intuitive pattern builder" />
-    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.knottypatterns.com/" />
     <meta property="og:image" content="/social-preview.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="KnottyPatterns Crochet Pattern Builder Preview" />
-    
+
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="KnottyPatterns - Crochet Pattern Builder" />
     <meta name="twitter:description" content="Create beautiful crochet patterns with our intuitive pattern builder" />
     <meta name="twitter:image" content="/social-preview.png" />
-    <meta name="twitter:image:alt" content="KnottyPatterns Crochet Pattern Builder Preview" />
-    
+    <meta name="twitter:domain" content="knottypatterns.com" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://www.knottypatterns.com/",
+      "name": "KnottyPatterns - Crochet Pattern Builder",
+      "description": "Create, save, and share crochet patterns with KnottyPatterns - the intuitive pattern builder for crocheters.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "KnottyPatterns",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.knottypatterns.com/logo.svg"
+        }
+      }
+    }
+    </script>
+
     <title>KnottyPatterns - Crochet Pattern Builder</title>
-  </head>
+</head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
