@@ -98,10 +98,10 @@ export default function PatternBuilder() {
         }}
       />
     <div className="min-h-screen bg-gray-50">
-      {/* Fixed Header */}
-      <div className=" top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-[90rem] mx-auto px-4 py-4">
-          <div className="flex justify-between items-center mb-4">
+        {/* Fixed Header */}
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-[1320px] mx-auto px-6 py-4">
+            <div className="flex justify-between items-center mb-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Pattern Builder</h1>
               <p className="mt-1 text-gray-600">Create and edit your crochet pattern</p>
@@ -141,8 +141,8 @@ export default function PatternBuilder() {
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-[90rem] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 px-4 py-6">
+      <div className="max-w-[1320px] mx-auto px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-6">
           {/* Left Column - Pattern Building Tools */}
           <div className="space-y-6">
             {pattern.sections.length === 0 ? (
