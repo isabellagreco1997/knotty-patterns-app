@@ -9,6 +9,7 @@ interface GeneratedPattern {
   id: string;
   prompt: string;
   image_url: string;
+  image_data: string;
   raw_pattern: string;
   created_at: string;
 }
@@ -47,11 +48,10 @@ export default function GeneratedPatterns() {
   }, [user, navigate]);
 
   const handleTestPattern = (pattern: GeneratedPattern) => {
-    // Store pattern in localStorage for pattern builder
     localStorage.setItem('test_pattern', JSON.stringify({
       prompt: pattern.prompt,
       pattern: pattern.raw_pattern,
-      imageUrl: pattern.image_url
+      imageUrl: pattern.image_data || pattern.image_url // Prefer base64 data if available
     }));
     navigate('/pattern-builder');
   };
@@ -134,7 +134,7 @@ export default function GeneratedPatterns() {
                 <div key={pattern.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
                   <div className="aspect-square overflow-hidden">
                     <img
-                      src={pattern.image_url}
+                      src={pattern.image_data || pattern.image_url}
                       alt={pattern.prompt}
                       className="w-full h-full object-cover"
                     />

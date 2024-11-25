@@ -14,6 +14,9 @@ export default function AIPatternPreview({
   pattern,
   onClose
 }: AIPatternPreviewProps) {
+  // Check if imageUrl is a base64 string or a regular URL
+  const isBase64 = imageUrl.startsWith('data:image');
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-primary-200 overflow-hidden mb-6">
       <div className="p-4 bg-primary-50 border-b border-primary-100 flex justify-between items-start">
@@ -38,6 +41,11 @@ export default function AIPatternPreview({
                 src={imageUrl}
                 alt={prompt}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  if (!isBase64 && e.currentTarget.src !== imageUrl) {
+                    e.currentTarget.src = imageUrl;
+                  }
+                }}
               />
             </div>
           </div>

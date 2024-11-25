@@ -1,7 +1,6 @@
 import { Handler } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client with service role key for admin access
 const supabase = createClient(
     process.env.VITE_SUPABASE_URL!,
     process.env.VITE_SUPABASE_ANON_KEY!,
@@ -59,13 +58,27 @@ export const handler: Handler = async (event) => {
       };
     }
 
+    // Convert image URL to base64
+    let imageData;
+    try {
+      const response = await fetch(imageUrl);
+      const arrayBuffer = await response.arrayBuffer();
+      const base64 = Buffer.from(arrayBuffer).toString('base64');
+      const mimeType = response.headers.get('content-type');
+      imageData = `data:${mimeType};base64,${base64}`;
+    } catch (error) {
+      console.error('Error converting image to base64:', error);
+      throw new Error('Failed to process image');
+    }
+
     // Save to generated_patterns table using service role
     const { data, error } = await supabase
       .from('generated_patterns')
       .insert({
         user_id: userId,
         prompt,
-        image_url: imageUrl,
+        image_url: imageUrl, // Keep for backward compatibility
+        image_data: imageData, // Store base64 data
         raw_pattern: pattern,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
