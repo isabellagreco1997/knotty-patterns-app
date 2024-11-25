@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PiSpinner, PiRobot, PiMagicWand, PiPencilSimple, PiCheck, PiWarning, PiSparkle } from 'react-icons/pi';
+import { PiFolder } from 'react-icons/pi';
 import { Link, useNavigate } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 import { useAuthStore } from '../stores/useAuthStore';
@@ -195,6 +195,22 @@ export default function GetInspiration() {
       <div className="max-w-4xl mx-auto px-4">
         <Header />
         <Disclaimer />
+
+         {/* Generated Patterns Notice */}
+         <div className="mb-8 p-4 bg-primary-50 border border-primary-200 rounded-xl">
+          <div className="flex items-start">
+            <PiFolder className="w-5 h-5 text-primary-600 mt-0.5 mr-3 flex-shrink-0" />
+            <div>
+              <p className="text-primary-800 font-medium">
+                Your AI-generated patterns are saved automatically
+              </p>
+              <p className="text-sm text-primary-600 mt-1">
+                Visit the <Link to="/generated-patterns" className="underline font-medium">Generated Patterns</Link> section to view your saved patterns and test them using the pattern builder.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {!isPremium && generationsLeft !== null && (
           <FreeAccountNotice generationsLeft={generationsLeft} />
         )}
