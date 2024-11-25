@@ -1,3 +1,4 @@
+import { stitchData } from '../data/stitchData';
 import contentful from 'contentful';
 
 export interface SitemapUrl {
@@ -30,6 +31,12 @@ export const STATIC_URLS: SitemapUrl[] = [
     priority: '0.9'
   },
   {
+    loc: `${BASE_URL}/stitch-glossary`,
+    lastmod: new Date().toISOString().split('T')[0],
+    changefreq: 'weekly',
+    priority: '0.9'
+  },
+  {
     loc: `${BASE_URL}/blog`,
     lastmod: new Date().toISOString().split('T')[0],
     changefreq: 'weekly',
@@ -40,7 +47,13 @@ export const STATIC_URLS: SitemapUrl[] = [
     lastmod: new Date().toISOString().split('T')[0],
     changefreq: 'monthly',
     priority: '0.7'
-  }
+  },
+  ...stitchData.map(stitch => ({
+    loc: `${BASE_URL}/stitch/${stitch.slug}`,
+    lastmod: new Date().toISOString().split('T')[0],
+    changefreq: 'monthly',
+    priority: '0.8'
+  }))
 ];
 
 export async function getBlogUrls(): Promise<SitemapUrl[]> {
