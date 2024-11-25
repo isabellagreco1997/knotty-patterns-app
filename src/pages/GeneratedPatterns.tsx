@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PiWarning, PiSpinner, PiPencilSimple, PiTrash } from 'react-icons/pi';
+import { PiWarning, PiSpinner, PiPencilSimple, PiTrash, PiMagnifyingGlass } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 import { supabase } from '../lib/supabase';
 import SEOHead from '../components/SEOHead';
+import AIGeneratedPatternModal from '../components/pattern-builder/AIGeneratedPatternModal';
 
 interface GeneratedPattern {
   id: string;
@@ -18,6 +19,7 @@ export default function GeneratedPatterns() {
   const [patterns, setPatterns] = useState<GeneratedPattern[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPattern, setSelectedPattern] = useState<GeneratedPattern | null>(null);
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -131,13 +133,28 @@ export default function GeneratedPatterns() {
           ) : (
             <div className="grid gap-8 md:grid-cols-2">
               {patterns.map((pattern) => (
-                <div key={pattern.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
-                  <div className="aspect-square overflow-hidden">
+                <div key={pattern.id} className="bg-white rounded-xl shadow-sm overflow-hidden group hover:shadow-md transition-all duration-300">
+                  <div 
+                    className="aspect-square overflow-hidden relative cursor-pointer"
+                    onClick={() => setSelectedPattern(pattern)}
+                  >
+                    {/* Overlay with click indicator */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 transform scale-75 group-hover:scale-100 transition-transform">
+                        <PiMagnifyingGlass className="w-6 h-6 text-primary-600" />
+                      </div>
+                    </div>
                     <img
                       src={pattern.image_data || pattern.image_url}
                       alt={pattern.prompt}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
+                    {/* "Click to view" indicator */}
+                    <div className="absolute bottom-4 left-4 right-4 text-center">
+                      <div className="bg-white/90 backdrop-blur-sm text-sm py-2 px-4 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                        Click to view pattern details
+                      </div>
+                    </div>
                   </div>
                   <div className="p-6">
                     <h3 className="text-lg font-semibold mb-2">{pattern.prompt}</h3>
@@ -174,6 +191,18 @@ export default function GeneratedPatterns() {
           )}
         </div>
       </div>
+
+      {selectedPattern && (
+        <AIGeneratedPatternModal
+          isOpen={!!selectedPattern}
+          onClose={() => setSelectedPattern(null)}
+          pattern={selectedPattern}
+          onTestPattern={() => {
+            handleTestPattern(selectedPattern);
+            setSelectedPattern(null);
+          }}
+        />
+      )}
     </>
   );
 }
