@@ -186,7 +186,7 @@ export default function Home() {
             
             <ScrollFadeIn direction="up" delay={600}>
               <p className="text-xl sm:text-2xl text-white/80 mb-12 max-w-2xl mx-auto font-light">
-                Design, test and sell your patterns with our intuitive builder and AI assistant
+                Design, test, and sell your patterns with our intuitive builder and AI assistant
               </p>
             </ScrollFadeIn>
             
