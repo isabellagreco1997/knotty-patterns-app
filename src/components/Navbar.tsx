@@ -124,21 +124,7 @@ export default function Navbar() {
                   )}
                 </div>
               </>
-            ) : (
-              <Link
-                to="/pattern-builder"
-                className={`px-3 py-2 rounded-lg ${
-                  isActive('/pattern-builder')
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <PiPencilSimple className="w-4 h-4" />
-                  <span>Pattern Builder</span>
-                </div>
-              </Link>
-            )}
+            ) : null}
 
             {/* AI Generator */}
             <Link
@@ -273,17 +259,6 @@ export default function Navbar() {
                   AI Generated
                 </Link>
               </div>
-            )}
-
-            {!user && (
-              <Link
-                to="/pattern-builder"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
-              >
-                <PiPencilSimple className="w-4 h-4 mr-2" />
-                Pattern Builder
-              </Link>
             )}
 
             <Link

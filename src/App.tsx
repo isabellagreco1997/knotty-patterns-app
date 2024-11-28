@@ -4,6 +4,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import { supabase } from './lib/supabase';
 import { useAuthStore } from './stores/useAuthStore';
 import { useSubscriptionStatus } from './hooks/useSubscriptionStatus';
+// import PaywallGuard from './components/PaywallGuard';
+import AuthGuard from './components/AuthGuard';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import PatternBuilder from './pages/PatternBuilder';
@@ -56,14 +58,12 @@ export default function App() {
           return;
         }
 
-        // Check for existing session
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           await checkAuth();
           await refreshProfile();
         }
 
-        // Set up auth state listener
         authListener = supabase.auth.onAuthStateChange(async (event, session) => {
           if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             await checkAuth();
@@ -115,28 +115,29 @@ export default function App() {
           <Navbar />
           <main className="flex-grow">
             <CustomerProvider>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/pattern-builder" element={<PatternBuilder />} />
-                <Route path="/pattern-builder/:id" element={<PatternBuilder />} />
-                <Route path="/saved-patterns" element={<SavedPatterns />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/auth/confirm" element={<EmailConfirmation />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/account" element={<AccountSettings />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/get-inspiration" element={user ? <GetInspiration /> : <AILanding />} />
-                <Route path="/generated-patterns" element={<GeneratedPatterns />} />
-                <Route path="/stitch-glossary" element={<StitchGlossary />} />
-                <Route path="/stitch/:slug" element={<StitchDetail />} />
-
-              </Routes>
+              {/* <PaywallGuard> */}
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
+                  <Route path="/pattern-builder" element={<AuthGuard><PatternBuilder /></AuthGuard>} />
+                  <Route path="/pattern-builder/:id" element={<AuthGuard><PatternBuilder /></AuthGuard>} />
+                  <Route path="/saved-patterns" element={<AuthGuard><SavedPatterns /></AuthGuard>} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/auth/confirm" element={<EmailConfirmation />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
+                  <Route path="/account" element={<AuthGuard><AccountSettings /></AuthGuard>} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/get-inspiration" element={user ? <GetInspiration /> : <AILanding />} />
+                  <Route path="/generated-patterns" element={<AuthGuard><GeneratedPatterns /></AuthGuard>} />
+                  <Route path="/stitch-glossary" element={<StitchGlossary />} />
+                  <Route path="/stitch/:slug" element={<StitchDetail />} />
+                </Routes>
+              {/* </PaywallGuard> */}
             </CustomerProvider>
           </main>
           <Footer />
