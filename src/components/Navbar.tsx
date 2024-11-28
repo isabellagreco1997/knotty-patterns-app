@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   PiList, 
@@ -19,10 +19,21 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMyPatternsMenuOpen, setIsMyPatternsMenuOpen] = useState(false);
   const [isLearnMenuOpen, setIsLearnMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { user, signOut } = useAuthStore();
   const location = useLocation();
+  const isHome = location.pathname === '/';
 
   const isActive = (path: string) => location.pathname === path;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -32,20 +43,35 @@ export default function Navbar() {
     }
   };
 
+  const navbarClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    isHome
+      ? isScrolled
+        ? 'bg-white/90 backdrop-blur-sm shadow-sm'
+        : 'bg-transparent'
+      : 'bg-white shadow-sm'
+  }`;
+
+  const textColorClasses = isHome && !isScrolled ? 'text-white' : 'text-gray-900';
+  const buttonColorClasses = isHome && !isScrolled
+    ? 'text-white hover:bg-white/10'
+    : 'text-gray-700 hover:bg-gray-50';
+
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className={navbarClasses}>
       <div className="max-w-[1320px] mx-auto px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
             <img src="/logo.svg" alt="KnottyPatterns" className="w-8 h-8" />
-            <span className="text-xl font-bold text-primary-500">KnottyPatterns</span>
+            <span className={`text-xl font-bold ${isHome && !isScrolled ? 'text-white' : 'text-primary-500'}`}>
+              KnottyPatterns
+            </span>
           </Link>
 
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-md text-primary-500 hover:bg-primary-50"
+            className={`md:hidden p-2 rounded-md ${buttonColorClasses}`}
           >
             {isMenuOpen ? (
               <PiX className="w-6 h-6" />
@@ -61,11 +87,7 @@ export default function Navbar() {
                 {/* Dashboard */}
                 <Link
                   to="/dashboard"
-                  className={`px-3 py-2 rounded-lg font-medium ${
-                    isActive('/dashboard')
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-primary-600 hover:bg-primary-50'
-                  }`}
+                  className={`px-3 py-2 rounded-lg font-medium ${buttonColorClasses}`}
                 >
                   <div className="flex items-center space-x-2">
                     <PiHouse className="w-4 h-4" />
@@ -77,11 +99,7 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setIsMyPatternsMenuOpen(!isMyPatternsMenuOpen)}
-                    className={`px-3 py-2 rounded-lg flex items-center space-x-2 ${
-                      isMyPatternsMenuOpen || isActive('/pattern-builder') || isActive('/saved-patterns') || isActive('/generated-patterns')
-                        ? 'bg-gray-100 text-gray-900'
-                        : 'text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`px-3 py-2 rounded-lg flex items-center space-x-2 ${buttonColorClasses}`}
                   >
                     <PiFolder className="w-4 h-4" />
                     <span>My Patterns</span>
@@ -129,11 +147,7 @@ export default function Navbar() {
             {/* AI Generator */}
             <Link
               to="/get-inspiration"
-              className={`px-3 py-2 rounded-lg ${
-                isActive('/get-inspiration')
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-700 hover:bg-gray-50'
-              }`}
+              className={`px-3 py-2 rounded-lg ${buttonColorClasses}`}
             >
               <div className="flex items-center space-x-2">
                 <PiMagicWand className="w-4 h-4" />
@@ -145,9 +159,7 @@ export default function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setIsLearnMenuOpen(!isLearnMenuOpen)}
-                className={`px-3 py-2 rounded-lg flex items-center space-x-2 ${
-                  isLearnMenuOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50'
-                }`}
+                className={`px-3 py-2 rounded-lg flex items-center space-x-2 ${buttonColorClasses}`}
               >
                 <PiBook className="w-4 h-4" />
                 <span>Learn</span>
@@ -173,11 +185,7 @@ export default function Navbar() {
             {/* Pricing */}
             <Link
               to="/pricing"
-              className={`px-3 py-2 rounded-lg ${
-                isActive('/pricing')
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-700 hover:bg-gray-50'
-              }`}
+              className={`px-3 py-2 rounded-lg ${buttonColorClasses}`}
             >
               Pricing
             </Link>
@@ -187,14 +195,22 @@ export default function Navbar() {
               <div className="flex items-center space-x-3">
                 <Link
                   to="/account"
-                  className="inline-flex items-center px-3 py-2 border border-primary-300 text-sm font-medium rounded-md text-primary-500 hover:bg-primary-50 transition-colors"
+                  className={`inline-flex items-center px-3 py-2 border ${
+                    isHome && !isScrolled
+                      ? 'border-white/30 text-white hover:bg-white/10'
+                      : 'border-primary-300 text-primary-500 hover:bg-primary-50'
+                  } text-sm font-medium rounded-md transition-colors`}
                 >
                   <PiGear className="w-4 h-4 mr-2" />
                   <span className="max-w-[120px] truncate">{user.email}</span>
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="inline-flex items-center px-3 py-2 border border-primary-300 text-sm font-medium rounded-md text-primary-500 hover:bg-primary-50 transition-colors"
+                  className={`inline-flex items-center px-3 py-2 border ${
+                    isHome && !isScrolled
+                      ? 'border-white/30 text-white hover:bg-white/10'
+                      : 'border-primary-300 text-primary-500 hover:bg-primary-50'
+                  } text-sm font-medium rounded-md transition-colors`}
                 >
                   <PiSignOut className="w-4 h-4 mr-2" />
                   Sign Out
@@ -203,7 +219,11 @@ export default function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className="inline-flex items-center px-4 py-2 border border-primary-300 text-sm font-medium rounded-md text-primary-500 hover:bg-primary-50 transition-colors"
+                className={`inline-flex items-center px-4 py-2 border ${
+                  isHome && !isScrolled
+                    ? 'border-white/30 text-white hover:bg-white/10'
+                    : 'border-primary-300 text-primary-500 hover:bg-primary-50'
+                } text-sm font-medium rounded-md transition-colors`}
               >
                 <PiUser className="w-4 h-4 mr-2" />
                 Sign In
