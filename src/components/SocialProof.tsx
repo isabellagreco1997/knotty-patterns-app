@@ -4,19 +4,30 @@ export default function SocialProof() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    // Generate a random number between 150-300
-    const baseCount = Math.floor(Math.random() * (300 - 150 + 1) + 150);
-    
-    // Get today's date as string to use as seed
-    const today = new Date().toDateString();
-    
-    // Simple hash function for the date
-    const hash = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    
-    // Combine base count with date hash for daily variation
-    const dailyCount = baseCount + (hash % 50);
-    
+    const today = new Date().toDateString(); // Get today's date as string
+    const storedData = localStorage.getItem('dailySocialProof'); // Check if today's count is already stored
+
+    if (storedData) {
+      const { date, value } = JSON.parse(storedData);
+      if (date === today) {
+        // If the date matches, use the stored value
+        setCount(value);
+        return;
+      }
+    }
+
+    // If no stored data or the date doesn't match, calculate a new count
+    const baseCount = 150 + Math.floor(Math.random() * 151); // Generate a base count between 150-300
+    const hash = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0); // Simple hash
+    const dailyCount = baseCount + (hash % 50); // Combine base count and hash for daily variation
+
     setCount(dailyCount);
+
+    // Save today's count to localStorage
+    localStorage.setItem(
+      'dailySocialProof',
+      JSON.stringify({ date: today, value: dailyCount })
+    );
   }, []);
 
   return (
