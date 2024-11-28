@@ -9,6 +9,7 @@ import Mock from '../../public/mock.png'
 import FeaturePreview from '../components/FeaturePreview';
 import FeedbackBanner from '../components/FeedbackBanner';
 import ImageOverlay from '../components/ImageOverlay';
+import SocialProof from '../components/SocialProof';
 
 const carouselImages = [
   {
@@ -206,6 +207,8 @@ export default function Home() {
                   View Pricing
                 </Link>
               </div>
+              <SocialProof />
+
             </ScrollFadeIn>
           </div>
         </div>
