@@ -491,7 +491,7 @@ export default function Home() {
 
 
            {/* About Us Section */}
-<section className="py-24 bg-gradient-to-b from-white to-primary-50">
+{/* <section className="py-24 bg-gradient-to-b from-white to-primary-50">
   <div className="max-w-6xl mx-auto px-4">
     <ScrollFadeIn>
       <div className="text-center mb-16">
@@ -572,7 +572,7 @@ export default function Home() {
       </div>
     </ScrollFadeIn>
   </div>
-</section>
+</section> */}
 
 
       
