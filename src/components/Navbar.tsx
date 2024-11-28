@@ -145,7 +145,7 @@ export default function Navbar() {
             ) : null}
 
             {/* AI Generator */}
-            <Link
+            {/* <Link
               to="/get-inspiration"
               className={`px-3 py-2 rounded-lg ${buttonColorClasses}`}
             >
@@ -153,7 +153,7 @@ export default function Navbar() {
                 <PiMagicWand className="w-4 h-4" />
                 <span>AI Generator</span>
               </div>
-            </Link>
+            </Link> */}
 
             {/* Learn Dropdown */}
             <div className="relative">

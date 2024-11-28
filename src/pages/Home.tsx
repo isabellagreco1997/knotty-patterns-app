@@ -11,6 +11,9 @@ import FeedbackBanner from '../components/FeedbackBanner';
 import ImageOverlay from '../components/ImageOverlay';
 import SocialProof from '../components/SocialProof';
 import HighlightedText from '../components/HighlightedText';
+import Strawberry from './strawberry.jpg'
+import Fox from './fox.jpg'
+import Elephant from './elephant.jpg'
 
 const carouselImages = [
   {
@@ -34,6 +37,25 @@ const carouselImages = [
     alt: "Crochet work in progress"
   }
 ];
+
+const showcaseExamples = [
+  {
+    prompt: "Cute baby elephant with a flower crown",
+    image: Elephant, 
+    pattern: "Magic ring with 6 sc\nRound 1: inc in each st (12)\nRound 2: *sc, inc* repeat 6 times (18)..."
+  },
+  {
+    prompt: "Kawaii strawberry with a happy face",
+    image: Strawberry, 
+    pattern: "Magic ring with 6 sc\nRound 1: inc in each st (12)\nRound 2: sc in each st..."
+  },
+  {
+    prompt: "Small sleeping fox amigurumi",
+    image: Fox, 
+    pattern: "Magic ring with 8 sc\nRound 1: inc in each st (16)\nRound 2: *sc, inc* repeat 8 times..."
+  }
+];
+
 
 const howItWorksSections = [
   {
@@ -110,19 +132,19 @@ const testimonials = [
     quote: "The AI pattern generator is amazing! It helps me quickly prototype new ideas before I start crocheting.",
     author: "Sarah M.",
     role: "Professional Pattern Designer",
-    image: "https://images.unsplash.com/photo-1582838038154-a88f9a755f89?auto=format&fit=crop&q=80&w=100"
+    image: "https://images.unsplash.com/photo-1714415182234-0672970be61a?auto=format&fit=crop&q=80&w=100"
   },
   {
     quote: "As a beginner, this tool helped me understand pattern creation. The AI suggestions are really helpful!",
     author: "Emily R.",
     role: "Hobbyist Crocheter",
-    image: "https://images.unsplash.com/photo-1615646589661-0e7bc0b2b6c3?auto=format&fit=crop&q=80&w=100"
+    image: "https://images.unsplash.com/photo-1479936343636-73cdc5aae0c3?auto=format&fit=crop&q=80&w=100"
   },
   {
     quote: "The best investment for my crochet journey. The AI features and premium tools are worth every penny.",
     author: "Michael K.",
     role: "Amigurumi Artist",
-    image: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&q=80&w=100"
+    image: "https://images.unsplash.com/photo-1711645169736-53327e726205?auto=format&fit=crop&q=80&w=100"
   }
 ];
 
@@ -218,6 +240,101 @@ export default function Home() {
         </div>
       </ImageOverlay>
 <FeaturePreview />
+
+<div className="py-24 bg-gradient-to-b from-white to-primary-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <span className="text-primary-600 font-semibold tracking-wide uppercase text-sm">Showcase</span>
+              <h2 className="mt-2 text-4xl font-bold text-gray-900">From Idea to Creation</h2>
+              <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
+                See how AI assists in transforming simple prompts into detailed crochet patterns
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-12">
+              {showcaseExamples.map((example, index) => (
+                <div 
+                  key={index} 
+                  className="group relative bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                >
+                  {/* Image Container */}
+                  <div className="relative aspect-square overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
+                    <img
+                      src={example.image}
+                      alt={example.prompt}
+                      className="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                        <p className="text-white font-medium">
+                          <span className="text-primary-200 text-sm block mb-1">Prompt:</span>
+                          {example.prompt}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pattern Preview */}
+                  <div className="p-6">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Generated Pattern</h3>
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white z-10" />
+                        <div className="bg-gray-50 rounded-xl p-4 overflow-hidden max-h-32">
+                          <pre className="text-xs text-gray-600 font-mono whitespace-pre-wrap">
+                            {example.pattern}
+                          </pre>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Features */}
+                    <div className="space-y-2">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+                        Beginner-friendly pattern
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 mr-2" />
+                        Complete stitch counts
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
+                        Step-by-step instructions
+                      </div>
+                    </div>
+
+                  
+                 
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Additional Info */}
+            <div className="mt-16 text-center">
+              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                Each pattern is generated with AI assistance and refined through human expertise. 
+                Start with AI-generated suggestions and make them your own.
+              </p>
+              <Link
+                to="/login?redirect=/get-inspiration"
+                className="inline-flex items-center px-8 py-4 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors"
+              >
+                Try Pattern Generation
+                <svg 
+                  className="w-5 h-5 ml-2" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </div>
 
          {/* How It Works Section */}
  <section className="py-24 bg-white">
