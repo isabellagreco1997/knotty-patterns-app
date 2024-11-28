@@ -9,6 +9,7 @@ interface PricingFeature {
   name: string;
   free: boolean;
   premium: boolean;
+  new?: boolean;
 }
 
 const features: PricingFeature[] = [
@@ -16,10 +17,14 @@ const features: PricingFeature[] = [
   { name: 'Basic stitch library', free: true, premium: true },
   { name: 'Export as Text', free: true, premium: true },
   { name: 'Save up to 5 patterns', free: true, premium: true },
+  { name: '3 AI pattern generations per month', free: true, premium: true },
   { name: 'Pattern version history', free: false, premium: true },
   { name: 'Export as PDF', free: false, premium: true },
   { name: 'Unlimited pattern saves', free: false, premium: true },
   { name: 'Custom stitch creation', free: false, premium: true },
+  { name: 'Unlimited AI pattern generations', free: false, premium: true, new: true },
+  { name: 'AI pattern customization', free: false, premium: true, new: true },
+  { name: 'Priority AI processing', free: false, premium: true, new: true },
   { name: 'Priority support', free: false, premium: true },
 ];
 
@@ -64,6 +69,11 @@ const PricingCards: React.FC = () => {
           )}
           <span className={feature[planType] ? 'text-neutral-700' : 'text-neutral-400'}>
             {feature.name}
+            {feature.new && (
+              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800">
+                New
+              </span>
+            )}
           </span>
         </li>
       ))}
@@ -125,7 +135,7 @@ const PricingCards: React.FC = () => {
               <span className="text-sm text-primary-600">Most Popular</span>
             </span>
           </div>
-          <p className="mt-4 text-sm text-neutral-600">All features unlocked with priority support</p>
+          <p className="mt-4 text-sm text-neutral-600">All features unlocked with unlimited AI access</p>
           <p className="mt-6">
             <span className="text-4xl font-bold text-neutral-800">$8</span>
             <span className="text-sm text-neutral-500">/month</span>
