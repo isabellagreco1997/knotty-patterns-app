@@ -15,6 +15,7 @@ import Strawberry from './strawberry.jpg'
 import Fox from './fox.jpg'
 import Elephant from './elephant.jpg'
 import GallerySection from '../components/home/GallerySection';
+import ShowcaseSection from '../components/home/ShowcaseSection';
 
 const carouselImages = [
   {
@@ -245,100 +246,11 @@ export default function Home() {
            <GallerySection />
 <FeaturePreview />
 
-<div className="py-24 bg-gradient-to-b from-white to-primary-50">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="text-center mb-16">
-              <span className="text-primary-600 font-semibold tracking-wide uppercase text-sm">Showcase</span>
-              <h2 className="mt-2 text-4xl font-bold text-gray-900">From Idea to Creation</h2>
-              <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-                See how AI assists in transforming simple prompts into detailed crochet patterns
-              </p>
-            </div>
 
-            <div className="grid lg:grid-cols-3 gap-12">
-              {showcaseExamples.map((example, index) => (
-                <div 
-                  key={index} 
-                  className="group relative bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                >
-                  {/* Image Container */}
-                  <div className="relative aspect-square overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
-                    <img
-                      src={example.image}
-                      alt={example.prompt}
-                      className="w-full h-full object-cover transform transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
-                      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                        <p className="text-white font-medium">
-                          <span className="text-primary-200 text-sm block mb-1">Prompt:</span>
-                          {example.prompt}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Pattern Preview */}
-                  <div className="p-6">
-                    <div className="mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Generated Pattern</h3>
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white z-10" />
-                        <div className="bg-gray-50 rounded-xl p-4 overflow-hidden max-h-32">
-                          <pre className="text-xs text-gray-600 font-mono whitespace-pre-wrap">
-                            {example.pattern}
-                          </pre>
-                        </div>
-                      </div>
-                    </div>
+            <ShowcaseSection />
 
-                    {/* Features */}
-                    <div className="space-y-2">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                        Beginner-friendly pattern
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 rounded-full bg-blue-500 mr-2" />
-                        Complete stitch counts
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
-                        Step-by-step instructions
-                      </div>
-                    </div>
-
-                  
-                 
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Additional Info */}
-            <div className="mt-16 text-center">
-              <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-                Each pattern is generated with AI assistance and refined through human expertise. 
-                Start with AI-generated suggestions and make them your own.
-              </p>
-              <Link
-                to="/login?redirect=/get-inspiration"
-                className="inline-flex items-center px-8 py-4 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors"
-              >
-                Try Pattern Generation
-                <svg 
-                  className="w-5 h-5 ml-2" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </div>
+            
 
          {/* How It Works Section */}
  <section className="py-24 bg-white">
@@ -420,62 +332,7 @@ export default function Home() {
       </section>
  
 
-     {/* Features Section */}
-     <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMzAgMEw2MCAzMEwzMCA2MEwwIDMwTDMwIDB6IiBmaWxsPSIjMDAwIi8+PC9zdmc+')] bg-repeat"></div>
-          
-          <div className="max-w-7xl mx-auto px-4">
-            <ScrollFadeIn>
-              <div className="text-center mb-16">
-                <span className="text-primary-600 font-semibold tracking-wide uppercase text-sm">Why Choose Us</span>
-                <h2 className="mt-2 text-4xl font-bold text-gray-900 sm:text-5xl">
-                  Crafted for Crocheters
-                </h2>
-                <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-                  Our pattern builder combines AI assistance with powerful features, making pattern creation a joy
-                </p>
-              </div>
-            </ScrollFadeIn>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature, index) => (
-                <ScrollFadeIn key={feature.label} delay={index * 100}>
-                  <div className="relative group text-center">
-                    {/* Card */}
-                    <div className="h-full bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 p-8 relative z-10 border border-gray-100">
-                      {/* Icon */}
-                      <div className={`inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} text-white mb-6 transform group-hover:scale-110 transition-transform duration-300`}>
-                        {feature.icon}
-                      </div>
-                      
-                      {/* Content */}
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3 ">
-                        {feature.label}
-                      </h3>
-                      <p className="text-gray-600 mb-6">
-                        {feature.description}
-                      </p>
-                      
-                      {/* Benefits List */}
-                      <ul className="space-y-3 text-center ">
-                        {feature.benefits.map((benefit, i) => (
-                          <li key={i} className="flex items-center text-sm text-gray-600">
-                            <PiArrowRight className="w-4 h-4 mr-2 text-gray-400" />
-                            {benefit}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    {/* Decorative Background */}
-                    <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300 rounded-2xl transform group-hover:scale-105 -z-10`}></div>
-                  </div>
-                </ScrollFadeIn>
-              ))}
-            </div>
-          </div>
-        </section>
+   
 
 {/* Testimonials */}
 <section className="py-24 bg-primary-900 relative overflow-hidden">

@@ -52,24 +52,26 @@ export default function GallerySection() {
   ];
 
   return (
-    <section className="py-6 bg-black relative">
-  <div className="overlay-top"></div>
-  <div className="overlay-bottom"></div>
+    <section className="py-6 bg-black relative overflow-hidden">
+      {/* Top fade overlay */}
+      <div className="absolute top-0 left-0 right-0 h-60 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none z-10"></div>
+      
+      {/* Bottom fade overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-60 bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none z-10"></div>
 
-  <div className="max-w mx-auto px-4 relative z-20">
-    <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
-      {galleryItems.map((item, index) => (
-        <div key={index} className="mb-4">
-          <img
-            src={item.image}
-            alt={item.prompt}
-            className="w-full h-auto object-cover rounded-lg"
-          />
+      <div className="max-w mx-auto px-4 relative">
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-4">
+          {galleryItems.map((item, index) => (
+            <div key={index} className="mb-4">
+              <img
+                src={item.image}
+                alt={item.prompt}
+                className="w-full h-auto object-cover rounded-lg"
+              />
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  </div>
-</section>
-
+      </div>
+    </section>
   );
 }
