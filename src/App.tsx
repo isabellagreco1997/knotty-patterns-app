@@ -6,7 +6,7 @@ import { useAuthStore } from './stores/useAuthStore';
 import { useSubscriptionStatus } from './hooks/useSubscriptionStatus';
 import PaywallGuard from './components/PaywallGuard';
 import AuthGuard from './components/AuthGuard';
-import Navbar from './components/Navbar';
+import BaseLayout from './components/layouts/BaseLayout';
 import Home from './pages/Home';
 import PatternBuilder from './pages/PatternBuilder';
 import SavedPatterns from './pages/SavedPatterns';
@@ -20,7 +20,6 @@ import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import AccountSettings from './pages/AccountSettings';
 import PrivacyPolicy from './pages/PrivacyPolicy';
-import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
 import { CustomerProvider } from './context/CustomerContext';
 import GetInspiration from './pages/GetInspiration';
@@ -111,72 +110,81 @@ export default function App() {
   return (
     <HelmetProvider>
       <BrowserRouter>
-        <div className="min-h-screen flex flex-col bg-[#fdf6f0]">
-          <Navbar />
-          <main className="flex-grow">
-            <CustomerProvider>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/dashboard" element={
-                  <AuthGuard>
-                    <PaywallGuard>
-                      <Dashboard />
-                    </PaywallGuard>
-                  </AuthGuard>
-                } />
-                <Route path="/pattern-builder" element={
-                  <AuthGuard>
-                    <PaywallGuard>
-                      <PatternBuilder />
-                    </PaywallGuard>
-                  </AuthGuard>
-                } />
-                <Route path="/pattern-builder/:id" element={
-                  <AuthGuard>
-                    <PaywallGuard>
-                      <PatternBuilder />
-                    </PaywallGuard>
-                  </AuthGuard>
-                } />
-                <Route path="/saved-patterns" element={
-                  <AuthGuard>
-                    <PaywallGuard>
-                      <SavedPatterns />
-                    </PaywallGuard>
-                  </AuthGuard>
-                } />
-                <Route path="/login" element={<Login />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/auth/confirm" element={<EmailConfirmation />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/account" element={
-                  <AuthGuard>
-                    <PaywallGuard>
-                      <AccountSettings />
-                    </PaywallGuard>
-                  </AuthGuard>
-                } />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/get-inspiration" element={user ? <GetInspiration /> : <AILanding />} />
-                <Route path="/generated-patterns" element={
-                  <AuthGuard>
-                    <PaywallGuard>
-                      <GeneratedPatterns />
-                    </PaywallGuard>
-                  </AuthGuard>
-                } />
-                <Route path="/stitch-glossary" element={<StitchGlossary />} />
-                <Route path="/stitch/:slug" element={<StitchDetail />} />
-              </Routes>
-            </CustomerProvider>
-          </main>
-          <Footer />
-          <CookieConsent />
-        </div>
+        <CustomerProvider>
+          <Routes>
+            <Route path="/" element={<BaseLayout><Home /></BaseLayout>} />
+            <Route path="/dashboard" element={
+              <BaseLayout>
+                <AuthGuard>
+                  <PaywallGuard>
+                    <Dashboard />
+                  </PaywallGuard>
+                </AuthGuard>
+              </BaseLayout>
+            } />
+            <Route path="/pattern-builder" element={
+              <BaseLayout>
+                <AuthGuard>
+                  <PaywallGuard>
+                    <PatternBuilder />
+                  </PaywallGuard>
+                </AuthGuard>
+              </BaseLayout>
+            } />
+            <Route path="/pattern-builder/:id" element={
+              <BaseLayout>
+                <AuthGuard>
+                  <PaywallGuard>
+                    <PatternBuilder />
+                  </PaywallGuard>
+                </AuthGuard>
+              </BaseLayout>
+            } />
+            <Route path="/saved-patterns" element={
+              <BaseLayout>
+                <AuthGuard>
+                  <PaywallGuard>
+                    <SavedPatterns />
+                  </PaywallGuard>
+                </AuthGuard>
+              </BaseLayout>
+            } />
+            <Route path="/login" element={<BaseLayout><Login /></BaseLayout>} />
+            <Route path="/forgot-password" element={<BaseLayout><ForgotPassword /></BaseLayout>} />
+            <Route path="/reset-password" element={<BaseLayout><ResetPassword /></BaseLayout>} />
+            <Route path="/auth/confirm" element={<BaseLayout><EmailConfirmation /></BaseLayout>} />
+            <Route path="/auth/callback" element={<BaseLayout><AuthCallback /></BaseLayout>} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/blog" element={<BaseLayout><Blog /></BaseLayout>} />
+            <Route path="/blog/:slug" element={<BaseLayout><BlogPost /></BaseLayout>} />
+            <Route path="/account" element={
+              <BaseLayout>
+                <AuthGuard>
+                  <PaywallGuard>
+                    <AccountSettings />
+                  </PaywallGuard>
+                </AuthGuard>
+              </BaseLayout>
+            } />
+            <Route path="/privacy-policy" element={<BaseLayout><PrivacyPolicy /></BaseLayout>} />
+            <Route path="/get-inspiration" element={
+              <BaseLayout>
+                {user ? <GetInspiration /> : <AILanding />}
+              </BaseLayout>
+            } />
+            <Route path="/generated-patterns" element={
+              <BaseLayout>
+                <AuthGuard>
+                  <PaywallGuard>
+                    <GeneratedPatterns />
+                  </PaywallGuard>
+                </AuthGuard>
+              </BaseLayout>
+            } />
+            <Route path="/stitch-glossary" element={<BaseLayout><StitchGlossary /></BaseLayout>} />
+            <Route path="/stitch/:slug" element={<BaseLayout><StitchDetail /></BaseLayout>} />
+          </Routes>
+        </CustomerProvider>
       </BrowserRouter>
     </HelmetProvider>
   );
