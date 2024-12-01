@@ -8,8 +8,8 @@ export default function Pricing() {
   return (
     <>
       <SEOHead 
-        title="Pricing Plans - KnottyPatterns"
-        description="Choose the perfect plan for your crochet journey. Free and premium options available with features like unlimited patterns, PDF export, and more."
+        title="Pricing - KnottyPatterns"
+        description="Get unlimited access to all KnottyPatterns features including AI pattern generation, PDF exports, and priority support."
         type="product"
         schema={{
           "@context": "https://schema.org",
@@ -17,11 +17,10 @@ export default function Pricing() {
           "name": "KnottyPatterns Premium",
           "description": "Premium crochet pattern creation tools",
           "offers": {
-            "@type": "AggregateOffer",
-            "lowPrice": "0",
-            "highPrice": "8",
+            "@type": "Offer",
+            "price": "8",
             "priceCurrency": "USD",
-            "offerCount": "2"
+            "availability": "https://schema.org/InStock"
           }
         }}
       />
@@ -31,9 +30,9 @@ export default function Pricing() {
         <div className="py-20 bg-gradient-to-b from-primary-50 to-white">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-16">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h1>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">Start Creating Amazing Patterns Today</h1>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Choose the perfect plan for your crochet journey. All plans include access to our pattern builder and basic features.
+                Get unlimited access to all features including AI pattern generation, PDF exports, and priority support.
               </p>
             </div>
 

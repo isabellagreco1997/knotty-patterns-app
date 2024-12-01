@@ -8,24 +8,20 @@ interface FAQItem {
 
 const faqItems: FAQItem[] = [
   {
-    question: "How does the free plan work?",
-    answer: "The free plan allows you to create up to 5 patterns and includes basic features like pattern creation and text export. You also get 3 AI pattern generations per month."
+    question: "What's included in the subscription?",
+    answer: "Your subscription includes unlimited pattern creation, AI pattern generation, PDF exports, custom stitch creation, pattern version history, and priority support."
   },
   {
-    question: "What's included in the Premium plan?",
-    answer: "Premium includes unlimited pattern storage, PDF exports, custom stitch creation, unlimited AI pattern generations, and priority support."
+    question: "How does the 30-day guarantee work?",
+    answer: "If you're not satisfied with KnottyPatterns within the first 30 days, we'll give you a full refund. No questions asked."
   },
   {
-    question: "Can I upgrade or downgrade anytime?",
-    answer: "Yes! You can upgrade to Premium whenever you want. You can also cancel your Premium subscription at any time - you'll keep access until the end of your billing period."
+    question: "Can I cancel my subscription anytime?",
+    answer: "Yes! You can cancel your subscription at any time. You'll continue to have access until the end of your current billing period."
   },
   {
     question: "Is my payment information secure?",
     answer: "Yes, all payments are processed securely through Stripe. We never store your credit card information directly."
-  },
-  {
-    question: "Do you offer refunds?",
-    answer: "Yes, we offer a 30-day money-back guarantee if you're not satisfied with your Premium subscription."
   },
   {
     question: "What payment methods do you accept?",
@@ -34,6 +30,10 @@ const faqItems: FAQItem[] = [
   {
     question: "Are my patterns private?",
     answer: "Yes, all your patterns are completely private and can only be accessed by you. We take data privacy very seriously."
+  },
+  {
+    question: "Do you offer team or business plans?",
+    answer: "Not yet, but we're working on it! Contact us if you're interested in a team or business subscription."
   }
 ];
 
