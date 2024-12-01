@@ -14,6 +14,7 @@ import HighlightedText from '../components/HighlightedText';
 import Strawberry from './strawberry.jpg'
 import Fox from './fox.jpg'
 import Elephant from './elephant.jpg'
+import GallerySection from '../components/home/GallerySection';
 
 const carouselImages = [
   {
@@ -239,6 +240,9 @@ export default function Home() {
           </div>
         </div>
       </ImageOverlay>
+
+           {/* Gallery Section */}
+           <GallerySection />
 <FeaturePreview />
 
 <div className="py-24 bg-gradient-to-b from-white to-primary-50">
