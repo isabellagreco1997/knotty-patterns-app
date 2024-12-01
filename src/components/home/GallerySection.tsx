@@ -2,7 +2,6 @@ import Dog from './gallery/dog.jpg';
 import Duck from './gallery/duck.jpg';
 import Doll from './gallery/doll.jpg';
 import Bear from './gallery/bear.jpg';
-import './gallery.css'
 
 export default function GallerySection() {
   const galleryItems = [
