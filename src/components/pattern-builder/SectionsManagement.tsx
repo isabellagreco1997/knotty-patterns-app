@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { PiPlus, PiWarning } from 'react-icons/pi';
 import AddSectionModal from './AddSectionModal';
 import SectionsList from './SectionsList';
@@ -68,17 +68,24 @@ export default function SectionsManagement({
           </div>
         ) : (
           <DragDropContext onDragEnd={handleSectionDragEnd}>
-            <SectionsList
-              sections={pattern.sections}
-              currentSectionId={currentSectionId}
-              editingSectionId={editingSectionId}
-              editingSectionName={editingSectionName}
-              setCurrentSectionId={setCurrentSectionId}
-              setEditingSectionId={setEditingSectionId}
-              setEditingSectionName={setEditingSectionName}
-              handleUpdateSectionName={handleUpdateSectionName}
-              handleDeleteSection={handleDeleteSection}
-            />
+            <Droppable droppableId="sections">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  <SectionsList
+                    sections={pattern.sections}
+                    currentSectionId={currentSectionId}
+                    editingSectionId={editingSectionId}
+                    editingSectionName={editingSectionName}
+                    setCurrentSectionId={setCurrentSectionId}
+                    setEditingSectionId={setEditingSectionId}
+                    setEditingSectionName={setEditingSectionName}
+                    handleUpdateSectionName={handleUpdateSectionName}
+                    handleDeleteSection={handleDeleteSection}
+                  />
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
           </DragDropContext>
         )}
       </div>

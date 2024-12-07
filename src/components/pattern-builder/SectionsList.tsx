@@ -27,7 +27,7 @@ export default function SectionsList({
   handleDeleteSection,
 }: SectionsListProps) {
   return (
-    <Droppable droppableId="sections">
+    <Droppable droppableId="sections-list">
       {(provided) => (
         <div
           {...provided.droppableProps}
