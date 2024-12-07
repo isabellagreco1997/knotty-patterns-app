@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { PiPencil, PiTrash, PiNote, PiWarning } from 'react-icons/pi';
-import type { Round, Pattern, Stitch, RepetitionGroup } from '../../types/pattern';
+import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
+import { PiWarning } from 'react-icons/pi';
+import type { Round, Pattern } from '../../types/pattern';
+import DraggableRound from './DraggableRound';
+import DroppableSection from './DroppableSection';
+import { formatRoundInstructions, getRoundNumber } from '../../utils/roundFormatting';
 
 interface PatternDisplayProps {
   pattern: Pattern;
@@ -10,118 +13,6 @@ interface PatternDisplayProps {
   onDelete: (roundId: string) => void;
   onReorder: (startIndex: number, endIndex: number) => void;
   language: 'en' | 'es';
-}
-
-const translations = {
-  en: {
-    round: 'Round',
-    stitches: 'sts',
-    inc: 'inc',
-    dec: 'dec',
-  },
-  es: {
-    round: 'Vuelta',
-    stitches: 'pts',
-    inc: 'aum',
-    dec: 'dism',
-  },
-};
-
-function formatRoundInstructions(round: Round): string {
-  if (round.isText) {
-    return round.notes || '';
-  }
-
-  const stitchToGroup = new Map<string, RepetitionGroup>();
-  if (round.repetitionGroups) {
-    round.repetitionGroups.forEach(group => {
-      group.stitchIds.forEach(id => {
-        stitchToGroup.set(id, group);
-      });
-    });
-  }
-
-  const processedGroups = new Set<string>();
-  let pattern = '';
-  let currentGroup: RepetitionGroup | null = null;
-  let currentGroupStitches: string[] = [];
-
-  round.stitches.forEach((stitch) => {
-    const group = stitchToGroup.get(stitch.id);
-
-    if (group !== currentGroup) {
-      if (currentGroup && currentGroupStitches.length > 0 && !processedGroups.has(currentGroup.id)) {
-        if (pattern) pattern += ', ';
-        pattern += `(${currentGroupStitches.join(', ')}) * ${currentGroup.count}`;
-        processedGroups.add(currentGroup.id);
-        currentGroupStitches = [];
-      }
-      
-      if (group && !processedGroups.has(group.id)) {
-        currentGroup = group;
-        currentGroupStitches = [];
-      } else {
-        currentGroup = null;
-      }
-    }
-
-    const beforeNote = stitch.note?.beforeNote ? `${stitch.note.beforeNote} ` : '';
-    const afterNote = stitch.note?.afterNote ? ` ${stitch.note.afterNote}` : '';
-    const stitchText = stitch.type === 'dec'
-      ? `${beforeNote}dec  ${afterNote}`
-      : `${beforeNote}${stitch.count} ${stitch.type}${afterNote}`;
-
-    if (currentGroup && !processedGroups.has(currentGroup.id)) {
-      currentGroupStitches.push(stitchText);
-    } else if (!group || processedGroups.has(group.id)) {
-      if (pattern) pattern += ', ';
-      pattern += stitchText;
-    }
-  });
-
-  if (currentGroup && currentGroupStitches.length > 0 && !processedGroups.has(currentGroup.id)) {
-    if (pattern) pattern += ', ';
-    pattern += `(${currentGroupStitches.join(', ')}) * ${currentGroup.count}`;
-  }
-
-  const totalStitches = calculateTotalStitches(round);
-  const repeatText = round.isRepeating && round.repeatCount ? ` * ${round.repeatCount}x` : '';
-  return `${pattern}${repeatText} (${totalStitches} sts)`;
-}
-
-function calculateTotalStitches(round: Round): number {
-  if (round.isText) return 0;
-
-  const baseStitches = round.stitches.reduce((total, stitch) => {
-    if (round.repetitionGroups?.some(g => g.stitchIds.includes(stitch.id))) {
-      return total;
-    }
-    if (stitch.type === 'skip') return total;
-    if (stitch.type === 'inc') return total + (stitch.count * 2);
-    if (stitch.type === 'dec') return total + Math.ceil(stitch.count / 2);
-    return total + stitch.count;
-  }, 0);
-
-  const groupStitches = round.repetitionGroups?.reduce((total, group) => {
-    const groupTotal = group.stitchIds.reduce((sum, stitchId) => {
-      const stitch = round.stitches.find(s => s.id === stitchId);
-      if (!stitch) return sum;
-      if (stitch.type === 'skip') return sum;
-      if (stitch.type === 'inc') return sum + (stitch.count * 2);
-      if (stitch.type === 'dec') return sum + Math.ceil(stitch.count / 2);
-      return sum + stitch.count;
-    }, 0);
-    return total + (groupTotal * group.count);
-  }, 0) || 0;
-
-  const totalBeforeRepeat = baseStitches + groupStitches;
-  return round.isRepeating && round.repeatCount
-    ? totalBeforeRepeat * round.repeatCount
-    : totalBeforeRepeat;
-}
-
-function getRoundNumber(rounds: Round[], currentIndex: number): number {
-  return rounds.slice(0, currentIndex + 1).filter(r => !r.isText).length;
 }
 
 export default function PatternDisplay({ 
@@ -205,111 +96,31 @@ export default function PatternDisplay({
           </div>
         </div>
 
-        {pattern.sections.map((section) => (
-          <div key={section.id} className="mb-8">
-            <div className="text-lg font-semibold mb-4">
-              {section.name}
+        <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          {pattern.sections.map((section) => (
+            <div key={section.id} className="mb-8">
+              <div className="text-lg font-semibold mb-4">
+                {section.name}
+              </div>
+
+              <DroppableSection
+                sectionId={section.id}
+                rounds={section.rounds}
+                currentRounds={rounds}
+                expandedNotes={expandedNotes}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onToggleNotes={toggleNotes}
+                onShowTooltip={() => setShowTooltip(true)}
+                onHideTooltip={() => setShowTooltip(false)}
+                onMouseMove={handleMouseMove}
+                language={language}
+                formatInstructions={formatRoundInstructions}
+                getRoundNumber={getRoundNumber}
+              />
             </div>
-
-            <DragDropContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-              <Droppable droppableId={`section-${section.id}`} isDropDisabled={section.rounds !== rounds}>
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="space-y-2"
-                  >
-                    {section.rounds.map((round, index) => (
-                      <Draggable 
-                        key={round.id} 
-                        draggableId={`round-${round.id}`}
-                        index={index}
-                        isDragDisabled={section.rounds !== rounds}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`group relative p-4 rounded-md ${
-                              round.isText ? 'bg-primary-50' : 
-                              snapshot.isDragging ? 'bg-primary-50' : 
-                              section.rounds === rounds ? 'bg-gray-50 hover:bg-gray-100 cursor-grab' : 
-                              'bg-gray-50 hover:bg-gray-100 cursor-not-allowed'
-                            }`}
-                            onMouseEnter={() => {
-                              if (section.rounds !== rounds) {
-                                setShowTooltip(true);
-                              }
-                            }}
-                            onMouseLeave={() => setShowTooltip(false)}
-                            onMouseMove={handleMouseMove}
-                          >
-                            {round.headerNote && (
-                              <div className="text-sm text-gray-600 italic mb-2">
-                                {round.headerNote}
-                              </div>
-                            )}
-
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                {!round.isText && (
-                                  <span className="font-medium">
-                                    {translations[language].round} {getRoundNumber(section.rounds, index)}: {' '}
-                                  </span>
-                                )}
-                                {formatRoundInstructions(round)}
-                              </div>
-                              
-                              <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                  onClick={() => onEdit(round.id)}
-                                  className="p-1 hover:bg-primary-100 rounded-full"
-                                  title="Edit Round"
-                                >
-                                  <PiPencil className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => onDelete(round.id)}
-                                  className="p-1 hover:bg-primary-100 rounded-full text-red-600"
-                                  title="Delete Round"
-                                >
-                                  <PiTrash className="w-4 h-4" />
-                                </button>
-                                {!round.isText && (round.notes || round.headerNote || round.footerNote) && (
-                                  <button
-                                    onClick={() => toggleNotes(round.id)}
-                                    className="p-1 hover:bg-primary-100 rounded-full"
-                                    title="Toggle Notes"
-                                  >
-                                    <PiNote className="w-4 h-4" />
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-
-                            {round.footerNote && (
-                              <div className="text-sm text-gray-600 italic mt-2">
-                                {round.footerNote}
-                              </div>
-                            )}
-
-                            {!round.isText && expandedNotes.includes(round.id) && round.notes && (
-                              <div className="mt-2 text-sm text-gray-600 bg-white p-2 rounded-md border border-gray-200">
-                                <strong>Notes:</strong> {round.notes}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </div>
-        ))}
+          ))}
+        </DragDropContext>
       </div>
     </div>
   );

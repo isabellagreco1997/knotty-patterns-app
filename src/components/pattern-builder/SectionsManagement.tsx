@@ -21,7 +21,7 @@ interface SectionsManagementProps {
   onUpdateSections: (sections: PatternSection[]) => void;
 }
 
-const SectionsManagement: React.FC<SectionsManagementProps> = ({
+export default function SectionsManagement({
   pattern,
   currentSectionId,
   setCurrentSectionId,
@@ -29,7 +29,7 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
   handleDeleteSection,
   handleSectionDragEnd,
   onUpdateSections,
-}) => {
+}: SectionsManagementProps) {
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [editingSectionName, setEditingSectionName] = useState('');
@@ -42,15 +42,13 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
     );
 
     onUpdateSections(updatedSections);
-
     setEditingSectionId(null);
     setEditingSectionName('');
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md">
       <div className="p-6">
-        {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Pattern Sections</h2>
           <button
@@ -62,7 +60,6 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
           </button>
         </div>
 
-        {/* No Sections Message */}
         {pattern.sections.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
             <PiWarning className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -76,13 +73,20 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
             </button>
           </div>
         ) : (
-          /* Sections List with Drag and Drop */
           <DragDropContext onDragEnd={handleSectionDragEnd}>
-            <Droppable droppableId="sections">
+            <Droppable droppableId="pattern-sections">
               {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="space-y-2"
+                >
                   {pattern.sections.map((section, index) => (
-                    <Draggable key={section.id} draggableId={section.id} index={index}>
+                    <Draggable
+                      key={section.id}
+                      draggableId={`section-${section.id}`}
+                      index={index}
+                    >
                       {(provided, snapshot) => (
                         <div
                           ref={provided.innerRef}
@@ -96,7 +100,6 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
                               : 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
                           }`}
                         >
-                          {/* Section Name and Controls */}
                           <div className="flex items-center flex-1">
                             <button
                               onClick={() => setCurrentSectionId(section.id)}
@@ -110,7 +113,6 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
                             </button>
 
                             {editingSectionId === section.id ? (
-                              /* Editing Section Name */
                               <div className="flex items-center flex-1">
                                 <input
                                   type="text"
@@ -126,26 +128,14 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
                                 />
                                 <div className="flex items-center ml-2">
                                   <button
-                                    onClick={() =>
-                                      handleUpdateSectionName(section.id, editingSectionName)
-                                    }
+                                    onClick={() => handleUpdateSectionName(section.id, editingSectionName)}
                                     className="p-1 text-green-600 hover:bg-green-50 rounded-full"
                                   >
                                     <PiCheck className="w-5 h-5" />
                                   </button>
-                                  <button
-                                    onClick={() => {
-                                      setEditingSectionId(null);
-                                      setEditingSectionName('');
-                                    }}
-                                    className="p-1 text-gray-600 hover:bg-gray-100 rounded-full"
-                                  >
-                                    {/* Replace with a cancel icon if available */}
-                                  </button>
                                 </div>
                               </div>
                             ) : (
-                              /* Display Section Name */
                               <div className="flex items-center flex-1">
                                 <span className="font-medium text-lg">{section.name}</span>
                                 <span className="ml-3 text-sm text-gray-500">
@@ -155,7 +145,6 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
                             )}
                           </div>
 
-                          {/* Action Buttons */}
                           <div className="flex items-center space-x-2">
                             {editingSectionId !== section.id && (
                               <button
@@ -187,7 +176,6 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
         )}
       </div>
 
-      {/* Add Section Modal */}
       <AddSectionModal
         isOpen={showAddSectionModal}
         onClose={() => setShowAddSectionModal(false)}
@@ -195,6 +183,4 @@ const SectionsManagement: React.FC<SectionsManagementProps> = ({
       />
     </div>
   );
-};
-
-export default SectionsManagement;
+}
