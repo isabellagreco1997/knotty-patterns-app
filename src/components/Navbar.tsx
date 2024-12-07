@@ -43,7 +43,7 @@ export default function Navbar() {
     }
   };
 
-  const navbarClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+  const navbarClasses = `${isHome ? 'fixed' : 'sticky'} top-0 left-0 right-0 z-50 transition-all duration-300 ${
     isHome
       ? isScrolled
         ? 'bg-white/90 backdrop-blur-sm shadow-sm'
