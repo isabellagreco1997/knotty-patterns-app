@@ -12,6 +12,13 @@ import { usePatternBuilder } from '../hooks/usePatternBuilder';
 import { PiSpinner, PiPlus, PiWarning } from 'react-icons/pi';
 import FeedbackBanner from '../components/FeedbackBanner';
 import SEOHead from '../components/SEOHead';
+import { supabase } from '../lib/supabase';
+
+interface TestPattern {
+  prompt: string;
+  imageUrl: string;
+  pattern: string;
+}
 
 export default function PatternBuilder() {
   const [testPattern, setTestPattern] = useState<TestPattern | null>(null);
@@ -53,6 +60,37 @@ export default function PatternBuilder() {
   const handleCloseTestPattern = () => {
     localStorage.removeItem('test_pattern');
     setTestPattern(null);
+  };
+
+  const handleEditText = async (roundId: string, text: string) => {
+    if (!currentSectionId || !pattern.id) return;
+
+    try {
+      // Update the round in the database
+      const { error } = await supabase
+        .from('patterns')
+        .update({
+          sections: pattern.sections.map(section => ({
+            ...section,
+            rounds: section.rounds.map(round => 
+              round.id === roundId ? { ...round, notes: text } : round
+            )
+          }))
+        })
+        .eq('id', pattern.id);
+
+      if (error) throw error;
+
+      // Update local state
+      boundUpdateSections(pattern.sections.map(section => ({
+        ...section,
+        rounds: section.rounds.map(round => 
+          round.id === roundId ? { ...round, notes: text } : round
+        )
+      })));
+    } catch (error) {
+      console.error('Error updating text:', error);
+    }
   };
 
   useEffect(() => {
@@ -97,25 +135,25 @@ export default function PatternBuilder() {
           }
         }}
       />
-    <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
         {/* Fixed Header */}
         <div className="bg-white border-b border-gray-200 shadow-sm">
           <div className="max-w-[1320px] mx-auto px-6 py-4">
             <div className="flex justify-between items-center mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Pattern Builder</h1>
-              <p className="mt-1 text-gray-600">Create and edit your crochet pattern</p>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Pattern Builder</h1>
+                <p className="mt-1 text-gray-600">Create and edit your crochet pattern</p>
+              </div>
+              <button
+                onClick={startNewPattern}
+                className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                <PiPlus className="w-4 h-4 mr-2" />
+                New Pattern
+              </button>
             </div>
-            <button
-              onClick={startNewPattern}
-              className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              <PiPlus className="w-4 h-4 mr-2" />
-              New Pattern
-            </button>
-          </div>
 
-          {testPattern && (
+            {testPattern && (
               <AIPatternPreview
                 prompt={testPattern.prompt}
                 imageUrl={testPattern.imageUrl}
@@ -124,82 +162,100 @@ export default function PatternBuilder() {
               />
             )}
 
-          {/* Pattern Details and Sections Area */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-4">
-            <PatternSettingsCard pattern={pattern} onUpdate={updatePatternSettings} />
-            <SectionsManagement
-              pattern={pattern}
-              currentSectionId={currentSectionId}
-              setCurrentSectionId={setCurrentSectionId}
-              handleAddSection={handleAddSection}
-              handleDeleteSection={handleDeleteSection}
-              handleSectionDragEnd={handleSectionDragEnd}
-              onUpdateSections={boundUpdateSections}
-            />
+            {/* Pattern Details and Sections Area */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-4">
+              <PatternSettingsCard pattern={pattern} onUpdate={updatePatternSettings} />
+              <SectionsManagement
+                pattern={pattern}
+                currentSectionId={currentSectionId}
+                setCurrentSectionId={setCurrentSectionId}
+                handleAddSection={handleAddSection}
+                handleDeleteSection={handleDeleteSection}
+                handleSectionDragEnd={handleSectionDragEnd}
+                onUpdateSections={boundUpdateSections}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content Area */}
-      <div className="max-w-[1320px] mx-auto px-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-6">
-          {/* Left Column - Pattern Building Tools */}
-          <div className="space-y-6">
-            {pattern.sections.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-6">
-                  <div className="text-center py-12">
-                    <PiWarning className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">Add a section to start building your pattern</p>
-                    <button
-                      onClick={() => setShowAddSectionModal(true)}
-                      className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                    >
-                      <PiPlus className="w-4 h-4 mr-2" />
-                      Add Your First Section
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <>
-                {currentSectionId && <CustomTextInput onAddText={addCustomText} />}
-
-                {currentSectionId && (
-                  <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="p-6">
-                      <h2 className="text-xl font-semibold pb-6">Start your pattern</h2>
-
-                      {!hasActualRounds && <PatternStarter onStart={handlePatternStart} />}
-
-                      <StitchPanel onStitchSelect={addStitch} />
-
-                      <CurrentRound
-                        round={currentRound}
-                        onComplete={completeRound}
-                        onUpdateCount={updateStitchCount}
-                        onUpdateNotes={updateNotes}
-                        onDeleteStitch={deleteStitch}
-                        onUpdateStitchNote={updateStitchNote}
-                        onUpdateHeaderNote={updateHeaderNote}
-                        onUpdateFooterNote={updateFooterNote}
-                      />
+        {/* Main Content Area */}
+        <div className="max-w-[1320px] mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-6">
+            {/* Left Column - Pattern Building Tools */}
+            <div className="space-y-6">
+              {pattern.sections.length === 0 ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6">
+                    <div className="text-center py-12">
+                      <PiWarning className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600 mb-4">Add a section to start building your pattern</p>
+                      <button
+                        onClick={() => setShowAddSectionModal(true)}
+                        className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                      >
+                        <PiPlus className="w-4 h-4 mr-2" />
+                        Add Your First Section
+                      </button>
                     </div>
                   </div>
-                )}
-              </>
-            )}
-          </div>
+                </div>
+              ) : (
+                <>
+                  {currentSectionId && <CustomTextInput onAddText={addCustomText} />}
 
-          {/* Right Column - Pattern Preview */}
-          <div className="hidden lg:block">
-            <div className="sticky top-[300px] bottom-6">
+                  {currentSectionId && (
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                      <div className="p-6">
+                        <h2 className="text-xl font-semibold pb-6">Start your pattern</h2>
+
+                        {!hasActualRounds && <PatternStarter onStart={handlePatternStart} />}
+
+                        <StitchPanel onStitchSelect={addStitch} />
+
+                        <CurrentRound
+                          round={currentRound}
+                          onComplete={completeRound}
+                          onUpdateCount={updateStitchCount}
+                          onUpdateNotes={updateNotes}
+                          onDeleteStitch={deleteStitch}
+                          onUpdateStitchNote={updateStitchNote}
+                          onUpdateHeaderNote={updateHeaderNote}
+                          onUpdateFooterNote={updateFooterNote}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Right Column - Pattern Preview */}
+            <div className="hidden lg:block">
+              <div className="sticky top-[300px] bottom-6">
+                <PatternPreviewArea
+                  pattern={pattern}
+                  rounds={currentSection?.rounds || []}
+                  onEdit={editRound}
+                  onDelete={deleteRound}
+                  onReorder={handleReorderRounds}
+                  onEditText={handleEditText}
+                  saveError={saveError}
+                  handleSave={handleSave}
+                  isSaving={isSaving}
+                  language="en"
+                />
+              </div>
+            </div>
+
+            {/* Mobile Pattern Preview */}
+            <div className="lg:hidden">
               <PatternPreviewArea
                 pattern={pattern}
                 rounds={currentSection?.rounds || []}
                 onEdit={editRound}
                 onDelete={deleteRound}
                 onReorder={handleReorderRounds}
+                onEditText={handleEditText}
                 saveError={saveError}
                 handleSave={handleSave}
                 isSaving={isSaving}
@@ -207,33 +263,15 @@ export default function PatternBuilder() {
               />
             </div>
           </div>
-
-          {/* Mobile Pattern Preview */}
-          <div className="lg:hidden">
-            <PatternPreviewArea
-              pattern={pattern}
-              rounds={currentSection?.rounds || []}
-              onEdit={editRound}
-              onDelete={deleteRound}
-              onReorder={handleReorderRounds}
-              saveError={saveError}
-              handleSave={handleSave}
-              isSaving={isSaving}
-              language="en"
-            />
-          </div>
         </div>
+
+        <AddSectionModal
+          isOpen={showAddSectionModal}
+          onClose={() => setShowAddSectionModal(false)}
+          onAdd={handleAddSection}
+        />
+        <FeedbackBanner />
       </div>
-
-      <AddSectionModal
-        isOpen={showAddSectionModal}
-        onClose={() => setShowAddSectionModal(false)}
-        onAdd={handleAddSection}
-      />
-          <FeedbackBanner />
-
-    </div>
     </>
   );
 }
-

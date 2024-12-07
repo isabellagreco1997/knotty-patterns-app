@@ -12,6 +12,7 @@ interface PatternDisplayProps {
   onEdit: (roundId: string) => void;
   onDelete: (roundId: string) => void;
   onReorder: (startIndex: number, endIndex: number) => void;
+  onEditText?: (roundId: string, text: string) => void;
   language: 'en' | 'es';
 }
 
@@ -21,6 +22,7 @@ export default function PatternDisplay({
   onEdit, 
   onDelete, 
   onReorder,
+  onEditText,
   language 
 }: PatternDisplayProps) {
   const [expandedNotes, setExpandedNotes] = useState<string[]>([]);
@@ -117,6 +119,7 @@ export default function PatternDisplay({
                 language={language}
                 formatInstructions={formatRoundInstructions}
                 getRoundNumber={getRoundNumber}
+                onEditText={onEditText}
               />
             </div>
           ))}

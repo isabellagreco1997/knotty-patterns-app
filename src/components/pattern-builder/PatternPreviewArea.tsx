@@ -11,6 +11,7 @@ interface PatternPreviewAreaProps {
   onEdit: (roundId: string) => void;
   onDelete: (roundId: string) => void;
   onReorder: (startIndex: number, endIndex: number) => void;
+  onEditText?: (roundId: string, text: string) => void;
   saveError: string | null;
   handleSave: () => void;
   isSaving: boolean;
@@ -23,6 +24,7 @@ const PatternPreviewArea: React.FC<PatternPreviewAreaProps> = ({
   onEdit,
   onDelete,
   onReorder,
+  onEditText,
   saveError,
   handleSave,
   isSaving,
@@ -52,6 +54,7 @@ const PatternPreviewArea: React.FC<PatternPreviewAreaProps> = ({
               onEdit={onEdit}
               onDelete={onDelete}
               onReorder={onReorder}
+              onEditText={onEditText}
               language={language}
             />
           </div>

@@ -28,6 +28,7 @@ import AILanding from './pages/AILanding';
 import StitchGlossary from './pages/StitchGlossary';
 import StitchDetail from './pages/StitchDetail';
 import Dashboard from './pages/Dashboard';
+import HowItWorks from './pages/HowItWorks';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -183,9 +184,11 @@ export default function App() {
             } />
             <Route path="/stitch-glossary" element={<BaseLayout><StitchGlossary /></BaseLayout>} />
             <Route path="/stitch/:slug" element={<BaseLayout><StitchDetail /></BaseLayout>} />
+            <Route path="/how-it-works" element={<BaseLayout><HowItWorks /></BaseLayout>} />
           </Routes>
         </CustomerProvider>
       </BrowserRouter>
+      <CookieConsent />
     </HelmetProvider>
   );
 }

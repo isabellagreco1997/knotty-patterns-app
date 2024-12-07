@@ -17,6 +17,7 @@ interface DroppableSectionProps {
   language: 'en' | 'es';
   formatInstructions: (round: Round) => string;
   getRoundNumber: (rounds: Round[], index: number) => number;
+  onEditText?: (id: string, text: string) => void;
 }
 
 export default function DroppableSection({
@@ -32,7 +33,8 @@ export default function DroppableSection({
   onMouseMove,
   language,
   formatInstructions,
-  getRoundNumber
+  getRoundNumber,
+  onEditText
 }: DroppableSectionProps) {
   return (
     <Droppable droppableId={`section-${sectionId}`}>
@@ -44,7 +46,7 @@ export default function DroppableSection({
         >
           {rounds.map((round, index) => (
             <DraggableRound
-              key={round.id}
+              key={round.id || `round-${index}`}
               round={round}
               index={index}
               isDragDisabled={rounds !== currentRounds}
@@ -58,6 +60,7 @@ export default function DroppableSection({
               language={language}
               roundNumber={getRoundNumber(rounds, index)}
               formatInstructions={formatInstructions}
+              onEditText={onEditText}
             />
           ))}
           {provided.placeholder}
