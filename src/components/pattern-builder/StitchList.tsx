@@ -2,6 +2,7 @@ import React from 'react';
 import { PiTrash, PiNote } from 'react-icons/pi';
 import StitchCount from './StitchCount';
 import type { Stitch, RepetitionGroup } from '../../types/pattern';
+import StitchNoteEditor from './StitchNoteEditor';
 
 interface StitchListProps {
   stitches: Stitch[];
