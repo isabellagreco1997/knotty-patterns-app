@@ -1,5 +1,5 @@
 import React from 'react';
-import { PiQuotes, PiStar, PiSparkle } from 'react-icons/pi';
+import { PiQuotes, PiStarFill, PiSparkle } from 'react-icons/pi';
 
 const testimonials = [
   {
@@ -84,7 +84,7 @@ export default function Testimonials() {
               {/* Rating */}
               <div className="flex mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <PiStar key={i} className="w-5 h-5 text-yellow-400" />
+                  <PiStarFill key={i} className="w-5 h-5 text-yellow-400 "/>
                 ))}
               </div>
 
