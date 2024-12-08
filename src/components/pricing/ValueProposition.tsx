@@ -30,7 +30,7 @@ const benefits = [
 
 const funFacts = [
   { number: "500+", text: "Happy Creators", emoji: "🎨" },
-  { number: "1000+", text: "Patterns", emoji: "📝" },
+  { number: "1,000+", text: "Patterns", emoji: "📝" },
   { number: "24/7", text: "AI Magic", emoji: "🤖" }
 ];
 
