@@ -153,8 +153,7 @@ export default function Terms() {
                 <div className="bg-primary-50 rounded-xl p-6">
                   <p className="mb-4">For any questions about these Terms, please contact us at:</p>
                   <ul className="space-y-2">
-                    <li>Email: legal@knottypatterns.com</li>
-                    <li>Address: 123 Crochet Lane, Stitchville, ST 12345</li>
+                    <li>Email: isabellasilvagreco@gmail.com</li>
                   </ul>
                 </div>
               </div>
