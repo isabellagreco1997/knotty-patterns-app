@@ -27,10 +27,6 @@ const Footer: React.FC = () => {
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-violet-900 to-primary-900"></div>
       
-      {/* Decorative Elements */}
-      <div className="absolute top-10 left-10 text-4xl animate-bounce">✨</div>
-      <div className="absolute top-20 right-10 text-4xl animate-bounce delay-100">🧶</div>
-      <div className="absolute bottom-10 left-1/4 text-4xl animate-bounce delay-200">🎨</div>
 
       <div className="relative max-w-6xl mx-auto px-4 py-16">
         {/* Main Footer Content */}
