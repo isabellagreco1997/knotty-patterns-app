@@ -11,13 +11,13 @@ const Footer: React.FC = () => {
   ];
 
   const supportLinks = [
-    { name: "Help Center", path: "/help" },
+    // { name: "Help Center", path: "/help" },
     { name: "Privacy Policy", path: "/privacy-policy" },
     { name: "Terms of Service", path: "/terms" }
   ];
 
   const companyLinks = [
-    { name: "About Us", path: "/about" },
+    // { name: "About Us", path: "/about" },
     { name: "Stitch Glossary", path: "/stitch-glossary" },
     { name: "How It Works", path: "/how-it-works" }
   ];

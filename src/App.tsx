@@ -6,6 +6,7 @@ import { useAuthStore } from './stores/useAuthStore';
 import { useSubscriptionStatus } from './hooks/useSubscriptionStatus';
 import PaywallGuard from './components/PaywallGuard';
 import AuthGuard from './components/AuthGuard';
+import ScrollToTop from './components/ScrollToTop'
 import BaseLayout from './components/layouts/BaseLayout';
 import Home from './pages/Home';
 import PatternBuilder from './pages/PatternBuilder';
@@ -112,6 +113,7 @@ export default function App() {
   return (
     <HelmetProvider>
       <BrowserRouter>
+      <ScrollToTop /> 
         <CustomerProvider>
           <Routes>
             <Route path="/" element={<BaseLayout><Home /></BaseLayout>} />
