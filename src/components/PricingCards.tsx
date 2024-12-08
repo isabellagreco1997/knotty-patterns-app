@@ -24,13 +24,11 @@ const features = [
   
   // Organization
   { name: "Pattern organization system 📁", included: true },
-  { name: "Cloud backup & sync ☁️", included: true },
   { name: "Pattern notes & comments 📝", included: true },
   { name: "Tags and categories 🏷️", included: true },
   
   // Business Features
   { name: "Sell on Etsy & Ravelry 🛍️", included: true },
-  { name: "Pattern analytics 📊", included: true },
   { name: "Priority support 🎯", included: true },
   { name: "Early access to new features 🚀", included: true },
 ];
