@@ -123,16 +123,16 @@ export default function Testimonials() {
         {/* Success Stats */}
         <div className="mt-16 grid grid-cols-3 gap-8 text-center">
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-            <div className="text-4xl font-bold text-primary-300 mb-2">500+</div>
+          <div className="text-4xl font-bold text-primary-300 mb-2 sm:text-sm text-lg">500+</div>
             <div className="text-white">Happy Creators 🎨</div>
           </div>
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-            <div className="text-4xl font-bold text-primary-300 mb-2">1000+</div>
+            <div className="text-4xl font-bold text-primary-300 mb-2 sm:text-sm text-lg">1000+</div>
             <div className="text-white">Patterns Created 📝</div>
           </div>
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-            <div className="text-4xl font-bold text-primary-300 mb-2">24/7</div>
-            <div className="text-white">AI Assistant 🤖</div>
+            <div className="text-4xl font-bold text-primary-300 mb-2 sm:text-sm text-lg">24/7</div>
+            <div className="text-white ">AI Assistant 🤖</div>
           </div>
         </div>
       </div>

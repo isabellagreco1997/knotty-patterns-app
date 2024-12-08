@@ -113,14 +113,17 @@ export default function FeaturePreview() {
                 </div>
               </div>
 
-              <Link
-                to="/pattern-builder"
-                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-xl hover:from-primary-700 hover:to-secondary-700 transition-all transform hover:scale-105 group"
-              >
-                <PiPencilSimple className="w-5 h-5 mr-2" />
-                Try Pattern Builder
-                <span className="ml-2 group-hover:translate-x-1 transition-transform">✨</span>
-              </Link>
+              <div className="flex justify-center items-center w-full">
+  <Link
+    to="/pattern-builder"
+    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-xl hover:from-primary-700 hover:to-secondary-700 transition-all transform hover:scale-105 group"
+  >
+    <PiPencilSimple className="w-5 h-5 mr-2" />
+    Try Pattern Builder
+    <span className="ml-2 group-hover:translate-x-1 transition-transform">✨</span>
+  </Link>
+</div>
+
             </div>
           </ScrollFadeIn>
         </div>
