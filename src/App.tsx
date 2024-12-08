@@ -20,6 +20,7 @@ import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import AccountSettings from './pages/AccountSettings';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
 import CookieConsent from './components/CookieConsent';
 import { CustomerProvider } from './context/CustomerContext';
 import GetInspiration from './pages/GetInspiration';
@@ -168,6 +169,7 @@ export default function App() {
               </BaseLayout>
             } />
             <Route path="/privacy-policy" element={<BaseLayout><PrivacyPolicy /></BaseLayout>} />
+            <Route path="/terms" element={<BaseLayout><Terms /></BaseLayout>} />
             <Route path="/get-inspiration" element={
               <BaseLayout>
                 {user ? <GetInspiration /> : <AILanding />}
