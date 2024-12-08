@@ -17,7 +17,7 @@ import Elephant from './elephant.jpg'
 import GallerySection from '../components/home/GallerySection';
 import ShowcaseSection from '../components/home/ShowcaseSection';
 import Testimonials from '../components/pricing/Testimonials';
-import HowItWorks from '../components/home/howItWorks/howItWorks'
+import HowItWorks from '../components/home/howItWorks/HowItWorks'
 
 const carouselImages = [
   {
