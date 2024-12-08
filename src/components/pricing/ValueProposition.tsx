@@ -40,8 +40,8 @@ const features = [
 ];
 
 const funFacts = [
-  { number: "1000+", text: "Happy Creators", emoji: "🎨" },
-  { number: "50,000+", text: "Patterns Created", emoji: "📝" },
+  { number: "100+", text: "Happy Creators", emoji: "🎨" },
+  { number: "1000+", text: "Patterns Created", emoji: "📝" },
   { number: "24/7", text: "AI Assistant", emoji: "🤖" },
 ];
 

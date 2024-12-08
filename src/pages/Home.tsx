@@ -16,6 +16,8 @@ import Fox from './fox.jpg'
 import Elephant from './elephant.jpg'
 import GallerySection from '../components/home/GallerySection';
 import ShowcaseSection from '../components/home/ShowcaseSection';
+import Testimonials from '../components/pricing/Testimonials';
+import HowItWorks from '../components/home/howItWorks/howItWorks'
 
 const carouselImages = [
   {
@@ -251,163 +253,10 @@ export default function Home() {
             <ShowcaseSection />
 
             
-
-         {/* How It Works Section */}
- <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <ScrollFadeIn>
-            <div className="text-center mb-16">
-              <span className="text-primary-600 font-semibold tracking-wide uppercase text-sm">How It Works</span>
-              <h2 className="mt-2 text-4xl font-bold text-gray-900 sm:text-5xl">
-                Create in Three Simple Steps
-              </h2>
-              <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-                From AI-generated ideas to finished patterns, we make it easy to bring your crochet designs to life
-              </p>
-            </div>
-          </ScrollFadeIn>
-
-          <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute top-24 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 via-violet-500 to-blue-500 hidden md:block"></div>
-
-            {/* Steps */}
-            <div className="grid md:grid-cols-3 gap-12 md:gap-8 relative">
-              {howItWorksSections.map((section, index) => (
-                <ScrollFadeIn key={section.step} delay={index * 200}>
-                  <div className="relative group">
-                    {/* Combined Number and Icon */}
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex flex-col items-center z-10">
-                      <div className="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-sm font-bold text-gray-900 mb-4">
-                        {section.step}
-                      </div>
-                      <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${section.color} text-white flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300`}>
-                        {section.icon}
-                      </div>
-                    </div>
-
-                    {/* Card */}
-                    <div className="pt-32 h-full">
-                      {/* Content */}
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3 text-center">
-                        {section.title}
-                      </h3>
-                      <p className="text-gray-600 mb-6 text-center">
-                        {section.description}
-                      </p>
-
-                      {/* Features List */}
-                      <ul className="space-y-3">
-                        {section.features.map((feature, i) => (
-                          <li key={i} className="flex items-center text-sm text-gray-600 justify-center">
-                            <PiArrowRight className="w-4 h-4 mr-2 text-gray-400" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Connector Line (visible on mobile) */}
-                    {index < howItWorksSections.length - 1 && (
-                      <div className="absolute -bottom-6 left-1/2 w-px h-12 bg-gradient-to-b from-gray-200 to-transparent md:hidden"></div>
-                    )}
-                  </div>
-                </ScrollFadeIn>
-              ))}
-            </div>
-          </div>
-
-          <ScrollFadeIn delay={600}>
-            <div className="text-center mt-16">
-              <Link
-                to="/get-inspiration"
-                className="inline-flex items-center px-8 py-4 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all transform hover:scale-105 hover:shadow-lg"
-              >
-                <PiRobot className="w-5 h-5 mr-2" />
-                Try AI Pattern Generation
-              </Link>
-            </div>
-          </ScrollFadeIn>
-        </div>
-      </section>
- 
+            <HowItWorks />
 
    
-
-{/* Testimonials */}
-<section className="py-24 bg-primary-900 relative overflow-hidden">
-  {/* Background Pattern */}
-  <div 
-    className="absolute inset-0 opacity-5"
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0z' fill='%23ffffff' fill-opacity='0.1'/%3E%3C/svg%3E")`,
-      backgroundSize: '30px 30px'
-    }}
-  />
-  
-  <div className="max-w-6xl mx-auto px-4 relative">
-    <ScrollFadeIn>
-      <div className="text-center mb-16">
-        <span className="text-primary-300 font-semibold tracking-wide uppercase text-sm">Testimonials</span>
-        <h2 className="mt-2 text-4xl font-bold text-white sm:text-5xl">
-          What Our Users Say
-        </h2>
-        <p className="mt-4 text-xl text-primary-200 max-w-3xl mx-auto">
-          Join thousands of crocheters who are creating amazing patterns with KnottyPatterns
-        </p>
-      </div>
-    </ScrollFadeIn>
-
-    <div className="grid md:grid-cols-3 gap-8">
-      {testimonials.map((testimonial, index) => (
-        <ScrollFadeIn key={index} direction="up" delay={index * 200}>
-          <div className="relative">
-            {/* Decorative Elements */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-primary-800/50 to-primary-700/50 rounded-2xl transform rotate-1 -z-10" />
-            <div className="absolute -inset-4 bg-gradient-to-l from-primary-800/50 to-primary-700/50 rounded-2xl transform -rotate-1 -z-10" />
-            
-            {/* Card Content */}
-            <div className="bg-primary-800/50 backdrop-blur-sm p-8 rounded-xl border border-primary-700/50">
-              {/* Quote Icon */}
-              <div className="mb-6">
-                <svg className="w-10 h-10 text-primary-500 opacity-50" fill="currentColor" viewBox="0 0 32 32">
-                  <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
-                </svg>
-              </div>
-              
-              {/* Quote Text */}
-              <p className="text-primary-100 text-lg italic mb-8 min-h-[100px]">
-                "{testimonial.quote}"
-              </p>
-              
-              {/* Author Info */}
-              <div className="flex items-center">
-                <div className="flex-shrink-0 mr-4">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.author}
-                    className="w-12 h-12 rounded-full object-cover border-2 border-primary-500"
-                    onError={(e) => {
-                      e.currentTarget.src = 'https://via.placeholder.com/100?text=User';
-                    }}
-                  />
-                </div>
-                <div>
-                  <div className="font-semibold text-white">
-                    {testimonial.author}
-                  </div>
-                  <div className="text-primary-300 text-sm">
-                    {testimonial.role}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </ScrollFadeIn>
-      ))}
-    </div>
-  </div>
-</section>
+<Testimonials />
 
 
 
@@ -447,7 +296,6 @@ export default function Home() {
         </ScrollFadeIn>
       </section>
 
-      <FeedbackBanner />
 
     </div>
   );
