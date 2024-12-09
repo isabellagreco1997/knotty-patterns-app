@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "postbuild": "cp _redirects dist/ && tsx scripts/generate-sitemap.ts",
+    "postbuild": "tsx scripts/generate-sitemap.ts",
     "lint": "eslint .",
     "preview": "vite preview",
     "netlify:dev": "netlify dev",

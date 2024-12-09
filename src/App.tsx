@@ -31,6 +31,8 @@ import StitchGlossary from './pages/StitchGlossary';
 import StitchDetail from './pages/StitchDetail';
 import Dashboard from './pages/Dashboard';
 import HowItWorks from './pages/HowItWorks';
+import FreePatterns from './pages/FreePatterns'
+import FreePatternDetail from './pages/FreePatternDetail';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -161,6 +163,9 @@ export default function App() {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/blog" element={<BaseLayout><Blog /></BaseLayout>} />
             <Route path="/blog/:slug" element={<BaseLayout><BlogPost /></BaseLayout>} />
+            <Route path="/free-patterns" element={<BaseLayout><FreePatterns /></BaseLayout>} />
+            <Route path="/free-patterns/:id" element={<BaseLayout><FreePatternDetail /></BaseLayout>} />
+
             <Route path="/account" element={
               <BaseLayout>
                 <AuthGuard>
