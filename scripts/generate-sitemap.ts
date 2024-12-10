@@ -1,18 +1,15 @@
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import dotenv from 'dotenv';
-import { STATIC_URLS, getBlogUrls, generateSitemapXml } from '../src/utils/sitemap';
+import { getAllUrls, generateSitemapXml } from '../src/utils/sitemap';
 
 // Load environment variables
 dotenv.config();
 
 async function generateSitemap(): Promise<void> {
   try {
-    // Get blog post URLs
-    const blogUrls = await getBlogUrls();
-
-    // Combine all URLs
-    const allUrls = [...STATIC_URLS, ...blogUrls];
+    // Get all URLs including free patterns
+    const allUrls = await getAllUrls();
 
     // Generate sitemap XML
     const sitemap = generateSitemapXml(allUrls);

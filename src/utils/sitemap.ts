@@ -1,5 +1,6 @@
 import { stitchData } from '../data/stitchData';
 import contentful from 'contentful';
+import { supabase } from '../lib/supabase-node';
 
 export interface SitemapUrl {
   loc: string;
@@ -48,6 +49,12 @@ export const STATIC_URLS: SitemapUrl[] = [
     changefreq: 'monthly',
     priority: '0.7'
   },
+  {
+    loc: `${BASE_URL}/free-patterns`,
+    lastmod: new Date().toISOString().split('T')[0],
+    changefreq: 'daily',
+    priority: '0.9'
+  },
   ...stitchData.map(stitch => ({
     loc: `${BASE_URL}/stitch/${stitch.slug}`,
     lastmod: new Date().toISOString().split('T')[0],
@@ -55,6 +62,27 @@ export const STATIC_URLS: SitemapUrl[] = [
     priority: '0.8'
   }))
 ];
+
+export async function getFreePatternUrls(): Promise<SitemapUrl[]> {
+  try {
+    const { data: patterns, error } = await supabase
+      .from('freepatterns')
+      .select('id, last_updated')
+      .eq('approved', true);
+
+    if (error) throw error;
+
+    return (patterns || []).map(pattern => ({
+      loc: `${BASE_URL}/free-patterns/${pattern.id}`,
+      lastmod: new Date(pattern.last_updated).toISOString().split('T')[0],
+      changefreq: 'weekly',
+      priority: '0.8'
+    }));
+  } catch (error) {
+    console.error('Error fetching free patterns:', error);
+    return [];
+  }
+}
 
 export async function getBlogUrls(): Promise<SitemapUrl[]> {
   const client = contentful.createClient({
@@ -79,6 +107,20 @@ export async function getBlogUrls(): Promise<SitemapUrl[]> {
   } catch (error) {
     console.error('Error fetching blog posts:', error);
     return [];
+  }
+}
+
+export async function getAllUrls(): Promise<SitemapUrl[]> {
+  try {
+    const [blogUrls, freePatternUrls] = await Promise.all([
+      getBlogUrls(),
+      getFreePatternUrls()
+    ]);
+
+    return [...STATIC_URLS, ...blogUrls, ...freePatternUrls];
+  } catch (error) {
+    console.error('Error getting all URLs:', error);
+    return STATIC_URLS;
   }
 }
 
