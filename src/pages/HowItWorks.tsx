@@ -26,8 +26,13 @@ import {
   MockPatternExport,
   MockPatternPreview
 } from '../components/how-it-works/MockComponents';
+import Breadcrumbs from '../components/free-patterns/Breadcrumbs';
+
 
 export default function HowItWorks() {
+  const breadcrumbItems = [
+    { label: 'How to Use the Pattern Builder' }
+  ];
   return (
     <>
       <SEOHead 
@@ -38,6 +43,8 @@ export default function HowItWorks() {
 
       <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12">
         <div className="max-w-7xl mx-auto px-4">
+        <Breadcrumbs items={breadcrumbItems} />
+
           {/* Hero Section */}
           <div className="text-center mb-16">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">

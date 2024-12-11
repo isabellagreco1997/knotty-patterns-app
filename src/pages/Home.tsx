@@ -243,9 +243,9 @@ export default function Home() {
           </div>
         </div>
       </ImageOverlay>
-
+      <HowItWorks />
            {/* Gallery Section */}
-           <GallerySection />
+           {/* <GallerySection /> */}
 <FeaturePreview />
 
 
@@ -253,7 +253,7 @@ export default function Home() {
             <ShowcaseSection />
 
             
-            <HowItWorks />
+            
 
    
 <Testimonials />
