@@ -12,6 +12,7 @@ import {
   getImageUrl
 } from '../utils/formatters';
 import { parseArrayData } from '../utils/json-parser';
+import Breadcrumbs from '../components/free-patterns/Breadcrumbs';
 
 export default function FreePatternDetail() {
   const { id } = useParams<{ id: string }>();
@@ -79,14 +80,39 @@ export default function FreePatternDetail() {
 
   return (
     <>
-      <SEOHead
-        title={`${pattern.name} - Free Crochet Pattern`}
-        description={pattern.description || `Free crochet pattern for ${pattern.name}`}
-        type="article"
-      />
+   <SEOHead
+  title={`${pattern.name} - Free Crochet Pattern | KnottyPatterns`}
+  description={pattern.description || `Free crochet pattern for ${pattern.name}. Difficulty: ${difficultyText}. Created by ${creator.name}. Find detailed instructions, materials list, and step-by-step guidance.`}
+  type="article"
+  schema={{
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": pattern.name,
+    "description": pattern.description || `Free crochet pattern for ${pattern.name}`,
+    "image": images || undefined,
+    "author": {
+      "@type": "Person",
+      "name": creator.name
+    },
+    "datePublished": pattern.submitted_on || undefined,
+    "dateModified": pattern.last_updated || undefined,
+    "skill_level": difficultyText,
+    "tool": materials?.map(material => ({
+      "@type": "HowToTool",
+      "name": material
+    })),
+    "step": techniques?.map(technique => ({
+      "@type": "HowToStep",
+      "name": technique
+    }))
+  }}
+/>
+
 
       <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12">
+        
         <div className="max-w-7xl mx-auto px-4">
+          
           <Link
             to="/free-patterns"
             className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-8"
@@ -96,6 +122,11 @@ export default function FreePatternDetail() {
           </Link>
 
           <PatternDetailAd />
+          <Breadcrumbs pattern={pattern} />
+
+          <div className="max-w-7xl mx-auto px-4">
+  {/* Rest of the content */}
+</div>
 
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             <div className="grid md:grid-cols-2 gap-8 p-8">

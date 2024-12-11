@@ -6,6 +6,7 @@ import PatternFilters from '../components/free-patterns/PatternFilters';
 import PromoCard from '../components/free-patterns/PromoCard';
 import { useFreePatterns } from '../hooks/useFreePatterns';
 import type { FreePatternFilters } from '../types/freePattern';
+import Breadcrumbs from '../components/free-patterns/Breadcrumbs';
 
 export default function FreePatterns() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,13 +37,25 @@ export default function FreePatterns() {
 
   return (
     <>
-      <SEOHead
-        title="Free Crochet Patterns Directory"
-        description="Discover a curated collection of free crochet patterns from around the web. Find your next project from our handpicked selection!"
-        type="website"
-      />
+     <SEOHead 
+  title="Free Crochet Patterns Directory | KnottyPatterns"
+  description="Browse our curated collection of free crochet patterns. Find amigurumi, blankets, clothing, accessories and more. Perfect for beginners and experienced crocheters."
+  type="website"
+  schema={{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Free Crochet Patterns Directory",
+    "description": "Browse our curated collection of free crochet patterns",
+    "numberOfItems": totalCount,
+  }}
+/>
+
 
       <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12">
+      <div className="max-w-7xl mx-auto px-4">
+  <Breadcrumbs />
+  {/* Rest of the content */}
+</div>
         <div className="max-w-7xl mx-auto px-4">
           {/* Fun Header Section */}
           <div className="text-center mb-16 relative">
