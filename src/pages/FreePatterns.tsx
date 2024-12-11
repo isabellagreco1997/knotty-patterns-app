@@ -138,7 +138,7 @@ export default function FreePatterns() {
           <div className="text-center mb-16 relative">
             <div className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full text-primary-800 mb-6">
               <PiSparkle className="w-5 h-5 mr-2" />
-              Discover Free Patterns! ✨
+              Discover Free Crochet Patterns! ✨
             </div>
 
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -149,7 +149,7 @@ export default function FreePatterns() {
             </h1>
 
             <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-              Explore our collection of {totalCount} handpicked free patterns from talented creators around the web!
+              Explore our collection of {totalCount} handpicked free crochet patterns from talented creators around the web!
             </p>
           </div>
 
@@ -164,7 +164,7 @@ export default function FreePatterns() {
                 <p>
                   These patterns are curated from various creators across the web. 
                   While not created by KnottyPatterns, we've organized them here to help you 
-                  discover amazing free patterns more easily! Each pattern links to the 
+                  discover amazing free crochet patterns more easily! Each pattern links to the 
                   original creator's website.
                 </p>
               </div>
