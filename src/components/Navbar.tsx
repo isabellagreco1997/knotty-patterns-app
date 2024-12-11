@@ -1,4 +1,4 @@
-{/* Previous imports remain the same */}
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -13,11 +13,13 @@ import {
   PiPencilSimple,
   PiFolder,
   PiHouse,
-  PiQuestionMark
+  PiQuestionMark,
+  PiHeart // Add this import
 } from 'react-icons/pi';
 import { useAuthStore } from '../stores/useAuthStore';
 
 export default function Navbar() {
+  // Previous state declarations remain the same
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMyPatternsMenuOpen, setIsMyPatternsMenuOpen] = useState(false);
   const [isLearnMenuOpen, setIsLearnMenuOpen] = useState(false);
@@ -158,6 +160,17 @@ export default function Navbar() {
               </>
             )}
 
+            {/* Free Patterns Link - Add this */}
+            <Link
+              to="/free-patterns"
+              className={`px-3 py-2 rounded-lg ${buttonColorClasses}`}
+            >
+              <div className="flex items-center space-x-2">
+                <PiHeart className="w-4 h-4" />
+                <span>Free Patterns</span>
+              </div>
+            </Link>
+
             {/* Learn Dropdown */}
             <div className="relative">
               <button
@@ -242,6 +255,16 @@ export default function Navbar() {
           } border-t border-gray-200 py-2`}
         >
           <div className="flex flex-col space-y-1 px-2 pb-3 pt-2">
+            {/* Add Free Patterns to mobile menu */}
+            <Link
+              to="/free-patterns"
+              onClick={() => setIsMenuOpen(false)}
+              className="text-primary-500 hover:bg-primary-50 px-3 py-2 rounded-md text-base font-medium flex items-center"
+            >
+              <PiHeart className="w-4 h-4 mr-2" />
+              Free Patterns
+            </Link>
+
             {user ? (
               <Link
                 to="/dashboard"
