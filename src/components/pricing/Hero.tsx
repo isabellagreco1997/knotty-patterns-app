@@ -43,11 +43,6 @@ export default function Hero() {
             <div className="text-sm sm:text-base text-gray-600">All patterns in one place!</div>
           </div>
         </div>
-
-        <div className="mt-12 inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-white/80 backdrop-blur-sm rounded-xl text-primary-800">
-          <span className="text-xl sm:text-2xl mr-2">🎁</span>
-          <span className="font-medium text-sm sm:text-base">30-day money-back guarantee!</span>
-        </div>
       </div>
     </div>
   );
