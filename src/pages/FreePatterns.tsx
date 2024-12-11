@@ -8,6 +8,7 @@ import PromoCard from '../components/free-patterns/PromoCard';
 import PatternFilters from '../components/free-patterns/PatternFilters';
 import { useFreePatterns } from '../hooks/useFreePatterns';
 import type { FreePatternFilters } from '../types/freePattern';
+import Breadcrumbs from '../components/free-patterns/Breadcrumbs';
 
 const ITEMS_PER_PAGE = 32;
 
@@ -124,6 +125,10 @@ export default function FreePatterns() {
     );
   };
 
+  const breadcrumbItems = [
+    { label: 'Free Patterns' }
+  ];
+
   return (
     <>
       <SEOHead
@@ -133,7 +138,10 @@ export default function FreePatterns() {
       />
 
       <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12">
+
         <div className="max-w-7xl mx-auto px-4">
+        <Breadcrumbs items={breadcrumbItems} />
+
           {/* Header */}
           <div className="text-center mb-16 relative">
             <div className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full text-primary-800 mb-6">
