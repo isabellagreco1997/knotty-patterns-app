@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { PiSparkle, PiArrowRight } from 'react-icons/pi';
+import Etsy from './etsy.png'
+import LoveCrafts from './lovecrafts.png'
+import Ralvery from './ralvery.png'
 
 const profileImages = [
   "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=100&h=100&auto=format&fit=crop",
@@ -45,15 +48,15 @@ export default function Hero() {
       />
 
       {/* Glowing Orbs */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary-500/30 rounded-full filter blur-[100px] animate-pulse"></div>
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-secondary-500/30 rounded-full filter blur-[100px] animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-500/20 rounded-full filter blur-[120px] animate-pulse delay-500"></div>
+      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary-500/30 rounded-full filter blur-[100px]"></div>
+      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-secondary-500/30 rounded-full filter blur-[100px] delay-1000"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-500/20 rounded-full filter blur-[120px] delay-500"></div>
 
   
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         <div className="text-center">
           {/* Badge */}
-          <div className="inline-flex items-center px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white mb-8 animate-bounce">
+          <div className="inline-flex items-center px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white mb-8 ">
             <PiSparkle className="w-5 h-5 mr-2" />
             Create Like Magic! ✨
           </div>
@@ -121,13 +124,13 @@ export default function Hero() {
               </p>
               <div className="flex flex-wrap justify-center items-center gap-6">
                 <div className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-xl transform hover:scale-105 transition-all duration-300">
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Etsy_logo.svg/1280px-Etsy_logo.svg.png" alt="Etsy" className="h-6 opacity-90 hover:opacity-100 transition-opacity" />
+                  <img src={Etsy} alt="Etsy" className="h-6 opacity-90 hover:opacity-100 transition-opacity" />
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-xl transform hover:scale-105 transition-all duration-300">
-                  <img src="https://style-cdn.ravelrycache.com/images/assets/features/brand-resources/primary-logo-red.svg" alt="Ravelry" className="h-6 opacity-90 hover:opacity-100 transition-opacity" />
+                  <img src={Ralvery} alt="Ravelry" className="h-6 opacity-90 hover:opacity-100 transition-opacity" />
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-xl transform hover:scale-105 transition-all duration-300">
-                  <img src="https://image.pitchbook.com/cky0tqdVanSWLcGI0vf3nhZT57G1628684421357_200x200" alt="LoveCrafts" className="h-6 opacity-90 hover:opacity-100 transition-opacity" />
+                  <img src={LoveCrafts} alt="LoveCrafts" className="h-6 opacity-90 hover:opacity-100 transition-opacity" />
                 </div>
               </div>
             </div>
