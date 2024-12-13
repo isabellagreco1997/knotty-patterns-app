@@ -61,13 +61,16 @@ export default function Navbar() {
     ? 'text-white hover:bg-white/10'
     : 'text-gray-700 hover:bg-gray-50';
 
+  const logo = 'brightness(0) invert(1)'
+
+
   return (
     <nav className={navbarClasses}>
       <div className="max-w-[1320px] mx-auto px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <img src="/logo.svg" alt="KnottyPatterns" className="w-8 h-8" />
+            <img src="/logo.svg" alt="KnottyPatterns" className="w-8 h-8" style ={{filter:!isScrolled ? logo : ''}}/>
             <span className={`text-xl font-bold ${isHome && !isScrolled ? 'text-white' : 'text-primary-500'}`}>
               KnottyPatterns
             </span>
