@@ -71,7 +71,7 @@ export default function Hero() {
 
           {/* Description */}
           <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto mb-8 leading-relaxed">
-            Generate <span className="text-primary-300">pattern designs</span>,{' '}
+            Create <span className="text-primary-300">pattern designs</span>,{' '}
             <span className="text-secondary-300">visual inspiration</span>, and{' '}
             <span className="text-accent-300">instructions</span> that help you create amazing crochet patterns.
           </p>
