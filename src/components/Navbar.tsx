@@ -70,7 +70,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <img src="/logo.svg" alt="KnottyPatterns" className="w-8 h-8" style ={{filter:!isScrolled ? logo : ''}}/>
+            <img src="/logo.svg" alt="KnottyPatterns" className="w-8 h-8" style ={{filter:isHome && !isScrolled ? logo : ''}}/>
             <span className={`text-xl font-bold ${isHome && !isScrolled ? 'text-white' : 'text-primary-500'}`}>
               KnottyPatterns
             </span>

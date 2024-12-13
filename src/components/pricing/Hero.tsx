@@ -10,10 +10,7 @@ export default function Hero() {
       <div className="absolute bottom-10 left-1/4 text-4xl animate-bounce delay-300 hidden md:block">🎨</div>
 
       <div className="max-w-7xl mx-auto px-4 text-center">
-        <div className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-primary-100 text-primary-800 rounded-full mb-8 animate-pulse text-sm sm:text-base">
-          <PiStar className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-          Special Launch Pricing! 🎉
-        </div>
+      
         
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
           Create Amazing Patterns 
