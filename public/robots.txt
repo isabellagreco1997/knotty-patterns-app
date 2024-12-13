@@ -11,12 +11,26 @@ Crawl-delay: 10
 Allow: /pattern-builder
 Allow: /blog/
 Allow: /pricing
+Allow: /free-patterns
+Allow: /free-patterns/*
+Allow: /stitch-glossary
+Allow: /stitch/*
 
 # Prevent crawling of certain paths
 Disallow: /api/
 Disallow: /admin/
 Disallow: /account/
 Disallow: /auth/
+Disallow: /.netlify/
+Disallow: /generated-patterns/
+Disallow: /saved-patterns/
 
-# Allow crawling of blog posts
+# Allow crawling of public content
 Allow: /blog/*
+Allow: /free-patterns/*
+Allow: /stitch/*
+
+# Prevent crawling of user-specific content
+Disallow: /pattern-builder/*
+Disallow: /account/*
+Disallow: /dashboard
