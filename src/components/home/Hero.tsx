@@ -49,14 +49,7 @@ export default function Hero() {
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-secondary-500/30 rounded-full filter blur-[100px] animate-pulse delay-1000"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-500/20 rounded-full filter blur-[120px] animate-pulse delay-500"></div>
 
-      {/* Floating Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 text-6xl animate-float">✨</div>
-        <div className="absolute top-40 right-10 text-6xl animate-float-delayed">🧶</div>
-        <div className="absolute bottom-20 left-1/4 text-6xl animate-float-slow">🎨</div>
-        <div className="absolute bottom-40 right-1/4 text-6xl animate-float">💫</div>
-      </div>
-
+  
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         <div className="text-center">
           {/* Badge */}
@@ -117,7 +110,7 @@ export default function Hero() {
                 ))}
               </div>
               <p className="text-white/90 text-lg">
-                Join over <span className="font-bold text-white">10,000</span> happy crocheters!
+                Join over <span className="font-bold text-white">1,000</span> happy crocheters!
               </p>
             </div>
 
