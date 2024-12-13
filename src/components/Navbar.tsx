@@ -245,8 +245,7 @@ export default function Navbar() {
                     : 'border-primary-300 text-primary-500 hover:bg-primary-50'
                 } text-sm font-medium rounded-md transition-colors`}
               >
-                <PiUser className="w-4 h-4 mr-2" />
-                Sign In
+                Get Started
               </Link>
             )}
           </div>
