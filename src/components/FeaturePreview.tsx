@@ -1,133 +1,109 @@
+
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ScrollFadeIn from './ScrollFadeIn';
-import { PiPencilSimple, PiMagicWand, PiDownload, PiDevices, PiSparkle } from 'react-icons/pi';
+import { PiPencilSimple, PiMagicWand, PiDownload, PiDevices, PiSparkle, PiArrowRight } from 'react-icons/pi';
 import Mock from '../../public/mock.png';
 
 export default function FeaturePreview() {
   return (
-    <section className="py-24 bg-black relative overflow-hidden">
-      {/* Animated Background Pattern */}
-      <div 
-        className="absolute inset-0 opacity-5"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0z' fill='%23ffffff' fill-opacity='0.1'/%3E%3C/svg%3E")`,
-          backgroundSize: '30px 30px',
-          animation: 'patternMove 60s linear infinite'
-        }}
-      />
-
-      {/* Floating Emojis */}
-      <div className="absolute top-10 left-10 text-4xl animate-bounce">✨</div>
-      <div className="absolute top-20 right-10 text-4xl animate-bounce delay-100">🧶</div>
-      <div className="absolute bottom-10 left-1/4 text-4xl animate-bounce delay-200">🎨</div>
-
-      <div className="max-w-7xl mx-auto px-4">
-        <ScrollFadeIn>
-          <div className="text-center mb-16 relative z-10">
-            <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full text-white mb-6">
-              <PiSparkle className="w-5 h-5 mr-2" />
-              Create Like Magic! ✨
-            </div>
-            <h2 className="mt-2 text-5xl font-bold text-white sm:text-6xl mb-6">
-              Create Beautiful Patterns
-              <span className="block mt-2 bg-gradient-to-r from-primary-400 to-secondary-400 text-transparent bg-clip-text">
-                With Pure Magic! ✨
-              </span>
+    <div className="bg-white rounded-3xl shadow-xl overflow-hidden md:m-20 m-6">
+      <div className="grid lg:grid-cols-2 gap-8 p-8 md:p-12">
+        {/* Left Column - Content */}
+        <div className="space-y-8">
+          <div>
+            <div className="text-primary-500 font-medium mb-4">Pattern Builder Features</div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Everything You Need
+              <span className="block mt-2 text-primary-600">In One Place</span>
             </h2>
-            <p className="mt-4 text-xl text-white/80 max-w-2xl mx-auto">
-              Our intuitive pattern builder helps you create professional-quality patterns in minutes, not hours! 🚀
+            <p className="text-lg text-gray-600">
+              Create professional crochet patterns with our comprehensive suite of tools. From AI-powered inspiration to detailed pattern building and sharing.
             </p>
           </div>
-        </ScrollFadeIn>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <ScrollFadeIn direction="right">
-            <div className="relative mx-auto max-w-2xl lg:max-w-none">
-              {/* Pattern Builder Mockup */}
-              <div className="relative z-10 bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-all duration-300">
-                <div className="bg-gradient-to-r from-primary-600 to-secondary-600 text-white p-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  </div>
+          <div className="grid gap-6">
+            {[
+              {
+                icon: <PiMagicWand className="w-6 h-6" />,
+                title: "AI Magic Assistant",
+                description: "Get instant inspiration and pattern suggestions with our AI helper",
+                color: "from-rose-500 to-pink-600"
+              },
+              {
+                icon: <PiDevices className="w-6 h-6" />,
+                title: "Real-time Preview",
+                description: "See your pattern come to life as you create with live preview",
+                color: "from-violet-500 to-purple-600"
+              },
+              {
+                icon: <PiDownload className="w-6 h-6" />,
+                title: "Export Anywhere",
+                description: "Download as PDF, print, or share your patterns easily",
+                color: "from-blue-500 to-indigo-600"
+              }
+            ].map((feature, index) => (
+              <div key={index} className="flex items-start space-x-4">
+                <div className={`flex-shrink-0 w-12 h-12 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center text-white`}>
+                  {feature.icon}
                 </div>
-                <div className="relative w-full aspect-square bg-gray-50">
-                  <img
-                    src={Mock}
-                    alt="Pattern Builder Interface"
-                    className="absolute inset-0 w-full h-full object-contain"
-                  />
-                </div>
-              </div>
-              {/* Decorative Glows */}
-              <div className="absolute -bottom-6 -right-6 w-64 h-64 bg-primary-500/30 rounded-full filter blur-3xl"></div>
-              <div className="absolute -top-6 -left-6 w-48 h-48 bg-secondary-500/30 rounded-full filter blur-3xl"></div>
-            </div>
-          </ScrollFadeIn>
-
-          <ScrollFadeIn direction="left">
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 transform hover:-translate-y-1 transition-all duration-300">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-rose-500 to-pink-600 rounded-xl flex items-center justify-center text-white">
-                      <PiMagicWand className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-white mb-2">AI Magic! ✨</h3>
-                      <p className="text-white/80">
-                        Get instant inspiration and pattern suggestions with our AI assistant! 🤖
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 transform hover:-translate-y-1 transition-all duration-300">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl flex items-center justify-center text-white">
-                      <PiDevices className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-white mb-2">Real-time Preview 🎯</h3>
-                      <p className="text-white/80">
-                        Watch your pattern come to life as you create! Perfect every stitch! ✨
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 transform hover:-translate-y-1 transition-all duration-300">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white">
-                      <PiDownload className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-semibold text-white mb-2">Export Anywhere! 🚀</h3>
-                      <p className="text-white/80">
-                        Share your patterns in multiple formats! Sell on any platform! 💫
-                      </p>
-                    </div>
-                  </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
                 </div>
               </div>
+            ))}
+          </div>
 
-              <div className="flex justify-center items-center w-full">
-  <Link
-    to="/pattern-builder"
-    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-xl hover:from-primary-700 hover:to-secondary-700 transition-all transform hover:scale-105 group"
-  >
-    <PiPencilSimple className="w-5 h-5 mr-2" />
-    Try Pattern Builder
-    <span className="ml-2 group-hover:translate-x-1 transition-transform">✨</span>
-  </Link>
-</div>
+          <Link
+            to="/pattern-builder"
+            className="inline-flex items-center px-8 py-4 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all transform hover:scale-105 shadow-lg group"
+          >
+            <PiPencilSimple className="w-5 h-5 mr-2" />
+            Try Pattern Builder
+            <PiArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
 
+        {/* Right Column - Interface Preview */}
+        <div className="relative">
+          {/* Pattern Builder Preview */}
+          <div className="relative z-10 bg-white rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-all duration-300">
+            <div className="bg-gradient-to-r from-primary-600 to-secondary-600 text-white p-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
             </div>
-          </ScrollFadeIn>
+            <div className="relative w-full aspect-square bg-gray-50">
+              <img
+                src={Mock}
+                alt="Pattern Builder Interface"
+                className="absolute inset-0 w-full h-full object-contain"
+              />
+            </div>
+          </div>
+
+          {/* Decorative Elements */}
+          <div className="absolute -bottom-6 -right-6 w-64 h-64 bg-primary-500/30 rounded-full filter blur-3xl"></div>
+          <div className="absolute -top-6 -left-6 w-48 h-48 bg-secondary-500/30 rounded-full filter blur-3xl"></div>
+
+          {/* Feature Highlights */}
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+            <div className="flex items-center space-x-2 text-sm">
+              <PiSparkle className="w-4 h-4 text-primary-600" />
+              <span>AI-Powered Magic</span>
+            </div>
+          </div>
+          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+            <div className="flex items-center space-x-2 text-sm">
+              <PiDevices className="w-4 h-4 text-primary-600" />
+              <span>Live Preview</span>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

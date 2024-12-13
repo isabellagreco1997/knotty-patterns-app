@@ -18,6 +18,9 @@ import GallerySection from '../components/home/GallerySection';
 import ShowcaseSection from '../components/home/ShowcaseSection';
 import Testimonials from '../components/pricing/Testimonials';
 import HowItWorks from '../components/home/howItWorks/HowItWorks'
+import PatternGeneratorHero from '../components/home/PatternGeneratorHero';
+import PatternBuilderCard from '../components/home/PatternBuilderCard';
+import Hero from '../components/home/Hero';
 
 const carouselImages = [
   {
@@ -190,7 +193,8 @@ export default function Home() {
       />
 
      {/* Hero Section */}
-     <ImageOverlay
+     <Hero />
+     {/* <ImageOverlay
         image="https://images.pexels.com/photos/7585853/pexels-photo-7585853.jpeg"
         alt="Crochet background"
         overlayOpacity="0.85"
@@ -242,7 +246,12 @@ export default function Home() {
             </ScrollFadeIn>
           </div>
         </div>
-      </ImageOverlay>
+
+      </ImageOverlay> */}
+
+
+<PatternBuilderCard />
+      <PatternGeneratorHero />
       <HowItWorks />
            {/* Gallery Section */}
            {/* <GallerySection /> */}
@@ -250,7 +259,7 @@ export default function Home() {
 
 
 
-            <ShowcaseSection />
+            {/* <ShowcaseSection /> */}
 
             
             
