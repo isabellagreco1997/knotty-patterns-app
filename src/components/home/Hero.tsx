@@ -95,7 +95,7 @@ export default function Hero() {
             className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-600 via-secondary-600 to-accent-600 text-white rounded-xl hover:from-primary-700 hover:via-secondary-700 hover:to-accent-700 transition-all transform hover:scale-105 shadow-lg group mb-12"
           >
             <PiSparkle className="w-5 h-5 mr-2" />
-            Try For Free Now
+            Start creating
             <PiArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Link>
 
