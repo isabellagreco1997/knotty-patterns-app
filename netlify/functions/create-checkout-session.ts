@@ -165,7 +165,7 @@ export const handler: Handler = async (event) => {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: 'price_1QIUf8GUn4PvA8d7nBH6O0pG',
+          price: 'price_1QWFKaGUn4PvA8d7X04kMqLh',
           quantity: 1,
         },
       ],
