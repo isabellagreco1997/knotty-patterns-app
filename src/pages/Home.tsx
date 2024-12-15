@@ -174,7 +174,7 @@ export default function Home() {
   return (
     <div className="w-full">
       <SEOHead 
-        title="Create Beautiful Crochet Patterns with AI"
+        title="Create beautiful patterns with our crochet pattern builder and AI software"
         description="Design and share professional crochet patterns with our intuitive pattern builder and AI-powered design assistant. Perfect for beginners and experienced crocheters alike."
         schema={{
           "@context": "https://schema.org",
