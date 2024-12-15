@@ -44,9 +44,7 @@ function VideoDemo() {
           <PiPlayCircle className="w-16 h-16 text-white" />
         )}
       </button>
-      <div className="absolute bottom-4 left-4 right-4 bg-black/50 text-white text-sm py-2 px-4 rounded-lg backdrop-blur-sm">
-        Watch how easy it is to create patterns with our builder
-      </div>
+     
     </div>
   );
 }
@@ -169,7 +167,7 @@ export default function PatternBuilderCard() {
   return (
     <div className="bg-white rounded-3xl shadow-xl overflow-hidden md:m-20 m-6">
       {/* Video Demo at the top */}
-      <div className='p-6 md:p-10'> <VideoDemo /></div>
+      <div className='px-6 md:px-10 pt-6 md:pt-10'> <VideoDemo /></div>
      
 
       <div className="grid lg:grid-cols-2 gap-8 p-8 md:p-12">
