@@ -12,7 +12,8 @@ import {
   getImageUrl
 } from '../utils/formatters';
 import { parseArrayData } from '../utils/json-parser';
-import Breadcrumbs from '../components/free-patterns/Breadcrumbs';
+import Breadcrumbs from '../components/common/Breadcrumbs';
+import { getBreadcrumbPath, getPatternPath } from '../utils/navigation';
 
 export default function FreePatternDetail() {
   const { id } = useParams<{ id: string }>();
@@ -77,7 +78,8 @@ export default function FreePatternDetail() {
   const images = parseArrayData(pattern.images);
   const materials = parseArrayData(pattern.materials);
   const techniques = parseArrayData(pattern.techniques);
-
+  
+  const breadcrumbItems = pattern ? getPatternPath(pattern.id) : getBreadcrumbPath('/free-patterns');
   return (
     <>
    <SEOHead
@@ -122,7 +124,10 @@ export default function FreePatternDetail() {
           </Link>
 
           <PatternDetailAd />
-          <Breadcrumbs pattern={pattern} />
+          <Breadcrumbs 
+  items={breadcrumbItems}
+  pattern={pattern} 
+/>
 
           <div className="max-w-7xl mx-auto px-4">
   {/* Rest of the content */}

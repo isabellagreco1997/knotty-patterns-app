@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   PiPencilSimple, 
   PiMagicWand, 
@@ -26,13 +26,13 @@ import {
   MockPatternExport,
   MockPatternPreview
 } from '../components/how-it-works/MockComponents';
-import Breadcrumbs from '../components/free-patterns/Breadcrumbs';
-
+import Breadcrumbs from '../components/common/Breadcrumbs';
+import { getBreadcrumbPath } from '../utils/navigation';
 
 export default function HowItWorks() {
-  const breadcrumbItems = [
-    { label: 'How to Use the Pattern Builder' }
-  ];
+  const location = useLocation();
+  const breadcrumbItems = getBreadcrumbPath(location.pathname);
+
   return (
     <>
       <SEOHead 
@@ -43,7 +43,7 @@ export default function HowItWorks() {
 
       <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12">
         <div className="max-w-7xl mx-auto px-4">
-        <Breadcrumbs items={breadcrumbItems} />
+          <Breadcrumbs items={breadcrumbItems} />
 
           {/* Hero Section */}
           <div className="text-center mb-16">

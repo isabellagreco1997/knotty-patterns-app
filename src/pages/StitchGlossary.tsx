@@ -4,6 +4,7 @@ import { PiBook, PiArrowRight, PiRuler, PiStar, PiMagnifyingGlass, PiSliders } f
 import SEOHead from '../components/SEOHead';
 import { stitchData } from '../data/stitchData';
 import Breadcrumbs from '../components/free-patterns/Breadcrumbs';
+import { getBreadcrumbPath } from '../utils/navigation';
 
 type Difficulty = 'all' | 'beginner' | 'intermediate' | 'advanced';
 type Category = 'all' | string;
@@ -34,10 +35,9 @@ export default function StitchGlossary() {
     return acc;
   }, {} as Record<string, typeof stitchData>);
 
-  const breadcrumbItems = [
-    { label: 'Crochet Stitch Glossary' }
-  ];
 
+
+  const breadcrumbItems = getBreadcrumbPath(location.pathname);
   return (
     <>
       <SEOHead 

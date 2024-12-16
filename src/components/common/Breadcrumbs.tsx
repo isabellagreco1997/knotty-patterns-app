@@ -14,18 +14,12 @@ interface BreadcrumbsProps {
 export default function Breadcrumbs({ items, pattern }: BreadcrumbsProps) {
   const allItems = [...items];
   
-  // Add pattern-specific items if provided
-  if (pattern) {
-    if (pattern.category) {
-      allItems.push({
-        label: pattern.category,
-        path: `/categories/${pattern.category.toLowerCase()}`
-      });
-    }
-    allItems.push({
-      label: pattern.name,
-      path: ''
-    });
+  // Add pattern name if provided
+  if (pattern?.name && allItems[allItems.length - 1].label === 'Pattern Details') {
+    allItems[allItems.length - 1] = {
+      ...allItems[allItems.length - 1],
+      label: pattern.name
+    };
   }
 
   return (

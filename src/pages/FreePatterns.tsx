@@ -9,6 +9,7 @@ import PatternFilters from '../components/free-patterns/PatternFilters';
 import { useFreePatterns } from '../hooks/useFreePatterns';
 import type { FreePatternFilters } from '../types/freePattern';
 import Breadcrumbs from '../components/free-patterns/Breadcrumbs';
+import { getBreadcrumbPath } from '../utils/navigation';
 
 const ITEMS_PER_PAGE = 32;
 
@@ -34,7 +35,8 @@ export default function FreePatterns() {
   };
 
   const { patterns, loading, error, totalCount } = useFreePatterns(filters);
-
+  const breadcrumbItems = getBreadcrumbPath(location.pathname);
+  
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
@@ -125,9 +127,7 @@ export default function FreePatterns() {
     );
   };
 
-  const breadcrumbItems = [
-    { label: 'Free Patterns' }
-  ];
+ 
 
   return (
     <>
