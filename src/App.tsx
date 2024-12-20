@@ -33,6 +33,7 @@ import Dashboard from './pages/Dashboard';
 import HowItWorks from './pages/HowItWorks';
 import FreePatterns from './pages/FreePatterns'
 import FreePatternDetail from './pages/FreePatternDetail';
+import CrochetKits from './pages/CrochetKits';
 
 export default function App() {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -175,6 +176,7 @@ export default function App() {
                 </AuthGuard>
               </BaseLayout>
             } />
+            <Route path="/crochet-kits" element={<BaseLayout><CrochetKits /></BaseLayout>} />
             <Route path="/privacy-policy" element={<BaseLayout><PrivacyPolicy /></BaseLayout>} />
             <Route path="/terms" element={<BaseLayout><Terms /></BaseLayout>} />
             <Route path="/get-inspiration" element={
