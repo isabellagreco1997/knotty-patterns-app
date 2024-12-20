@@ -21,6 +21,7 @@ import HowItWorks from '../components/home/howItWorks/HowItWorks'
 import PatternGeneratorHero from '../components/home/PatternGeneratorHero';
 import PatternBuilderCard from '../components/home/PatternBuilderCard';
 import Hero from '../components/home/Hero';
+import CrochetKitsPopup from '../components/CrochetKitsPopup';
 
 const carouselImages = [
   {
@@ -263,7 +264,7 @@ export default function Home() {
 
             
             
-
+            <CrochetKitsPopup />
    
 <Testimonials />
 
