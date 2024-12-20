@@ -77,7 +77,7 @@ export default function Hero() {
           </p>
 
           {/* Floating Images Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
+          {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
             {crochetImages.map((image, index) => (
               <div key={index} className={`relative group ${image.className}`}>
                 <div className="aspect-square rounded-2xl overflow-hidden bg-white/10 backdrop-blur-sm p-0.5 shadow-xl">
@@ -90,7 +90,7 @@ export default function Hero() {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
 
           {/* CTA Button */}
           <Link
