@@ -123,36 +123,29 @@ export default function App() {
             <Route path="/dashboard" element={
               <BaseLayout>
                 <AuthGuard>
-                  <PaywallGuard>
                     <Dashboard />
-                  </PaywallGuard>
                 </AuthGuard>
               </BaseLayout>
             } />
             <Route path="/pattern-builder" element={
               <BaseLayout>
                 <AuthGuard>
-                  <PaywallGuard>
                     <PatternBuilder />
-                  </PaywallGuard>
                 </AuthGuard>
               </BaseLayout>
             } />
             <Route path="/pattern-builder/:id" element={
               <BaseLayout>
                 <AuthGuard>
-                  <PaywallGuard>
+                  
                     <PatternBuilder />
-                  </PaywallGuard>
                 </AuthGuard>
               </BaseLayout>
             } />
             <Route path="/saved-patterns" element={
               <BaseLayout>
                 <AuthGuard>
-                  <PaywallGuard>
                     <SavedPatterns />
-                  </PaywallGuard>
                 </AuthGuard>
               </BaseLayout>
             } />
@@ -170,9 +163,9 @@ export default function App() {
             <Route path="/account" element={
               <BaseLayout>
                 <AuthGuard>
-                  <PaywallGuard>
+                
                     <AccountSettings />
-                  </PaywallGuard>
+           
                 </AuthGuard>
               </BaseLayout>
             } />
@@ -187,9 +180,9 @@ export default function App() {
             <Route path="/generated-patterns" element={
               <BaseLayout>
                 <AuthGuard>
-                  <PaywallGuard>
+              
                     <GeneratedPatterns />
-                  </PaywallGuard>
+                  
                 </AuthGuard>
               </BaseLayout>
             } />
